@@ -15,6 +15,7 @@ import { bindUtilityDirectives } from './utils';
 import { effect } from '../runtime/signals';
 import { registerDirectiveCleanup } from './lifecycle';
 import { patchList } from '../runtime/list-patch';
+import { parseTransitionAttr } from './transition-attr';
 
 const REACTIVITY_ATTR_NAMES = new Set(['l-bind', 'l-model', 'l-class', 'l-style']);
 
@@ -67,6 +68,8 @@ export function bindListDirectives(element: HTMLElement): void {
     }
     const { loopVar, arrayExpr } = parsed;
     const keyExpr = element.getAttribute('l-key');
+    // Static markup, read once - not itself reactive, same convention as `keyExpr` above.
+    const transitionAttr = parseTransitionAttr(element.getAttribute('l-transition'));
 
     const parentScope = getNearestScope(element);
     const template = element;
@@ -143,7 +146,8 @@ export function bindListDirectives(element: HTMLElement): void {
                     return existingWrapper.innerHTML;
                 }
                 return templateMarkup;
-            }
+            },
+            transitionAttr ? { preset: transitionAttr.preset, duration: transitionAttr.duration } : undefined
         );
 
         const wrappers = Array.from(container.children);

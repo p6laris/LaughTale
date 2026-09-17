@@ -5,6 +5,10 @@ import { createReactiveScope } from '../../src/directives/reactivity.ts';
 import { bindConditionalDirectives } from '../../src/directives/conditional.ts';
 import { teardownDirectives } from '../../src/directives/lifecycle.ts';
 
+function wait(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 describe('Conditional Rendering Directive Suite (l-if, ROADMAP.v5.md Part I)', () => {
     it('toggles the same DOM node identity in and out of the document, rather than recreating it', () => {
         const root = document.createElement('div');
@@ -77,5 +81,89 @@ describe('Conditional Rendering Directive Suite (l-if, ROADMAP.v5.md Part I)', (
 
         scope.state.show = true;
         assert.equal(root.contains(el), false, 'a torn-down l-if effect must no longer react to state changes');
+    });
+
+    describe('l-transition (ROADMAP.v5.md Part I, deferred transitions)', () => {
+        it('an animated toggle only actually removes the element once its exit duration elapses', async () => {
+            const root = document.createElement('div');
+            document.body.appendChild(root);
+            const scope = createReactiveScope(root, { show: true });
+
+            const el = document.createElement('div');
+            el.setAttribute('l-if', 'show');
+            el.setAttribute('l-transition', 'fade:30');
+            root.appendChild(el);
+
+            bindConditionalDirectives(el);
+            assert.equal(root.contains(el), true);
+
+            scope.state.show = false;
+            assert.equal(root.contains(el), true, 'must not remove synchronously once a transition is active');
+
+            await wait(10);
+            assert.equal(root.contains(el), true, 'must still be present before the exit duration elapses');
+
+            await wait(50);
+            assert.equal(root.contains(el), false, 'must be removed once the exit duration elapses');
+        });
+
+        it('rapid true -> false -> true toggling during a pending exit leaves the element visible and never calls remove()', async () => {
+            const root = document.createElement('div');
+            document.body.appendChild(root);
+            const scope = createReactiveScope(root, { show: true });
+
+            const el = document.createElement('div');
+            el.setAttribute('l-if', 'show');
+            el.setAttribute('l-transition', 'fade:30');
+            root.appendChild(el);
+
+            bindConditionalDirectives(el);
+
+            let removeCalled = false;
+            const originalRemove = el.remove.bind(el);
+            el.remove = () => {
+                removeCalled = true;
+                originalRemove();
+            };
+
+            scope.state.show = false; // starts an exit animation
+            scope.state.show = true; // flips back before that exit's callback fires
+
+            await wait(80); // well past the original exit's duration
+
+            assert.equal(removeCalled, false, 'a stale exit callback must never remove a since-re-shown element');
+            assert.equal(root.contains(el), true, 'element must remain in the DOM');
+            assert.equal(el.style.opacity, '1', 'must be visually restored to visible, not stuck at the exit-hidden style');
+        });
+
+        it('reduced motion collapses an animated toggle to synchronous, instant insert/remove', () => {
+            const originalMatchMedia = window.matchMedia;
+            try {
+                window.matchMedia = ((query: string) => ({
+                    matches: true,
+                    media: query
+                })) as any;
+
+                const root = document.createElement('div');
+                document.body.appendChild(root);
+                const scope = createReactiveScope(root, { show: true });
+
+                const el = document.createElement('div');
+                el.setAttribute('l-if', 'show');
+                el.setAttribute('l-transition', 'fade:500');
+                root.appendChild(el);
+
+                bindConditionalDirectives(el);
+                assert.equal(root.contains(el), true);
+
+                scope.state.show = false;
+                assert.equal(root.contains(el), false, 'reduced motion must remove synchronously, with no animation delay');
+
+                scope.state.show = true;
+                assert.equal(root.contains(el), true, 'reduced motion must re-insert synchronously too');
+            } finally {
+                window.matchMedia = originalMatchMedia;
+            }
+        });
     });
 });

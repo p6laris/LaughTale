@@ -4,7 +4,21 @@ import * as path from 'path';
 import * as zlib from 'zlib';
 
 const isProd = process.argv.includes('--prod');
-const RUNTIME_GZIP_BUDGET_BYTES = 45 * 1024; // 45 KB for standalone runtime
+// Was 45 KB. This pass (ROADMAP.v5.md Part I, l-transition for l-if/l-for) measured this bundle at
+// 44.76 KB gzip BEFORE any of its own changes - i.e. this budget was already essentially exhausted
+// (99.5% full) purely from ordinary growth across the Part I/J commits since it was last set, with
+// no CI ever having re-checked it in between (confirmed: no .github/workflows ran `npm run build`
+// until the Part J pass). Wiring `l-if`'s new `l-transition` support through `useTransition`
+// (composables/animation/useTransition.ts) - a real, load-bearing part of this feature, not
+// optional weight - pulls that composable's full implementation into this bundle for the first
+// time (previously only `multiselect.ts`, a separately-chunked component, used it), landing at
+// 46.3 KB even after consolidating the preset-visual duplication between `useTransition.ts` and
+// the new `runtime/list-transitions.ts` into one shared table (composables/animation/
+// transition-presets.ts) - gzip already compresses that kind of repeated switch/case structure
+// well, so de-duplicating it barely moved the number. Raised with real headroom (not silently
+// widened to just clear today's number, same principle as FULL_BUNDLE_GZIP_BUDGET_BYTES below) so
+// it still catches genuine future bloat instead of becoming a no-op check.
+const RUNTIME_GZIP_BUDGET_BYTES = 50 * 1024; // 50 KB for standalone runtime
 // 250 KB was set once (commit 947c075) before all 76 components and all four framework adapters
 // (React/Vue/Svelte/Preact) were fully built out, and never revisited since - this is the FIRST time
 // `npm run build` has actually run past its own typecheck step in a very long while (no CI ever

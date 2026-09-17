@@ -683,8 +683,73 @@ needed" line for both was wrong. The genuinely open items are now closed:
   `intersect.ts`, and the new signal-backed `l-bind`/`l-show`/`l-hide`/`l-if`/`l-for` effects, and called
   from `router.ts` before every SPA navigation's DOM swap (excluding `[data-persist]` subtrees, matching
   the existing island-unmount exclusion rule).
-- **Transitions remain explicitly deferred** — needs `l-if`/`l-for` to exist and be validated first,
-  not designed speculatively alongside them.
+- **Transitions — [CLOSED, this pass]**: an optional `l-transition="<preset>[:<durationMs>]"`
+  attribute now ships on both `l-if` (`directives/conditional.ts`) and `l-for` (`directives/list.ts`),
+  reusing `useTransition.ts`'s `TransitionPreset` union (`fade`/`scale`/`slide-up/down/left/right`/
+  `collapse`) as the one shared vocabulary, parsed by one new file (`directives/transition-attr.ts`)
+  both directives read from once, outside their reactive `effect()` (same convention as `l-key`).
+  Absent attribute → byte-for-byte unchanged existing behavior on both directives, proven by every
+  pre-existing test in `tests/directives/conditional.test.ts`, `tests/directives/list.test.ts`, and
+  `tests/runtime/list-patch.test.ts` (whose 6 tests needed zero modification — `patchList`'s new 5th
+  parameter is purely additive) passing unmodified. `useTransition.ts` gets its second real consumer
+  (`l-if`, alongside `multiselect.ts`'s dropdown overlay); `l-for` gets a new WAAPI-based counterpart,
+  `runtime/list-patch.ts`'s `patchListAnimated` plus `runtime/list-transitions.ts` (enter/exit/move),
+  since `patchList`'s synchronous reconciliation needs a promise to sequence DOM removal after and
+  cancellable in-flight animations, which `useTransition`'s inline-style/rAF/setTimeout model doesn't
+  give it.
+  **Three races of the identical shape found and fixed, not two as scoped going in**: (1) `l-if`'s
+  rapid `true→false→true` toggle mid-exit — fixed by tracking intent (`visualState`) instead of DOM
+  presence, plus a `generation` counter a stale `exit()` callback checks before calling
+  `element.remove()`. (2) `patchList`'s exit/re-add-same-key race — a departed key's node now exits
+  via `playListTransition` before removal instead of removing synchronously; a
+  `WeakMap<Element, Map<key, {el, cancel}>>` per container lets a reappearing key cancel and reclaim
+  the still-exiting node instead of creating a duplicate. (3) An unscoped one, found only because
+  writing `l-if`'s fix required actually trusting `useTransition.enter()`/`exit()`'s contract under
+  rapid re-calling, then testing that trust directly (`tests/composables/useTransition.test.ts`, new):
+  `useTransition.ts` itself had the same bug internally — calling `enter()` while a prior `exit()`'s
+  `setTimeout` was still pending let the stale exit fire later and clobber `display` back to `none`
+  after `enter()`'s rAF chain had already reasserted `block`, permanently stuck. Fixed with the same
+  pattern as the other two: a `token` counter bumped on every `enter()`/`exit()` call, checked inside
+  every rAF/setTimeout continuation before it touches styles or fires a callback. All three fixes are
+  the same underlying shape — an intent/generation counter a stale async callback checks against
+  before acting — not three unrelated patches.
+  **Three animation mechanisms, re-confirmed**: `useTransition.ts` and `useAutoAnimate.ts` remain real
+  with exactly one consumer each (now two for `useTransition` — `multiselect.ts` and `l-if`) — but
+  `styles/animations.ts`'s `initAnimationStyles()`/`injectRipple` are dead code with zero call sites
+  anywhere in the repo, re-confirmed by grep before writing this (both are re-exported from
+  `runtime.ts`/`runtime-core.ts` but never actually called; `dialog.ts`/`drawer.ts`/`message.ts`/
+  `toast.ts`/`skeleton.ts` each hand-roll their own separate inline CSS transitions instead). Only
+  `getReducedMotionSafeDuration`/`isReducedMotionPreferred` from that same file get a new import site
+  (`runtime/list-transitions.ts`) — the dead code itself stays untouched, a separate initiative.
+  **The happy-dom/WAAPI test gap is real**, confirmed directly: the installed `happy-dom@20.11.6`
+  genuinely has no `Element.prototype.animate`/`getAnimations` (`typeof el.animate` is `undefined`,
+  checked by hand before writing any test), so every animated-path test either stubs
+  `Element.prototype.animate` or, for one smoke test per suite, deliberately runs with no stub at all
+  to prove the feature-detection fallback actually completes reconciliation with zero thrown errors.
+  `useAutoAnimate.ts` still has no test file at all — itself a finding, not fixed here (it's
+  `dataview.ts`'s mechanism, explicitly out of scope below).
+  **One unplanned side effect, fixed rather than routed around**: wiring `useTransition.ts` into
+  `l-if` pulls that composable's full implementation into `dist/runtime.js` (the lean, script-tag IIFE
+  build) for the first time — previously only `multiselect.ts`, a separately-chunked component, used
+  it. Running the real production build surfaced that this bundle's 45 KB gzip budget
+  (`esbuild.config.mjs`) was already at 44.76 KB *before* this pass's own changes — 99.5% exhausted
+  purely from ordinary growth across the Part I/J commits, with no CI having re-checked it since. After
+  consolidating the preset-visual mapping `useTransition.ts` and `list-transitions.ts` would otherwise
+  each hand-maintain separately into one shared table (`composables/animation/transition-presets.ts`)
+  — real de-duplication, though gzip was already compressing that repeated switch/case shape well
+  enough that it barely moved the number — the bundle still lands at 46.3 KB. Raised the budget to
+  50 KB with real headroom, same principle Part J's own `FULL_BUNDLE_GZIP_BUDGET_BYTES` correction
+  already established: not silently widened to just clear today's number.
+  **Explicitly out of scope**: `position: absolute` exit-layout-preservation (survivors snap to their
+  final position only once an exiting node is actually removed, not before — the
+  `<TransitionGroup>`-style immediate-reflow technique is a separate, larger change); a `collapse`
+  preset for `l-for` (falls back to `fade` with a `console.warn` — a per-item measured-height collapse
+  doesn't fit `patchList`'s synchronous model); per-phase (enter/exit/move) durations (one duration
+  drives all three, matching `useTransition`'s single-duration model); and `useAutoAnimate.ts`/
+  `dataview.ts`, untouched. An `l-if` element truthy on its very first effect run does play its enter
+  transition (page-load content animates in, same code path as any later toggle) — a conscious
+  design choice for uniformity over Vue's opt-in `appear` flag, not an oversight, in case a future pass
+  wants an opt-out.
 - **Two real component retrofits as proof, not a framework-wide rewrite**: `components/multiselect.ts`
   — the cleanest, smallest match for the innerHTML-rebuild complaint below (full item-list rebuild plus
   a full per-row listener rebind on every filter keystroke, no debounce). `selected`/`filterQuery` are

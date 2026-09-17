@@ -4,6 +4,7 @@
  */
 
 import { getReducedMotionSafeDuration } from '../../styles/animations';
+import { PRESET_VISUALS } from './transition-presets';
 
 export type TransitionPreset = 'fade' | 'scale' | 'slide-up' | 'slide-down' | 'slide-left' | 'slide-right' | 'collapse';
 
@@ -23,49 +24,41 @@ export function useTransition(element: HTMLElement | null, options: UseTransitio
     const easing = options.easing ?? 'cubic-bezier(0.16, 1, 0.3, 1)';
     const preset = options.preset ?? 'fade';
 
+    // Bumped on every enter()/exit() call. Each rAF/setTimeout continuation below captures the
+    // token at schedule time and checks it before touching styles or firing a callback - so a
+    // still-pending exit() completion from before a rapid re-entry can't clobber the newer call's
+    // styles (e.g. stomping display back to 'none' after enter() already reasserted 'block'), and
+    // vice versa. Same shape as the l-if/patchList generation-counter fixes this pass (l-transition,
+    // ROADMAP.v5.md Part I): a stale async callback checks whether it's since been superseded.
+    let token = 0;
+
+    // Derives from the shared PRESET_VISUALS table (transition-presets.ts) rather than its own
+    // per-preset switch, so this and `runtime/list-transitions.ts` (l-for's WAAPI equivalent) can
+    // never drift apart on what a given preset actually looks like. `collapse` (useTransition-only -
+    // see list-transitions.ts) stays a local special case, since it needs height/overflow, which
+    // doesn't fit the opacity/transform shape every other preset shares.
     function getPresetStyles(state: 'hidden' | 'visible'): Partial<CSSStyleDeclaration> {
-        switch (preset) {
-            case 'fade':
-                return {
-                    opacity: state === 'visible' ? '1' : '0',
-                    transform: 'none'
-                };
-            case 'scale':
-                return {
-                    opacity: state === 'visible' ? '1' : '0',
-                    transform: state === 'visible' ? 'scale(1)' : 'scale(0.95)'
-                };
-            case 'slide-up':
-                return {
-                    opacity: state === 'visible' ? '1' : '0',
-                    transform: state === 'visible' ? 'translateY(0)' : 'translateY(12px)'
-                };
-            case 'slide-down':
-                return {
-                    opacity: state === 'visible' ? '1' : '0',
-                    transform: state === 'visible' ? 'translateY(0)' : 'translateY(-12px)'
-                };
-            case 'slide-left':
-                return {
-                    transform: state === 'visible' ? 'translateX(0)' : 'translateX(100%)'
-                };
-            case 'slide-right':
-                return {
-                    transform: state === 'visible' ? 'translateX(0)' : 'translateX(-100%)'
-                };
-            case 'collapse':
-                return {
-                    height: state === 'visible' ? 'auto' : '0px',
-                    opacity: state === 'visible' ? '1' : '0',
-                    overflow: 'hidden'
-                };
-            default:
-                return { opacity: state === 'visible' ? '1' : '0' };
+        if (preset === 'collapse') {
+            return {
+                height: state === 'visible' ? 'auto' : '0px',
+                opacity: state === 'visible' ? '1' : '0',
+                overflow: 'hidden'
+            };
         }
+        const visual = PRESET_VISUALS[preset] ?? PRESET_VISUALS.fade;
+        const styles: Partial<CSSStyleDeclaration> = {};
+        if (visual.opacity) styles.opacity = state === 'visible' ? '1' : '0';
+        if (visual.transform === 'none') {
+            styles.transform = 'none';
+        } else if (visual.transform) {
+            styles.transform = state === 'visible' ? visual.transform.visible : visual.transform.hidden;
+        }
+        return styles;
     }
 
     function enter(cb?: () => void) {
         if (!element) return;
+        const myToken = ++token;
         options.onEnterStart?.();
 
         const visible = getPresetStyles('visible');
@@ -86,10 +79,13 @@ export function useTransition(element: HTMLElement | null, options: UseTransitio
         element.style.display = 'block';
 
         requestAnimationFrame(() => {
+            if (myToken !== token) return;
             requestAnimationFrame(() => {
+                if (myToken !== token) return;
                 Object.assign(element.style, visible);
 
                 setTimeout(() => {
+                    if (myToken !== token) return;
                     element.style.willChange = 'auto';
                     options.onEnterEnd?.();
                     cb?.();
@@ -100,6 +96,7 @@ export function useTransition(element: HTMLElement | null, options: UseTransitio
 
     function exit(cb?: () => void) {
         if (!element) return;
+        const myToken = ++token;
         options.onExitStart?.();
 
         const hidden = getPresetStyles('hidden');
@@ -118,6 +115,7 @@ export function useTransition(element: HTMLElement | null, options: UseTransitio
         Object.assign(element.style, hidden);
 
         setTimeout(() => {
+            if (myToken !== token) return;
             element.style.display = 'none';
             element.style.willChange = 'auto';
             options.onExitEnd?.();
