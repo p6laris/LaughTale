@@ -31,20 +31,26 @@ test.describe('Component visual regression (light theme, chromium)', () => {
   }
 });
 
-// The theme-studio drawer's own toggle FAB is `position: fixed`, always rendered, and z-indexed
-// above all page content (LaughTale.Client/src/components/theme-studio.ts) - since these new
-// variants generate fresh baselines anyway, hide it up front rather than rely on it happening not
-// to overlap a given section's captured bounding box.
-const HIDE_THEME_FAB_CSS = '.theme-studio-toggle-btn { display: none !important; }';
+// Two fixed-position, always-rendered, high-z-index FABs sit on every page and can bleed into a
+// section's captured bounding box depending on scroll/viewport overlap: the theme-studio drawer's
+// own toggle (theme-studio.ts) and the dev-only DevTools overlay's FAB (devtools/overlay.ts,
+// class `lt-devtools-fab`, gated on LaughTaleEnvironment.IsDevelopment - confirmed present in the
+// `dotnet run` environment both this workflow and local dev use). Since these new variants
+// generate fresh baselines anyway, hide both up front rather than rely on them happening not to
+// overlap a given section.
+const HIDE_THEME_FAB_CSS = '.theme-studio-toggle-btn, .lt-devtools-fab { display: none !important; }';
 
 test.describe('Component visual regression (dark theme, chromium)', () => {
   for (const { id, name } of SECTIONS) {
     test(`${name} matches baseline`, async ({ page }) => {
-      // Matches the real FOUC-prevention script in LaughTale.Showcase/Pages/_Layout.cshtml,
-      // which reads plain localStorage['theme'] synchronously before first paint. The
-      // theme-studio drawer's own persisted 'lt-theme' key is a different mechanism that only
-      // takes effect after the drawer island hydrates - too late to avoid a flash/diff here.
-      await page.addInitScript(() => localStorage.setItem('theme', 'dark'));
+      // Forcing localStorage['theme']='dark' alone isn't enough: it satisfies the FOUC-prevention
+      // script in _Layout.cshtml, but theme-studio.ts's own hydration runs right after and, finding
+      // no 'lt-theme' key, falls into its 'system' branch and re-applies prefers-color-scheme
+      // unconditionally (theme-studio.ts:930's applyTheme() call, ~line 532-536's system branch) -
+      // silently overwriting the FOUC script's correct dark state back to light. Emulating the
+      // media query instead makes both mechanisms agree, since neither ever reads a conflicting
+      // saved value.
+      await page.emulateMedia({ colorScheme: 'dark' });
       await installHydrationListeners(page);
       await page.goto(`/components#${id}`);
       await page.addStyleTag({ content: HIDE_THEME_FAB_CSS });
