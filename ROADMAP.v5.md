@@ -424,6 +424,30 @@ behaviour, and the fixes are sitting unused in `src/composables/`.
   first pass. `Dialog`/`Popover`/`Tooltip` screenshot only their default closed/idle state in v1 (no
   click-choreography to open them yet) — an explicit, named backlog item, not an oversight.
 
+  **[CLOSED] Dark theme and RTL fast-follows shipped 2026-09-19**, same 8-section slice, same
+  closed-state-only scope. Forcing state without slow drawer-click choreography needed two
+  different real mechanisms, both zero-flash: dark mode via `page.emulateMedia({ colorScheme:
+  'dark' })` and RTL via the `?culture=ku&ui-culture=ku` query string, which hits ASP.NET Core's
+  default `QueryStringRequestCultureProvider` and gets SSR `dir="rtl"`/`lang="ku"` before first
+  paint. **A real bug found and fixed along the way**: the first attempt forced dark mode via
+  `localStorage.setItem('theme', 'dark')` (matching `_Layout.cshtml`'s own FOUC-prevention script)
+  — this looked right in isolation, but `theme-studio.ts`'s own hydration runs immediately after
+  and, finding no separate `lt-theme` persistence key, falls into its `system` mode branch and
+  unconditionally re-applies `prefers-color-scheme`, silently overwriting the FOUC script's correct
+  dark state back to light. Caught by actually inspecting the first batch of generated screenshots
+  rather than trusting the mechanism because the code looked plausible — every one came back light.
+  Fixed by emulating `prefers-color-scheme: dark` directly instead of localStorage, which both the
+  FOUC script and theme-studio's fallback branch agree on since neither reads a conflicting saved
+  value. **A second, unrelated bug found the same way**: the dev-only DevTools overlay FAB
+  (`devtools/overlay.ts`, gated on `LaughTaleEnvironment.IsDevelopment`) sits at a different fixed
+  screen corner than the already-hidden theme-studio toggle and bled into the RTL `input-text`
+  screenshot — added to the same hide-CSS rule. Verified via two full `workflow_dispatch` runs on
+  `ubuntu-latest` (one exposing each bug, one confirming the fix) plus a local sanity pass across
+  all 24 variants before either CI run. RTL mirroring on `Popover` visually confirmed correct and
+  expected (per the already-shipped `useFloatingPosition` RTL-awareness); `Tooltip`'s RTL screenshot
+  is expected to be pixel-identical to its LTR one, a known, already-documented gap
+  (`directives/tooltip.ts` was not part of the RTL adoption pass), not a test bug.
+
 ---
 
 ## 6. Part D — Adapters
