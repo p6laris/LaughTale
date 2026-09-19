@@ -17,6 +17,7 @@ import { announce } from '../accessibility/announcer';
 
 let isRouterActive = false;
 let inFlightController: AbortController | null = null;
+let viewTransitionsDisabled = false;
 
 /**
  * Initializes the View Transitions router across the application.
@@ -374,8 +375,41 @@ export async function navigateTo(
             announce(titleAnnouncement, 'polite');
         };
 
-        if ('startViewTransition' in document && !isReducedMotionPreferred()) {
-            await (document as any).startViewTransition(updateDom);
+        if (!viewTransitionsDisabled && 'startViewTransition' in document && !isReducedMotionPreferred()) {
+            // ViewTransition (the object startViewTransition() returns) is NOT a thenable -
+            // awaiting it directly resolves almost immediately without ever waiting for the
+            // update callback (updateDom) to actually run or finish. updateCallbackDone is the
+            // promise that genuinely settles once the callback's own returned promise settles,
+            // so that's what must be awaited instead.
+            //
+            // A real, confirmed WebKit engine bug sits on top of that: after a real forward
+            // navigation's transition completes, a second startViewTransition() call issued
+            // from a popstate handler for the subsequent back navigation never invokes its own
+            // update callback at all - not delayed, not erroring, genuinely never (confirmed by
+            // waiting 20+ seconds). Calling transition.skipTransition() up front does not help;
+            // the browser-internal state never recovers within the same page instance. Guard
+            // against this with a bounded race: if the callback hasn't started within
+            // TRANSITION_CALLBACK_TIMEOUT_MS, run updateDom() directly (skipping the cosmetic
+            // cross-fade for that one navigation) and permanently stop trying
+            // startViewTransition() for the rest of this page's lifetime, so every subsequent
+            // navigation doesn't also pay the timeout cost for an API confirmed broken this
+            // session.
+            let callbackInvoked = false;
+            const guardedUpdateDom = async () => {
+                callbackInvoked = true;
+                return updateDom();
+            };
+            const transition = (document as any).startViewTransition(guardedUpdateDom);
+            const TRANSITION_CALLBACK_TIMEOUT_MS = 1000;
+            await Promise.race([
+                transition.updateCallbackDone,
+                new Promise<void>((resolve) => setTimeout(resolve, TRANSITION_CALLBACK_TIMEOUT_MS)),
+            ]);
+            if (!callbackInvoked) {
+                viewTransitionsDisabled = true;
+                console.warn('[LaughTale Router] document.startViewTransition() did not invoke its update callback; disabling native view transitions for the rest of this page and falling back to a direct DOM update.');
+                await updateDom();
+            }
         } else {
             await updateDom();
         }

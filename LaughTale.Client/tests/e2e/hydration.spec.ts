@@ -122,20 +122,6 @@ test.describe('LaughTale Real Browser Hydration & View Transitions Suite', () =>
         await page.goBack();
         await expect(page).toHaveURL(/\/$/, { timeout: 30_000 });
 
-        // A real, separate WebKit-specific gap found while writing this test, out of scope to fix
-        // here (the task was migrating specs, not the router) - reported instead of silently
-        // skipped or masked. Confirmed directly: `history.state` correctly holds the saved
-        // `{scrollX, scrollY}` after popstate fires (checked via a throwaway diagnostic script), a
-        // bare `window.scrollTo({..., behavior: 'instant'})` call works fine standalone on WebKit
-        // (ruling out the "'instant' isn't a standard ScrollBehavior value" theory), and
-        // `router.ts` already sets `history.scrollRestoration = 'manual'` (ruling out native
-        // browser auto-restoration fighting the manual one) - yet after a REAL navigateTo() ->
-        // popstate -> navigateTo() round trip specifically, the restored scroll position doesn't
-        // stick on WebKit, staying at 0. Chromium restores correctly and consistently. Root cause
-        // not fully isolated - asserting it here would make this spec flaky/failing on WebKit for a
-        // real product gap, not a test bug, so this one assertion is WebKit-only skipped with the
-        // finding on record rather than silently dropped.
-        test.skip(test.info().project.name === 'webkit', 'Known WebKit-specific scroll-restoration gap in runtime/router.ts - see comment above');
         await expect.poll(() => page.evaluate(() => window.scrollY), { timeout: 30_000 }).toBe(scrolledY);
     });
 });
