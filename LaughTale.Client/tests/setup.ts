@@ -39,7 +39,21 @@ const win = new Window({
 // on 20) and only tried to attach a `.clipboard` property to it, wrapped in a try/catch that swallowed
 // exactly this failure - so the mock silently never applied on Node 20 either. Explicitly assigning
 // happy-dom's own `navigator` here removes that assumption entirely, regardless of Node version.
-(globalThis as any).navigator = win.navigator;
+//
+// A bare assignment isn't enough, though: Node 21+ (including this repo's own dev machines, which
+// run newer Node than CI's pinned 20) defines its own built-in `globalThis.navigator` as an
+// accessor property with a getter but NO setter, so `globalThis.navigator = ...` throws
+// "Cannot set property navigator of #<Object> which has only a getter" instead of silently
+// no-oping - confirmed the hard way when this exact line broke every local test run on Node 24
+// while the Node 20 CI fix it was written for kept working. `Object.defineProperty` replaces the
+// accessor outright (Node's own built-in navigator property is configurable), working identically
+// whether `navigator` was previously unbound (Node 20), a getter-only accessor (Node 21+), or
+// already a plain writable property.
+Object.defineProperty(globalThis, 'navigator', {
+    value: win.navigator,
+    configurable: true,
+    writable: true
+});
 
 // Mock navigator.clipboard
 try {
