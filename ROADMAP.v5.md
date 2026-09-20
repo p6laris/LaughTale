@@ -976,7 +976,25 @@ needed" line for both was wrong. The genuinely open items are now closed:
   icon rendering during this same pass turned up 54 icon ids referenced somewhere in the Showcase
   (`activity`, `folder-tree`, `align-left`, `twitter`, `git-branch`, ...) that resolve to nothing
   because they were never wired through `getLucideIcon()`, so the sprite generator's static scan never
-  picked them up — confirmed via `git show HEAD:...icons.svg` to predate this session entirely.
+  picked them up — confirmed via `git show HEAD:...icons.svg` to predate this session entirely. Fixed
+  the same day: a new `lucide.manifest.ts` (scanner-only, never imported) gives the regex a literal
+  reference per otherwise-invisible icon name; also fixed two "print" vs "printer" typos and swapped
+  `twitter`/`facebook`/`linkedin`/`slack` to `share-2` since Lucide no longer ships dedicated
+  brand/social icons in its core set.
+  **A separate, real, PRE-EXISTING CI flake surfaced (not caused) by this pass, investigated and
+  deliberately left as known flakiness, not fixed**: `datatable`'s baseline (and now `dataview`'s, both
+  among the tallest sections on the page) intermittently fails CI with a small (2-8px) height mismatch.
+  Confirmed via a docs-only commit predating all of this pass's code changes hitting the identical
+  failure that this is not a regression from anything shipped here. Root-caused one level further than
+  the original `c4d9e9a` investigation: a fresh `workflow_dispatch` baseline regeneration produced a
+  *third* distinct height for the RTL variant in one run, proving the render height itself genuinely
+  jitters by a few px between fresh CI runners (font-hinting/subpixel rounding accumulating slightly
+  differently across a very tall, multi-viewport-stitched screenshot capture) — not a stale baseline
+  problem regeneration can permanently fix. Playwright's `toHaveScreenshot` has no tolerance for a
+  dimension mismatch regardless of `maxDiffPixelRatio` (it fails before any pixel diff runs), so this
+  can recur on either of the two tallest sections at any time. Properly stabilizing it needs a real
+  redesign of the tall-section capture strategy — out of scope for this pass; user explicitly chose to
+  accept the known flake rather than scope that work now.
 - **Two real component retrofits as proof, not a framework-wide rewrite**: `components/multiselect.ts`
   — the cleanest, smallest match for the innerHTML-rebuild complaint below (full item-list rebuild plus
   a full per-row listener rebind on every filter keystroke, no debounce). `selected`/`filterQuery` are
