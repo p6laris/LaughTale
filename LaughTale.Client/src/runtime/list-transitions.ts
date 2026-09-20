@@ -80,8 +80,8 @@ export function playListTransition(el: Element, kind: 'enter' | 'exit', options:
 
 /**
  * Fire-and-forget FLIP reposition for a survivor whose rect changed across a `patchList` call -
- * the same translate-then-none technique `useAutoAnimate.ts` uses, just computed synchronously
- * here (patchList already knows exactly what moved, no MutationObserver needed).
+ * a translate-then-none technique computed synchronously here, since patchList already knows
+ * exactly what moved (no MutationObserver needed, unlike the deleted useAutoAnimate.ts).
  */
 export function playListMove(el: Element, deltaX: number, deltaY: number, options: { duration?: number; easing?: string }): void {
     if (deltaX === 0 && deltaY === 0) return;

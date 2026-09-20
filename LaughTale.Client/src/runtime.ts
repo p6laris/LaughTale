@@ -54,7 +54,7 @@ export { PrefetchManager, prefetchManager, type CachedResponse, type PrefetchOpt
 export { extractIconSymbols, generateSubsetSprite, computeSpriteHash } from './icons/subset-generator';
 export { announce, clearAnnouncements, getAnnouncerElement, type AnnouncePriority } from './accessibility/announcer';
 export { applyAriaAttributes, setRovingTabindex, handleRovingKeydown } from './accessibility/aria';
-export { initAnimationStyles, injectRipple, isReducedMotionPreferred, getReducedMotionSafeDuration } from './styles/animations';
+export { isReducedMotionPreferred, getReducedMotionSafeDuration } from './styles/animations';
 export { renderErrorBoundary, isDevMode } from './runtime/error-boundary';
 export { MemoryLeakHarness, leakHarness, type LeakReport } from './testing/leak-harness';
 

@@ -23,6 +23,5 @@ export * from './useFormField';
 // Animation Composables
 export * from './animation/useSpring';
 export * from './animation/useTransition';
-export * from './animation/useAutoAnimate';
 export * from './animation/useStagger';
 export * from './animation/useMorphLayout';
