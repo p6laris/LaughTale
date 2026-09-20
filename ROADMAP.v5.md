@@ -656,14 +656,14 @@ doesn't forward it as a slot (an author-error case, not a framework gap).
 
 ---
 
-## 7. Part E — Rendering & routing
+## 7. Part E — Rendering & routing — **[5 of 6 items closed]**
 
 | Item | From | Effort |
 |---|---|---|
 | **Out-of-order streaming — [SCOPE CORRECTED, deferred]** — flush shell with skeletons, resolve slow data in background tasks, append late fragments as `<template>`. *.NET's real threads and `IAsyncEnumerable` make this cleaner than Node's* | Astro server islands, Next PPR | M · 3 wks |
 | **Partials — [CLOSED, this pass]** — named page regions updated by link/form, everything else untouched. *The most natural fit on this list for what LaughTale already is* | Fresh, Turbo Frames | S–M · 2 wks |
 | **Route rules / hybrid rendering — [CLOSED, this pass — scope corrected]** — per-path SSR/SSG/ISR/CSR in one config table | Nuxt `routeRules` | M · 2–3 wks |
-| **Nested layouts & outlets — [SCOPE CORRECTED, deferred]** — morph only the lowest common layout ancestor; sidebar scroll and media survive navigation by default | Nuxt, Next | M · 3 wks |
+| **Nested layouts & outlets — [CLOSED, this pass — scope corrected]** — morph only the lowest common layout ancestor; sidebar scroll and media survive navigation by default | Nuxt, Next | M · 3 wks |
 | **Delegated event resumability — [CLOSED, this pass]** — one listener on `document.body`, intent in attributes, chunk on first interaction | Qwik | M · 2–3 wks |
 | **Middleware & typed head — [CLOSED, this pass]** — per-route chain (auth, tenant, A/B) plus typed metadata API | Next, Nuxt, Astro | S–M · 2 wks |
 
@@ -799,15 +799,48 @@ to the user directly and they chose to close the two real items above rather tha
   page's headers were left untouched. Tests: `RouteRulesOptionsTests.cs` (exact/prefix/no-match/
   first-match-wins/validation), `RouteRulesMiddlewareTests.cs` (mirroring `CspMiddlewareTests.cs`'s
   direct-construction harness). Full suite: 429/429.
-- **Nested layouts & outlets**: confirmed to actually be two deliverables, not one. There is no nested
-  layout *authoring* convention anywhere in the codebase — every site (Showcase, Docs, the project
-  template) resolves to exactly one flat `_Layout.cshtml` via a single global `_ViewStart.cshtml`
+- **Nested layouts & outlets — [CLOSED, this pass — scope corrected]**: confirmed to actually be two
+  deliverables, not one. There is no nested layout *authoring* convention anywhere in the codebase —
+  every site resolved to exactly one flat `_Layout.cshtml` via a single global `_ViewStart.cshtml`
   setting; Razor Pages' own nesting primitive (a layout whose `Layout` property points at another
-  layout) is simply unused. So "morph only the lowest common layout ancestor" has nothing to compute an
-  ancestor over yet. Before any client-side morphing optimization is meaningful, someone has to design
-  and ship a real nested-layout authoring convention (most likely the `<island-outlet>` marker already
-  floated in `FRAMEWORK_FEATURES.md`) — unscoped and unestimated by the current roadmap line, which
-  almost certainly only budgeted for the router-side morphing half.
+  layout) was simply unused, so "morph only the lowest common layout ancestor" had nothing to compute
+  an ancestor over. Building genuine recursive lowest-common-ancestor tree-diffing (comparable to
+  morphdom/idiomorph) was confirmed to have no existing primitive to build on — `list-patch.ts`'s
+  keyed-list reconciler and `refresh.ts`'s single-element `morphElement` were both confirmed not to
+  generalize to diffing two arbitrary HTML documents. Shipped the honest smaller real version instead:
+  a single, opt-in **named outlet boundary**. New `<island-outlet name="...">`
+  (`LaughTale.Components/TagHelpers/Aura/Regions/IslandOutletTagHelper.cs`, a deliberately separate
+  primitive from `<island-region>` even though the generated markup shape is similar — an outlet is a
+  navigation boundary, a region is a link/form-driven partial-swap target, and conflating the two
+  attribute names would let one feature's swap silently interfere with the other's) generates
+  `id="lt-outlet-{name}"`; a nested section layout wraps `@RenderBody()` in it via Razor's own,
+  previously-unused `Layout` chaining — no new C# mechanism needed for the nesting itself. The router
+  (`LaughTale.Client/src/runtime/router.ts`) now detects when the current and incoming page share the
+  same outlet id and, when they do, morphs only the outlet's contents — the unmount-dispatch, persisted-
+  element extraction, directive teardown, script re-execution, and `initIslands`/`initDirectives` calls
+  that previously always operated on `document.body` are now all scoped to that same swap root, so
+  anything outside the outlet (a section nav, a sidebar's own scroll position) is never touched at all —
+  a real correctness requirement, not just an optimization, since unmounting a still-alive island
+  outside the outlet would be a genuine regression. Any page without a matching outlet (every page in
+  the repo before this feature) falls through to the exact pre-existing full-body-replace path,
+  unchanged — a strictly additive, zero-regression-risk opt-in. Also fixed a small, real, independent
+  correctness issue found while making this change: the persistent-element (`[data-persist]`)
+  restoration loop now guards with `targetSlot !== liveEl` before calling `replaceChild` — previously,
+  under an outlet-scoped swap, a persisted element outside the outlet (found unchanged by the same
+  query, since it was never removed) would get a needless remove+reinsert cycle, risking exactly the
+  scroll/focus reset this feature exists to prevent. Verified live: a demo section
+  (`LaughTale.Showcase/Pages/OutletDemoA.cshtml`/`OutletDemoB.cshtml`, sharing
+  `Pages/Shared/_OutletSectionLayout.cshtml`) confirmed the sidebar survives navigation by exact node
+  reference identity and its scroll position is preserved pixel-for-pixel across a real navigation
+  (a coordinate-based click's native "scroll clicked element into view" side effect was ruled out as
+  the cause of an initial false-alarm scroll discrepancy, isolated via a synthetic `dispatchEvent`
+  click). One console error was observed during live verification (`InvalidStateError: Transition was
+  aborted`) and confirmed pre-existing and unrelated — it reproduces identically on an ordinary
+  full-body navigation with zero outlet involvement, not something this pass introduced. Tests:
+  `IslandOutletTagHelperTests.cs` (id/data-outlet generation, default/custom name, child content
+  preserved), 4 new `router.test.ts` cases (outlet-scoped morph preserves sidebar identity and content;
+  an island outside the outlet does not receive `laughtale:unmount`; mismatched or absent outlets fall
+  back to the full-body replace unchanged). Full suites: 434/434 C#, 599/599 client.
 
 ---
 

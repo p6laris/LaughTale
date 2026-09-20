@@ -250,7 +250,21 @@ export async function navigateTo(
         const parser = new DOMParser();
         const newDoc = parser.parseFromString(htmlText, 'text/html');
 
-        // 3. Dispatch unmount lifecycle event to active unpersisted islands (depth-first: children before parents)
+        // ROADMAP.v5.md Part E "Nested layouts & outlets": if the current page and the incoming page
+        // both declare an <island-outlet> with the SAME id, they share the same nested section layout -
+        // morph only the outlet's contents instead of the whole body. Everything outside it (a section
+        // nav, a sidebar's own scroll position) is never touched at all, a stronger and more general
+        // version of "survives navigation" than needing an explicit [data-persist] on every such
+        // element. Any page without a matching outlet (every page in the repo before this feature)
+        // falls through to the exact pre-existing full-body-replace path below, unchanged.
+        const currentOutlet = document.querySelector<HTMLElement>('[data-outlet]');
+        const incomingOutlet = newDoc.body.querySelector<HTMLElement>('[data-outlet]');
+        const outletSwap = !!(currentOutlet?.id && incomingOutlet?.id && currentOutlet.id === incomingOutlet.id);
+        const swapRoot: ParentNode = outletSwap ? currentOutlet! : document.body;
+
+        // 3. Dispatch unmount lifecycle event to active unpersisted islands (depth-first: children before parents).
+        // Scoped to swapRoot: under an outlet-scoped swap, an island OUTSIDE the outlet is never removed
+        // at all, so unmounting it here would tear down a still-alive island's state for no reason.
         const getDepth = (el: HTMLElement) => {
             let depth = 0;
             let curr: HTMLElement | null = el;
@@ -261,7 +275,7 @@ export async function navigateTo(
             return depth;
         };
 
-        const outgoingIslands = Array.from(document.querySelectorAll<HTMLElement>('[data-island]'))
+        const outgoingIslands = Array.from(swapRoot.querySelectorAll<HTMLElement>('[data-island]'))
             .filter(el => !el.closest('[data-persist]'));
 
         outgoingIslands.sort((a, b) => getDepth(b) - getDepth(a));
@@ -270,9 +284,11 @@ export async function navigateTo(
             el.dispatchEvent(new CustomEventCtor('laughtale:unmount', { bubbles: false }));
         });
 
-        // 4. Extract persistent elements before updating DOM
+        // 4. Extract persistent elements before updating DOM. Scoped to swapRoot for the same reason -
+        // a [data-persist] element outside the outlet is never removed under outletSwap, so it needs
+        // neither extraction nor restoration.
         const persistentElements = new Map<string, HTMLElement>();
-        document.querySelectorAll<HTMLElement>('[data-persist]').forEach(el => {
+        swapRoot.querySelectorAll<HTMLElement>('[data-persist]').forEach(el => {
             const id = el.dataset.persist;
             if (id) persistentElements.set(id, el);
         });
@@ -282,10 +298,13 @@ export async function navigateTo(
         // discards it, so they don't keep running against detached elements.
         // Persistent islands are excluded via the same [data-persist] rule used
         // above - their subscriptions must survive the navigation.
-        teardownDirectives(document.body, { skip: el => el.closest('[data-persist]') !== null });
+        teardownDirectives(swapRoot, { skip: el => el.closest('[data-persist]') !== null });
 
-        // 5. Extract executable scripts from incoming document body
-        const newScripts = Array.from(newDoc.body.querySelectorAll('script'));
+        // 5. Extract executable scripts from the incoming region. Scoped to incomingOutlet under
+        // outletSwap so shared section-layout scripts outside the outlet aren't redundantly
+        // re-executed on every in-section navigation.
+        const scriptSource = outletSwap ? incomingOutlet! : newDoc.body;
+        const newScripts = Array.from(scriptSource.querySelectorAll('script'));
         newScripts.forEach(s => s.remove());
 
         // Use native View Transition API if supported
@@ -310,13 +329,17 @@ export async function navigateTo(
                 await Promise.race([Promise.all(imagePromises), new Promise(r => setTimeout(r, 500))]);
             }
 
-            // Replace body content
-            document.body.innerHTML = newDoc.body.innerHTML;
+            // Replace body content - or, under an outlet-scoped swap, just the outlet's own contents.
+            (swapRoot as HTMLElement).innerHTML = (outletSwap ? incomingOutlet! : newDoc.body).innerHTML;
 
-            // Restore persistent islands into their new matching slots
+            // Restore persistent islands into their new matching slots. Guarded with
+            // targetSlot !== liveEl: under outletSwap, a persisted element OUTSIDE the outlet is found
+            // unchanged by this same query (it was never removed) - without this guard it would get a
+            // needless remove+reinsert cycle, risking a scroll/focus reset in exactly the subtree this
+            // feature exists to leave alone.
             persistentElements.forEach((liveEl, id) => {
                 const targetSlot = document.querySelector<HTMLElement>(`[data-persist="${id}"]`);
-                if (targetSlot && targetSlot.parentNode) {
+                if (targetSlot && targetSlot.parentNode && targetSlot !== liveEl) {
                     targetSlot.parentNode.replaceChild(liveEl, targetSlot);
                 }
             });
@@ -332,12 +355,12 @@ export async function navigateTo(
                 });
                 newScript.textContent = script.textContent;
                 applyNonceToScript(newScript);
-                document.body.appendChild(newScript);
+                (swapRoot as HTMLElement).appendChild(newScript);
             });
 
-            // Hydrate any new islands & directives on the newly rendered page
-            initIslands(document.body);
-            initDirectives(document.body);
+            // Hydrate any new islands & directives on the newly rendered region
+            initIslands(swapRoot);
+            initDirectives(swapRoot);
 
             // Handle scroll restoration or hash anchor
             if (restoreScroll && typeof restoreScroll.scrollY === 'number') {

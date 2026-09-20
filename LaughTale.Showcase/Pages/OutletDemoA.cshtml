@@ -1,0 +1,13 @@
+@page "/OutletDemoA"
+@model LaughTale.Showcase.Pages.OutletDemoAModel
+@{
+    Layout = "_OutletSectionLayout";
+}
+
+<div style="background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: 1rem; padding: 1.75rem;">
+    <h1 style="font-size: 1.5rem; font-weight: 800; color: var(--p-text-color); margin: 0 0 0.5rem;">Outlet Demo A</h1>
+    <p style="color: var(--p-text-muted); font-size: 0.875rem;">
+        This is page A's content. Navigate to <a href="/OutletDemoB">Outlet Demo B</a> - only this
+        panel changes, the sidebar to the left (and its scroll position) is left completely alone.
+    </p>
+</div>

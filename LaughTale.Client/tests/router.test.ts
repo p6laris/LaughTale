@@ -319,5 +319,121 @@ describe('Router Comprehensive Suite (, , , )', () => {
             globalThis.fetch = originalFetch;
         }
     });
+
+    it('navigateTo: matching outlet ids morph only the outlet, leaving a sidebar outside it untouched by reference identity', async () => {
+        document.body.innerHTML = `
+            <nav id="section-nav" data-outlet-sibling>
+                <span id="nav-marker">Section Nav</span>
+            </nav>
+            <div id="lt-outlet-demo-section" data-outlet="demo-section">Page 1 content</div>
+        `;
+
+        const originalNav = document.getElementById('section-nav');
+        assert.ok(originalNav !== null);
+
+        const originalFetch = globalThis.fetch;
+        globalThis.fetch = (async (url: any) => ({
+            ok: true,
+            url: String(url),
+            text: async () => `
+                <html>
+                <head><title>Page 2</title></head>
+                <body>
+                    <nav id="section-nav"><span id="nav-marker">Section Nav (should not appear)</span></nav>
+                    <div id="lt-outlet-demo-section" data-outlet="demo-section">Page 2 content</div>
+                </body>
+                </html>
+            `
+        })) as any;
+
+        try {
+            await navigateTo('/section/page-2', false);
+
+            // The nav outside the outlet is the EXACT SAME node - never removed, never recreated.
+            assert.strictEqual(document.getElementById('section-nav'), originalNav, 'Sidebar/nav outside the outlet must survive by reference identity');
+            assert.equal(document.getElementById('nav-marker')?.textContent, 'Section Nav', 'Nav content outside the outlet must be untouched, not replaced by the incoming page\'s nav');
+
+            // Only the outlet's own content changed.
+            assert.equal(document.getElementById('lt-outlet-demo-section')?.textContent, 'Page 2 content');
+        } finally {
+            globalThis.fetch = originalFetch;
+        }
+    });
+
+    it('navigateTo: an island outside the outlet does not receive laughtale:unmount during an outlet-scoped swap', async () => {
+        document.body.innerHTML = `
+            <nav id="section-nav"></nav>
+            <div id="lt-outlet-demo-section" data-outlet="demo-section">Page 1</div>
+        `;
+        const navIsland = document.createElement('div');
+        navIsland.setAttribute('data-island', 'nav-widget');
+        let unmounted = false;
+        navIsland.addEventListener('laughtale:unmount', () => { unmounted = true; });
+        document.getElementById('section-nav')!.appendChild(navIsland);
+
+        const originalFetch = globalThis.fetch;
+        globalThis.fetch = (async (url: any) => ({
+            ok: true,
+            url: String(url),
+            text: async () => `
+                <html>
+                <head><title>Page 2</title></head>
+                <body>
+                    <nav id="section-nav"></nav>
+                    <div id="lt-outlet-demo-section" data-outlet="demo-section">Page 2</div>
+                </body>
+                </html>
+            `
+        })) as any;
+
+        try {
+            await navigateTo('/section/page-2', false);
+            assert.equal(unmounted, false, 'An island outside the outlet must not be unmounted during an outlet-scoped swap');
+        } finally {
+            globalThis.fetch = originalFetch;
+        }
+    });
+
+    it('navigateTo: falls back to a full-body replace when outlet ids do not match', async () => {
+        document.body.innerHTML = `<div id="lt-outlet-section-a" data-outlet="section-a">Page in section A</div>`;
+
+        const originalFetch = globalThis.fetch;
+        globalThis.fetch = (async (url: any) => ({
+            ok: true,
+            url: String(url),
+            text: async () => `
+                <html>
+                <head><title>Section B</title></head>
+                <body><div id="lt-outlet-section-b" data-outlet="section-b">Page in section B</div></body>
+                </html>
+            `
+        })) as any;
+
+        try {
+            await navigateTo('/section-b/page-1', false);
+            assert.ok(document.getElementById('lt-outlet-section-b'), 'Full-body replace should have installed the new section\'s outlet');
+            assert.equal(document.getElementById('lt-outlet-section-a'), null, 'The old section\'s outlet should be gone after a full-body replace');
+        } finally {
+            globalThis.fetch = originalFetch;
+        }
+    });
+
+    it('navigateTo: falls back to a full-body replace when neither page has an outlet', async () => {
+        document.body.innerHTML = `<h1>Ordinary Page 1</h1>`;
+
+        const originalFetch = globalThis.fetch;
+        globalThis.fetch = (async (url: any) => ({
+            ok: true,
+            url: String(url),
+            text: async () => '<html><head><title>Ordinary Page 2</title></head><body><h1>Ordinary Page 2</h1></body></html>'
+        })) as any;
+
+        try {
+            await navigateTo('/ordinary-page-2', false);
+            assert.equal(document.body.innerHTML.includes('Ordinary Page 2'), true);
+        } finally {
+            globalThis.fetch = originalFetch;
+        }
+    });
 });
 
