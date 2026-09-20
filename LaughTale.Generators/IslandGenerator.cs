@@ -148,6 +148,26 @@ public partial class IslandGenerator : IIncrementalGenerator
         isEnabledByDefault: true
     );
 
+    /// <summary>
+    /// ROADMAP.v5.md Part K item 3: flags a MapIslandData&lt;T&gt; call whose fieldPolicy has no
+    /// .WithTenantColumn(...) configured. Deliberately <c>isEnabledByDefault: false</c>, unlike every
+    /// other LTI rule - "this data endpoint has no tenant discriminator" is only a real problem for a
+    /// genuinely multi-tenant application. LTI001-007 each target a narrow, universally-applicable risk
+    /// pattern (an invalid name, a non-serializable prop, a credential-shaped prop, an escape hatch, a
+    /// missing auth attribute); this one would instead fire on every single MapIslandData call in every
+    /// single-tenant consumer (including this repo's own Showcase/Docs), which is a fundamentally
+    /// different, much noisier profile. A multi-tenant project opts in explicitly via
+    /// `dotnet_diagnostic.LTI008.severity = warning` in its own .editorconfig.
+    /// </summary>
+    private static readonly DiagnosticDescriptor MissingTenantDiscriminatorRule = new(
+        id: "LTI008",
+        title: "Island Data Endpoint Missing Tenant Discriminator",
+        messageFormat: "This IslandFieldPolicy has no tenant column configured (see IslandFieldPolicy.WithTenantColumn). If this island's data can belong to more than one tenant, every row not scoped by a tenant filter is potentially visible across tenants.",
+        category: "LaughTale.Security",
+        defaultSeverity: DiagnosticSeverity.Warning,
+        isEnabledByDefault: false
+    );
+
     private static readonly Regex SensitivePropertyPattern = new(
         @"password|secret|token|hash|apikey|connectionstring|passwd|pwd|privatekey",
         RegexOptions.IgnoreCase | RegexOptions.Compiled);
@@ -273,6 +293,111 @@ public partial class IslandGenerator : IIncrementalGenerator
                 spc.ReportDiagnostic(diagnostic);
             }
         });
+
+        // 6. ROADMAP.v5.md Part K item 3: flag a MapIslandData<T> call whose fieldPolicy argument has no
+        // .WithTenantColumn(...) in its immediate expression - disabled by default (see LTI008's own doc
+        // comment for why), so this only runs a no-op syntax scan for consumers who haven't opted in via
+        // .editorconfig, same shape as the LTI006 scan above but targeting an invocation, not a member access.
+        var missingTenantDiscriminatorUsages = context.SyntaxProvider.CreateSyntaxProvider(
+            predicate: static (node, _) => node is InvocationExpressionSyntax
+            {
+                Expression: MemberAccessExpressionSyntax { Name: IdentifierNameSyntax { Identifier.Text: "MapIslandData" } or GenericNameSyntax { Identifier.Text: "MapIslandData" } }
+            },
+            transform: static (ctx, _) => GetMissingTenantDiscriminatorDiagnostic(ctx)
+        );
+
+        context.RegisterSourceOutput(missingTenantDiscriminatorUsages, static (spc, diagnostic) =>
+        {
+            if (diagnostic is not null)
+            {
+                spc.ReportDiagnostic(diagnostic);
+            }
+        });
+    }
+
+    /// <summary>
+    /// Diagnostic LTI008: confirms a matched "MapIslandData" invocation actually resolves to
+    /// <c>LaughTale.Core.Endpoints.IslandEndpointExtensions.MapIslandData</c>, locates its
+    /// <c>fieldPolicy</c> argument by parameter name (works whether called positionally or with a named
+    /// argument), and checks whether that argument's own expression syntax contains a
+    /// <c>.WithTenantColumn(...)</c> call anywhere in it. This is an immediate-expression check only -
+    /// like LTI006, it cannot trace a fieldPolicy value built up across separate statements/variables
+    /// before being passed in, a documented limitation rather than an attempt at full dataflow analysis.
+    /// </summary>
+    private static Diagnostic? GetMissingTenantDiscriminatorDiagnostic(GeneratorSyntaxContext ctx)
+    {
+        var invocation = (InvocationExpressionSyntax)ctx.Node;
+
+        if (ctx.SemanticModel.GetSymbolInfo(invocation).Symbol is not IMethodSymbol { Name: "MapIslandData" } method)
+        {
+            return null;
+        }
+
+        // For a reduced extension method (the common `endpoints.MapIslandData(...)` call shape),
+        // ContainingType returns the RECEIVER type (IEndpointRouteBuilder), not the declaring static
+        // class - the same gotcha LTI006's property-access check doesn't hit, since a static property
+        // access is never "reduced". ReducedFrom recovers the original declaring type.
+        var declaringType = method.ReducedFrom?.ContainingType ?? method.ContainingType;
+        if (declaringType?.ToDisplayString() != "LaughTale.Core.Endpoints.IslandEndpointExtensions")
+        {
+            return null;
+        }
+
+        var parameters = method.Parameters;
+        var fieldPolicyIndex = -1;
+        for (int i = 0; i < parameters.Length; i++)
+        {
+            if (parameters[i].Name == "fieldPolicy")
+            {
+                fieldPolicyIndex = i;
+                break;
+            }
+        }
+
+        if (fieldPolicyIndex < 0)
+        {
+            return null;
+        }
+
+        var arguments = invocation.ArgumentList.Arguments;
+        ArgumentSyntax? fieldPolicyArgument = null;
+
+        foreach (var arg in arguments)
+        {
+            if (arg.NameColon?.Name.Identifier.Text == "fieldPolicy")
+            {
+                fieldPolicyArgument = arg;
+                break;
+            }
+        }
+
+        if (fieldPolicyArgument is null && fieldPolicyIndex < arguments.Count)
+        {
+            // Only valid when no earlier argument used a name (positions still line up); good enough for
+            // this diagnostic's documented immediate-expression scope.
+            var candidate = arguments[fieldPolicyIndex];
+            if (candidate.NameColon is null)
+            {
+                fieldPolicyArgument = candidate;
+            }
+        }
+
+        if (fieldPolicyArgument is null)
+        {
+            return null;
+        }
+
+        bool hasTenantColumn = fieldPolicyArgument.Expression
+            .DescendantNodesAndSelf()
+            .OfType<InvocationExpressionSyntax>()
+            .Any(inv => inv.Expression is MemberAccessExpressionSyntax { Name.Identifier.Text: "WithTenantColumn" });
+
+        if (hasTenantColumn)
+        {
+            return null;
+        }
+
+        return Diagnostic.Create(MissingTenantDiscriminatorRule, fieldPolicyArgument.GetLocation());
     }
 
     /// <summary>

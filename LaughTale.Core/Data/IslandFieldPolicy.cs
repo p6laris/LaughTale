@@ -21,6 +21,7 @@ public sealed class IslandFieldPolicy
     private readonly PolicyKind _kind;
     private readonly IReadOnlySet<string>? _fields;
     private readonly int _maxPageSize;
+    private readonly string? _tenantColumn;
 
     /// <summary>
     /// No fields are queryable.
@@ -32,11 +33,12 @@ public sealed class IslandFieldPolicy
     /// </summary>
     public static IslandFieldPolicy AllMappedProperties { get; } = new(PolicyKind.AllMappedProperties, null);
 
-    private IslandFieldPolicy(PolicyKind kind, IReadOnlySet<string>? fields, int maxPageSize = DefaultMaxPageSize)
+    private IslandFieldPolicy(PolicyKind kind, IReadOnlySet<string>? fields, int maxPageSize = DefaultMaxPageSize, string? tenantColumn = null)
     {
         _kind = kind;
         _fields = fields;
         _maxPageSize = maxPageSize;
+        _tenantColumn = tenantColumn;
     }
 
     /// <summary>
@@ -44,6 +46,17 @@ public sealed class IslandFieldPolicy
     /// requested <c>PageSize</c> above this is clamped, never rejected. Default: <see cref="DefaultMaxPageSize"/>.
     /// </summary>
     public int MaxPageSize => _maxPageSize;
+
+    /// <summary>
+    /// The property name a tenant discriminator filter is applied against (ROADMAP.v5.md Part K item 3),
+    /// or null if this policy is not tenant-scoped. Set via <see cref="WithTenantColumn"/>.
+    /// </summary>
+    public string? TenantColumn => _tenantColumn;
+
+    /// <summary>
+    /// True when this policy has a tenant discriminator configured via <see cref="WithTenantColumn"/>.
+    /// </summary>
+    public bool HasTenantColumn => !string.IsNullOrWhiteSpace(_tenantColumn);
 
     /// <summary>
     /// Returns a copy of this policy with a different <see cref="MaxPageSize"/> ceiling - for islands
@@ -57,7 +70,24 @@ public sealed class IslandFieldPolicy
             throw new ArgumentOutOfRangeException(nameof(maxPageSize), maxPageSize, "MaxPageSize must be at least 1.");
         }
 
-        return new IslandFieldPolicy(_kind, _fields, maxPageSize);
+        return new IslandFieldPolicy(_kind, _fields, maxPageSize, _tenantColumn);
+    }
+
+    /// <summary>
+    /// Returns a copy of this policy that applies a mandatory <c>propertyName == tenantValue</c> filter
+    /// to every query run under it (ROADMAP.v5.md Part K item 3) - applied before any client-supplied
+    /// filter/search/sort, unconditionally, regardless of <see cref="Allows"/>. The tenant value itself
+    /// is resolved per-request (see <c>MapIslandData</c>'s <c>tenantResolver</c> parameter), never baked
+    /// into this policy object, since a policy instance is typically shared/static across requests.
+    /// </summary>
+    public IslandFieldPolicy WithTenantColumn(string propertyName)
+    {
+        if (string.IsNullOrWhiteSpace(propertyName))
+        {
+            throw new ArgumentException("Tenant column property name must not be null or empty.", nameof(propertyName));
+        }
+
+        return new IslandFieldPolicy(_kind, _fields, _maxPageSize, propertyName);
     }
 
     /// <summary>

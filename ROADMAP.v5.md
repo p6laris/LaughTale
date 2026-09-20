@@ -1271,7 +1271,7 @@ island writes a `data-props` JSON blob into the HTML, and nothing about that pat
 
 ---
 
-## 12. Part K — Authorization & multi-tenancy
+## 12. Part K — Authorization & multi-tenancy — **[CLOSED, all 6 items]**
 
 `IIslandAuthorizationRegistry` is a sound design. The problems are the permissive default (§1.2) and
 how much of the enterprise story stops at that one policy string.
@@ -1301,16 +1301,63 @@ how much of the enterprise story stops at that one policy string.
   requires a mandatory, non-nullable `IslandFieldPolicy` per call site (Spec 041) and the endpoint
   itself runs authorization before executing any query. This bullet described a real gap in an earlier
   pass that has since closed; the roadmap text just never caught up.
-- **Row-level filtering as a first-class concept.** Confirmed still fully open and genuinely
-  greenfield — no multi-tenancy concept (tenant discriminator, per-request tenant context) exists
-  anywhere in the codebase today. Comparable in scope to the Spec 041 field-allowlist work. Not
-  started.
-- **Cache keys must include identity.** Investigated: the premise is partly wrong as written. There is
-  no keyed application-level cache for islands at all yet — `[IslandPrivate]`
-  (`IslandTagHelper.cs::EnforceCachePrivacy`) only sets HTTP `Cache-Control: no-store, no-cache,
-  private` + `Vary: Cookie` response headers. "Extend the cache key to include tenant/role" isn't
-  actionable until a real keyed cache exists to extend — that's a prerequisite this bullet doesn't
-  mention. Still open, scope corrected.
+- **Row-level filtering as a first-class concept. — [CLOSED, this pass]** Confirmed genuinely
+  greenfield (no multi-tenancy concept existed anywhere) before building anything. Since
+  `LaughTale.Core` has zero EF Core dependency anywhere in the repo (confirmed via a repo-wide search —
+  not even Showcase/Docs use it as an example), an EF global query filter was off the table; the
+  discriminator instead had to be a generic `Where(x => x.TenantColumn == tenantValue)` splice using
+  the same `PropertyInfo`+`Expression.Equal` machinery `QueryableExtensions.ApplyFilter` already uses,
+  so it works against any `IQueryable<T>` regardless of provider. `IslandFieldPolicy` gained
+  `WithTenantColumn(string propertyName)` (same copy-constructor builder pattern as the existing
+  `WithMaxPageSize`) and `MapIslandData<T>` gained an optional `Func<HttpContext, string>? tenantResolver`
+  parameter. When a policy has a tenant column configured, `PrepareQuery` applies the tenant filter
+  unconditionally, before any client-supplied filter/search/sort — the real security boundary, not just
+  another allowlisted option a client-side omission could bypass. Both the tenant value and the
+  configured column are validated fail-loud: a tenant-scoped policy with no resolver throws
+  `InvalidOperationException` at map time (a startup-shaped config bug, not a per-request condition,
+  matching the existing `IslandAuthorizeAttribute` Roles-without-Policy guard's philosophy), and a
+  configured column that doesn't exist on `T` throws the same way. Extracted the raw-value-to-CLR-type
+  conversion logic already inside `BuildComparison` into a shared `ConvertValue` helper reused by both
+  the client-filter path (still swallows a parse failure, same as before) and the new tenant-filter path
+  (deliberately does NOT swallow — a broken tenant filter must fail loud, not silently skip and leak
+  cross-tenant rows). Added `LTI008`, an opt-in-only analyzer (`isEnabledByDefault: false` — unlike every
+  other LTI rule, "no tenant column" is only a real problem for a genuinely multi-tenant app; firing by
+  default would warn on every single `MapIslandData` call in every single-tenant consumer, including
+  this repo's own Showcase/Docs) flagging a `MapIslandData` call whose `fieldPolicy` argument has no
+  `.WithTenantColumn(...)` in its immediate expression — same "immediate-expression only, no
+  cross-statement dataflow" documented limitation `LTI006` already accepts. A multi-tenant project opts
+  in via `dotnet_diagnostic.LTI008.severity = warning` in its own `.editorconfig`. Real bug found and
+  fixed while implementing the analyzer: for a reduced extension method (the common
+  `endpoints.MapIslandData(...)` call shape), `IMethodSymbol.ContainingType` returns the *receiver*
+  type (`IEndpointRouteBuilder`), not the declaring static class — `method.ReducedFrom?.ContainingType`
+  is what actually recovers `IslandEndpointExtensions`; confirmed via a debug probe before landing the
+  fix, not assumed. Tests: `IslandFieldPolicyTests` (builder + pipeline: filter applied correctly,
+  applied before client filters/sort, missing tenant value throws, missing column throws),
+  `IslandDataEndpointAuthorizationTests` (resolver invoked and threaded through, missing resolver
+  throws at map time), `MissingTenantDiscriminatorDiagnosticTests` (fires only when explicitly enabled
+  via `SpecificDiagnosticOptions` — modeling the real `.editorconfig` opt-in — silent by default,
+  doesn't false-positive on an unrelated same-named extension method). Full C# suite: 396/396.
+- **Cache keys must include identity. — [CLOSED, this pass]** Investigation found the premise partly
+  wrong as written: there was no keyed application-level cache for islands at all —
+  `[IslandPrivate]`/`EnforceCachePrivacy` only ever set HTTP `Cache-Control`/`Vary` headers. Building a
+  genuine server-side keyed fragment cache from scratch would be its own large feature (comparable to
+  Part F's Cache Tags/SSE item), not a small addition — presented this tradeoff to the user directly
+  rather than deciding unilaterally, and the user chose the honest, right-sized scope: extend the
+  *existing* header-guard mechanism to a genuinely tenant-aware endpoint, instead of building a cache
+  that doesn't exist. `MapIslandData<T>`'s JSON responses previously carried zero `Cache-Control` header
+  at all (confirmed: no caching step anywhere in the antiforgery→rate-limit→authorization→work
+  pipeline) — now, whenever `fieldPolicy.HasTenantColumn` is true (item 3's new tenant-scoping signal),
+  the response gets the exact same `no-store, no-cache, private` / `Pragma: no-cache` / `Vary: Cookie`
+  guard `EnforceCachePrivacy` already applies to SSR-rendered `[IslandPrivate]` islands — extracted into
+  a small shared `LaughTale.Core/Security/IslandCachePrivacy.cs` helper both call, rather than
+  duplicating the header-setting logic a second time. Two things investigated and explicitly ruled out
+  as out of scope, not silently skipped: extending the same guard to `MapLaughTaleIslandRefresh` (that
+  endpoint has no typed props object at all — it echoes the client's raw JSON body back — so there's no
+  `[IslandPrivate]` attribute to inspect without inventing a new islandName→Type registry); and
+  role-based cache-key extension (no "role column" structural concept exists analogous to a tenant
+  column — `IslandAuthorize` policies are opaque ASP.NET Core policy names, not data columns — so there
+  was nothing real to extend). Tests: `IslandDataEndpointAuthorizationTests` (tenant-scoped response
+  carries the no-store headers; a non-tenant-scoped response on the same endpoint carries none).
 - **Handle session expiry during client navigation. — [CLOSED, this pass]** `refreshIsland()`
   (`LaughTale.Client/src/runtime/refresh.ts`) previously threw a generic `Error` for any non-2xx
   refresh response, indistinguishable from a network blip or a 500. It now throws a typed

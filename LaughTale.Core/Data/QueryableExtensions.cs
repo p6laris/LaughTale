@@ -21,13 +21,14 @@ public static class QueryableExtensions
     public static IslandDataResult<T> ToIslandDataResult<T>(
         this IQueryable<T> query,
         IslandDataRequest request,
-        IslandFieldPolicy fieldPolicy)
+        IslandFieldPolicy fieldPolicy,
+        string? tenantValue = null)
     {
         ArgumentNullException.ThrowIfNull(query);
         ArgumentNullException.ThrowIfNull(request);
         ArgumentNullException.ThrowIfNull(fieldPolicy);
 
-        var (filteredQuery, totalCount, refusedFields) = PrepareQuery(query, request, fieldPolicy);
+        var (filteredQuery, totalCount, refusedFields) = PrepareQuery(query, request, fieldPolicy, tenantValue);
 
         // Apply Paging (Skip / Take). Ceiling comes from the policy (ROADMAP.v5.md Part H) rather than
         // a fixed constant, so a given island's own policy - not a one-size-fits-all number - decides
@@ -51,10 +52,11 @@ public static class QueryableExtensions
         this IQueryable<T> query,
         IslandDataRequest request,
         IslandFieldPolicy fieldPolicy,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        string? tenantValue = null)
     {
         // Executes query synchronously or via Task wrapper for standard IQueryable sources
-        return Task.Run(() => query.ToIslandDataResult(request, fieldPolicy), cancellationToken);
+        return Task.Run(() => query.ToIslandDataResult(request, fieldPolicy, tenantValue), cancellationToken);
     }
 
     /// <summary>
@@ -63,20 +65,22 @@ public static class QueryableExtensions
     public static IQueryable<T> ApplyIslandCriteria<T>(
         this IQueryable<T> query,
         IslandDataRequest request,
-        IslandFieldPolicy fieldPolicy)
+        IslandFieldPolicy fieldPolicy,
+        string? tenantValue = null)
     {
         ArgumentNullException.ThrowIfNull(query);
         ArgumentNullException.ThrowIfNull(request);
         ArgumentNullException.ThrowIfNull(fieldPolicy);
 
-        var (preparedQuery, _, _) = PrepareQuery(query, request, fieldPolicy);
+        var (preparedQuery, _, _) = PrepareQuery(query, request, fieldPolicy, tenantValue);
         return preparedQuery;
     }
 
     private static (IQueryable<T> Query, int TotalCount, IReadOnlyList<string> RefusedFields) PrepareQuery<T>(
         IQueryable<T> query,
         IslandDataRequest request,
-        IslandFieldPolicy fieldPolicy)
+        IslandFieldPolicy fieldPolicy,
+        string? tenantValue)
     {
         var entityType = typeof(T);
         var properties = entityType.GetProperties(BindingFlags.Public | BindingFlags.Instance)
@@ -84,6 +88,28 @@ public static class QueryableExtensions
                                    .ToDictionary(p => p.Name, p => p, StringComparer.OrdinalIgnoreCase);
 
         var refused = new List<string>();
+
+        // 0. Tenant discriminator (ROADMAP.v5.md Part K item 3) - applied unconditionally, before any
+        // client-supplied filter/search/sort, and NOT gated by fieldPolicy.Allows(): this is the actual
+        // row-level security boundary, not a client-facing query option a client could opt out of.
+        if (fieldPolicy.HasTenantColumn)
+        {
+            if (string.IsNullOrWhiteSpace(tenantValue))
+            {
+                throw new InvalidOperationException(
+                    $"IslandFieldPolicy for '{entityType.Name}' has a tenant column ('{fieldPolicy.TenantColumn}') " +
+                    "configured but no tenant value was resolved for this request. Pass a tenantResolver to " +
+                    "MapIslandData, or a tenantValue directly to ToIslandDataResult.");
+            }
+
+            if (!properties.TryGetValue(fieldPolicy.TenantColumn!, out var tenantProp))
+            {
+                throw new InvalidOperationException(
+                    $"IslandFieldPolicy's tenant column '{fieldPolicy.TenantColumn}' does not exist on '{entityType.Name}'.");
+            }
+
+            query = BuildTenantFilter(query, tenantProp, tenantValue);
+        }
 
         // 1. Apply Column Filters
         var effectiveFilters = request.GetEffectiveFilters();
@@ -184,6 +210,22 @@ public static class QueryableExtensions
         return source.Where(lambda);
     }
 
+    /// <summary>
+    /// Builds a mandatory <c>prop == tenantValue</c> filter (ROADMAP.v5.md Part K item 3) - the same
+    /// Expression-Tree shape ApplyFilter uses for a single "equals" comparison, kept separate since a
+    /// tenant filter always uses Equal and always applies, unlike ApplyFilter's client-selected operator.
+    /// </summary>
+    private static IQueryable<T> BuildTenantFilter<T>(IQueryable<T> source, PropertyInfo prop, string tenantValue)
+    {
+        var parameter = Expression.Parameter(typeof(T), "x");
+        var propertyAccess = Expression.Property(parameter, prop);
+        var convertedValue = ConvertValue(prop.PropertyType, tenantValue);
+        var constant = Expression.Constant(convertedValue, prop.PropertyType);
+        var comparison = Expression.Equal(propertyAccess, constant);
+        var lambda = Expression.Lambda<Func<T, bool>>(comparison, parameter);
+        return source.Where(lambda);
+    }
+
     private static IQueryable<T> ApplyGlobalSearch<T>(
         IQueryable<T> source,
         Dictionary<string, PropertyInfo> properties,
@@ -231,6 +273,36 @@ public static class QueryableExtensions
         return source.Where(lambda);
     }
 
+    /// <summary>
+    /// Converts a raw string value to the given target CLR type (Guid/enum/DateTime/DateTimeOffset/
+    /// IConvertible fallback) - shared by BuildComparison (a client-supplied filter value, where a
+    /// parse failure is caught and the filter silently skipped) and BuildTenantFilter (a
+    /// resolver-supplied tenant value, where a parse failure should propagate as a loud configuration
+    /// error instead, since silently skipping a tenant filter would be a data leak).
+    /// </summary>
+    private static object? ConvertValue(Type targetType, string rawValue)
+    {
+        var underlyingType = Nullable.GetUnderlyingType(targetType) ?? targetType;
+
+        if (underlyingType == typeof(Guid))
+        {
+            return Guid.Parse(rawValue);
+        }
+        if (underlyingType.IsEnum)
+        {
+            return Enum.Parse(underlyingType, rawValue, ignoreCase: true);
+        }
+        if (underlyingType == typeof(DateTime))
+        {
+            return DateTime.Parse(rawValue, CultureInfo.InvariantCulture);
+        }
+        if (underlyingType == typeof(DateTimeOffset))
+        {
+            return DateTimeOffset.Parse(rawValue, CultureInfo.InvariantCulture);
+        }
+        return Convert.ChangeType(rawValue, underlyingType, CultureInfo.InvariantCulture);
+    }
+
     private static Expression? BuildComparison(MemberExpression propertyAccess, Type propertyType, string op, string rawValue)
     {
         var targetType = Nullable.GetUnderlyingType(propertyType) ?? propertyType;
@@ -238,26 +310,7 @@ public static class QueryableExtensions
 
         try
         {
-            if (targetType == typeof(Guid))
-            {
-                convertedValue = Guid.Parse(rawValue);
-            }
-            else if (targetType.IsEnum)
-            {
-                convertedValue = Enum.Parse(targetType, rawValue, ignoreCase: true);
-            }
-            else if (targetType == typeof(DateTime))
-            {
-                convertedValue = DateTime.Parse(rawValue, CultureInfo.InvariantCulture);
-            }
-            else if (targetType == typeof(DateTimeOffset))
-            {
-                convertedValue = DateTimeOffset.Parse(rawValue, CultureInfo.InvariantCulture);
-            }
-            else
-            {
-                convertedValue = Convert.ChangeType(rawValue, targetType, CultureInfo.InvariantCulture);
-            }
+            convertedValue = ConvertValue(propertyType, rawValue);
         }
         catch
         {

@@ -14,13 +14,14 @@ public class IslandFieldPolicyTests
         public string Name { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string SecretNote { get; set; } = string.Empty;
+        public string TenantId { get; set; } = string.Empty;
     }
 
     private IQueryable<TestItem> GetSampleData() => new List<TestItem>
     {
-        new() { Id = 1, Name = "Alice", Email = "alice@example.com", SecretNote = "TopSecret1" },
-        new() { Id = 2, Name = "Bob", Email = "bob@example.com", SecretNote = "TopSecret2" },
-        new() { Id = 3, Name = "Charlie", Email = "charlie@example.com", SecretNote = "TopSecret3" }
+        new() { Id = 1, Name = "Alice", Email = "alice@example.com", SecretNote = "TopSecret1", TenantId = "tenant-a" },
+        new() { Id = 2, Name = "Bob", Email = "bob@example.com", SecretNote = "TopSecret2", TenantId = "tenant-b" },
+        new() { Id = 3, Name = "Charlie", Email = "charlie@example.com", SecretNote = "TopSecret3", TenantId = "tenant-a" }
     }.AsQueryable();
 
     [Fact]
@@ -182,5 +183,87 @@ public class IslandFieldPolicyTests
         Assert.Equal(2, result.RefusedFields.Count);
         Assert.Contains("SecretNote", result.RefusedFields);
         Assert.Contains("NonExistentField", result.RefusedFields);
+    }
+
+    [Fact]
+    public void WithTenantColumn_SetsHasTenantColumnAndTenantColumn()
+    {
+        var policy = IslandFieldPolicy.For("Name").WithTenantColumn("TenantId");
+
+        Assert.True(policy.HasTenantColumn);
+        Assert.Equal("TenantId", policy.TenantColumn);
+    }
+
+    [Fact]
+    public void WithTenantColumn_RejectsNullOrWhitespace()
+    {
+        Assert.Throws<ArgumentException>(() => IslandFieldPolicy.For("Name").WithTenantColumn(""));
+        Assert.Throws<ArgumentException>(() => IslandFieldPolicy.For("Name").WithTenantColumn("   "));
+    }
+
+    [Fact]
+    public void DefaultPolicy_HasNoTenantColumn()
+    {
+        Assert.False(IslandFieldPolicy.For("Name").HasTenantColumn);
+        Assert.Null(IslandFieldPolicy.For("Name").TenantColumn);
+    }
+
+    [Fact]
+    public void TenantColumn_FiltersToOnlyMatchingTenantRows()
+    {
+        var query = GetSampleData();
+        var policy = IslandFieldPolicy.For("Name").WithTenantColumn("TenantId");
+
+        var result = query.ToIslandDataResult(new IslandDataRequest(), policy, tenantValue: "tenant-a");
+
+        Assert.Equal(2, result.TotalCount);
+        Assert.All(result.Items, item => Assert.Equal("tenant-a", item.TenantId));
+    }
+
+    [Fact]
+    public void TenantColumn_AppliesBeforeClientFiltersAndSort()
+    {
+        var query = GetSampleData();
+        var policy = IslandFieldPolicy.For("Name").WithTenantColumn("TenantId");
+        var request = new IslandDataRequest { SortField = "Name", SortOrder = 1 };
+
+        var result = query.ToIslandDataResult(request, policy, tenantValue: "tenant-a");
+
+        Assert.Equal(2, result.TotalCount);
+        Assert.Equal("Alice", result.Items[0].Name);
+        Assert.Equal("Charlie", result.Items[1].Name);
+    }
+
+    [Fact]
+    public void TenantColumn_MissingTenantValue_ThrowsInvalidOperationException()
+    {
+        var query = GetSampleData();
+        var policy = IslandFieldPolicy.For("Name").WithTenantColumn("TenantId");
+
+        Assert.Throws<InvalidOperationException>(() => query.ToIslandDataResult(new IslandDataRequest(), policy));
+        Assert.Throws<InvalidOperationException>(() => query.ToIslandDataResult(new IslandDataRequest(), policy, tenantValue: "  "));
+    }
+
+    [Fact]
+    public void TenantColumn_ConfiguredColumnDoesNotExistOnEntity_ThrowsInvalidOperationException()
+    {
+        var query = GetSampleData();
+        var policy = IslandFieldPolicy.For("Name").WithTenantColumn("NoSuchColumn");
+
+        var ex = Assert.Throws<InvalidOperationException>(
+            () => query.ToIslandDataResult(new IslandDataRequest(), policy, tenantValue: "tenant-a"));
+        Assert.Contains("NoSuchColumn", ex.Message);
+    }
+
+    [Fact]
+    public void TenantColumn_NoMatchingRows_ReturnsEmptyResult()
+    {
+        var query = GetSampleData();
+        var policy = IslandFieldPolicy.For("Name").WithTenantColumn("TenantId");
+
+        var result = query.ToIslandDataResult(new IslandDataRequest(), policy, tenantValue: "tenant-z");
+
+        Assert.Equal(0, result.TotalCount);
+        Assert.Empty(result.Items);
     }
 }

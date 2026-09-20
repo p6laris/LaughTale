@@ -232,16 +232,7 @@ public class IslandTagHelper : TagHelper
 
         if (hasPrivateAttr)
         {
-            var response = httpContext.Response;
-            var currentCacheControl = response.Headers.CacheControl.ToString();
-            if (currentCacheControl.Contains("public", StringComparison.OrdinalIgnoreCase))
-            {
-                _logger.LogWarning("[LaughTale Security] Island '{Name}' carries private user props on a publicly cached response. Overriding Cache-Control to no-store.", Name);
-            }
-
-            response.Headers.CacheControl = "no-store, no-cache, private";
-            response.Headers.Pragma = "no-cache";
-            response.Headers.Vary = "Cookie";
+            LaughTale.Core.Security.IslandCachePrivacy.EnforceNoStore(httpContext, Name, _logger);
         }
     }
 }

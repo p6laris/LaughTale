@@ -118,13 +118,24 @@ public static class IslandEndpointExtensions
         string pattern,
         Func<HttpContext, Task<IQueryable<T>>> queryProvider,
         LaughTale.Core.Data.IslandFieldPolicy fieldPolicy,
-        string islandName)
+        string islandName,
+        Func<HttpContext, string>? tenantResolver = null)
     {
         ArgumentNullException.ThrowIfNull(endpoints);
         ArgumentNullException.ThrowIfNull(pattern);
         ArgumentNullException.ThrowIfNull(queryProvider);
         ArgumentNullException.ThrowIfNull(fieldPolicy);
         ArgumentNullException.ThrowIfNull(islandName);
+
+        // ROADMAP.v5.md Part K item 3: a tenant-scoped policy with no way to resolve the current
+        // tenant is a startup-shaped configuration bug, not a per-request condition - fail loud at
+        // map time rather than silently letting every request 500 or (worse) skip the tenant filter.
+        if (fieldPolicy.HasTenantColumn && tenantResolver is null)
+        {
+            throw new InvalidOperationException(
+                $"Island '{islandName}' has a tenant-scoped IslandFieldPolicy (tenant column " +
+                $"'{fieldPolicy.TenantColumn}') but MapIslandData was not given a tenantResolver.");
+        }
 
         endpoints.MapPost(pattern, async (HttpContext context, IslandDataRequest? request) =>
         {
@@ -179,8 +190,17 @@ public static class IslandEndpointExtensions
             }
 
             var req = request ?? new IslandDataRequest();
+            var tenantValue = tenantResolver?.Invoke(context);
             var query = await queryProvider(context);
-            var result = query.ToIslandDataResult(req, fieldPolicy);
+            var result = query.ToIslandDataResult(req, fieldPolicy, tenantValue);
+
+            if (fieldPolicy.HasTenantColumn)
+            {
+                var logger = context.RequestServices.GetService<Microsoft.Extensions.Logging.ILoggerFactory>()
+                    ?.CreateLogger("LaughTale.Core.Endpoints.IslandEndpointExtensions");
+                LaughTale.Core.Security.IslandCachePrivacy.EnforceNoStore(context, islandName, logger);
+            }
+
             return Results.Json(result);
         })
         .WithName($"LaughTaleData_{typeof(T).Name}")
@@ -200,9 +220,10 @@ public static class IslandEndpointExtensions
         string pattern,
         Func<HttpContext, IQueryable<T>> queryProvider,
         LaughTale.Core.Data.IslandFieldPolicy fieldPolicy,
-        string islandName)
+        string islandName,
+        Func<HttpContext, string>? tenantResolver = null)
     {
-        return endpoints.MapIslandData(pattern, (ctx) => Task.FromResult(queryProvider(ctx)), fieldPolicy, islandName);
+        return endpoints.MapIslandData(pattern, (ctx) => Task.FromResult(queryProvider(ctx)), fieldPolicy, islandName, tenantResolver);
     }
 
     /// <summary>
