@@ -100,5 +100,15 @@ namespace LaughTale.Core.Performance
                 }
             });
         }
+
+        /// <summary>
+        /// Applies per-path Cache-Control overrides declared via <see cref="LaughTale.Core.Configuration.LaughTaleOptions.RouteRules"/>
+        /// (ROADMAP.v5.md Part E "Route rules"). Register before <c>UseRouting</c>, matching where
+        /// <see cref="UseLaughTaleStaticAssetsCaching"/> already sits in the pipeline.
+        /// </summary>
+        public static IApplicationBuilder UseLaughTaleRouteRules(this IApplicationBuilder app)
+        {
+            return app.UseMiddleware<RouteRulesMiddleware>();
+        }
     }
 }

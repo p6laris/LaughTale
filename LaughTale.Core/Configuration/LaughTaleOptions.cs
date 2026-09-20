@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using LaughTale.Core.Localization;
 
 namespace LaughTale.Core.Configuration;
@@ -60,6 +61,85 @@ public sealed class LaughTaleOptions
     /// / <see cref="IslandRateLimitOptions.WindowSeconds"/> for your own traffic shape.
     /// </summary>
     public IslandRateLimitOptions RateLimit { get; set; } = new();
+
+    /// <summary>
+    /// Per-path Cache-Control declarations (ROADMAP.v5.md Part E "Route rules", redefined honestly -
+    /// see <see cref="RouteRulesOptions"/>'s own doc comment for why this is scoped to Cache-Control
+    /// rather than the originally-requested full SSR/SSG/ISR/CSR table).
+    /// </summary>
+    public RouteRulesOptions RouteRules { get; set; } = new();
+}
+
+/// <summary>
+/// ROADMAP.v5.md Part E: the honest, buildable subset of "route rules / hybrid rendering" for a Razor
+/// Pages framework. The originally-requested "SSR/SSG/ISR/CSR in one config table" (Nuxt <c>routeRules</c>)
+/// doesn't fit this architecture - there is no build-time pipeline that could statically pre-render a
+/// page (SSG) or regenerate it on a schedule (ISR) without bolting a foreign build system onto Razor
+/// Pages, and CSR-only would contradict the Islands architecture's own SSR-first premise. What genuinely
+/// generalizes to "a per-path config table" here is a declarative Cache-Control override per path.
+/// </summary>
+public sealed class RouteRulesOptions
+{
+    private readonly List<(string Pattern, string CacheControl)> _rules = new();
+
+    /// <summary>
+    /// The registered rules, in registration order.
+    /// </summary>
+    public IReadOnlyList<(string Pattern, string CacheControl)> Rules => _rules;
+
+    /// <summary>
+    /// Registers a Cache-Control override for requests matching <paramref name="pathPattern"/>. An
+    /// exact path (<c>"/pricing"</c>) matches only that path; a trailing <c>"/*"</c>
+    /// (<c>"/blog/*"</c>) matches any path under that prefix. Rules are matched in registration order -
+    /// first match wins - so register more specific patterns before broader ones.
+    /// </summary>
+    public RouteRulesOptions AddRule(string pathPattern, string cacheControl)
+    {
+        if (string.IsNullOrWhiteSpace(pathPattern))
+        {
+            throw new ArgumentException("Path pattern must not be null or empty.", nameof(pathPattern));
+        }
+        if (string.IsNullOrWhiteSpace(cacheControl))
+        {
+            throw new ArgumentException("Cache-Control value must not be null or empty.", nameof(cacheControl));
+        }
+
+        _rules.Add((pathPattern, cacheControl));
+        return this;
+    }
+
+    /// <summary>
+    /// Returns the Cache-Control value for the first rule matching <paramref name="path"/>, or null if
+    /// no rule matches.
+    /// </summary>
+    public string? Match(string path)
+    {
+        if (string.IsNullOrEmpty(path))
+        {
+            return null;
+        }
+
+        foreach (var (pattern, cacheControl) in _rules)
+        {
+            if (IsMatch(pattern, path))
+            {
+                return cacheControl;
+            }
+        }
+
+        return null;
+    }
+
+    private static bool IsMatch(string pattern, string path)
+    {
+        if (pattern.EndsWith("/*", StringComparison.Ordinal))
+        {
+            var prefix = pattern[..^1]; // keep the trailing slash, drop only the "*"
+            return path.StartsWith(prefix, StringComparison.OrdinalIgnoreCase);
+        }
+
+        return string.Equals(pattern, path, StringComparison.OrdinalIgnoreCase);
+    }
 }
 
 /// <summary>

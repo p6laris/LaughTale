@@ -662,7 +662,7 @@ doesn't forward it as a slot (an author-error case, not a framework gap).
 |---|---|---|
 | **Out-of-order streaming — [SCOPE CORRECTED, deferred]** — flush shell with skeletons, resolve slow data in background tasks, append late fragments as `<template>`. *.NET's real threads and `IAsyncEnumerable` make this cleaner than Node's* | Astro server islands, Next PPR | M · 3 wks |
 | **Partials — [CLOSED, this pass]** — named page regions updated by link/form, everything else untouched. *The most natural fit on this list for what LaughTale already is* | Fresh, Turbo Frames | S–M · 2 wks |
-| **Route rules / hybrid rendering — [SCOPE CORRECTED, deferred]** — per-path SSR/SSG/ISR/CSR in one config table | Nuxt `routeRules` | M · 2–3 wks |
+| **Route rules / hybrid rendering — [CLOSED, this pass — scope corrected]** — per-path SSR/SSG/ISR/CSR in one config table | Nuxt `routeRules` | M · 2–3 wks |
 | **Nested layouts & outlets — [SCOPE CORRECTED, deferred]** — morph only the lowest common layout ancestor; sidebar scroll and media survive navigation by default | Nuxt, Next | M · 3 wks |
 | **Delegated event resumability — [CLOSED, this pass]** — one listener on `document.body`, intent in attributes, chunk on first interaction | Qwik | M · 2–3 wks |
 | **Middleware & typed head — [CLOSED, this pass]** — per-route chain (auth, tenant, A/B) plus typed metadata API | Next, Nuxt, Astro | S–M · 2 wks |
@@ -778,15 +778,27 @@ to the user directly and they chose to close the two real items above rather tha
   this is a genuine architecture design task (interfaces, timeout/error-boundary semantics for a
   fragment that never resolves, interaction with antiforgery/caching which assume one synchronous
   render), not a mechanical feature addition. The roadmap's own M/3wk estimate holds up completely here.
-- **Route rules / hybrid rendering**: confirmed no per-path render-mode mechanism, SSG capability, or
-  ISR/output-caching integration exists anywhere. More importantly, a literal "SSR/SSG/ISR/CSR in one
-  table" overstates what's realistic for a Razor Pages app — there is no build-time static-generation
-  pipeline that could pre-render a page to disk without bolting a foreign build system onto Razor Pages
-  (compile-time `HttpContext`, route discovery, file writes, regeneration/invalidation), and CSR-only
-  contradicts the Islands architecture's own SSR-first premise (that's the still-hypothetical Part L
-  "SSR sidecar" work, not this item). The honest smallest real version is "per-page cache-control
-  declarations" via a Razor Pages convention — a materially smaller and different feature than what's
-  described, worth its own corrected roadmap line before scoping/estimating.
+- **Route rules / hybrid rendering — [CLOSED, this pass — scope corrected]**: confirmed no per-path
+  render-mode mechanism, SSG capability, or ISR/output-caching integration exists anywhere. More
+  importantly, a literal "SSR/SSG/ISR/CSR in one table" overstates what's realistic for a Razor Pages
+  app — there is no build-time static-generation pipeline that could pre-render a page to disk without
+  bolting a foreign build system onto Razor Pages (compile-time `HttpContext`, route discovery, file
+  writes, regeneration/invalidation), and CSR-only contradicts the Islands architecture's own SSR-first
+  premise (that's the still-hypothetical Part L "SSR sidecar" work, not this item). Presented this
+  tradeoff to the user directly rather than deciding unilaterally; they chose the honest smaller real
+  version: **per-path Cache-Control declarations**, a genuine "one config table, path → behavior"
+  mechanism scoped to what's actually buildable. Shipped `RouteRulesOptions`
+  (`LaughTale.Core/Configuration/LaughTaleOptions.cs`) — `AddRule(pathPattern, cacheControl)`, exact-path
+  or trailing-`/*`-prefix matching, first-registered-match-wins — plus `RouteRulesMiddleware`
+  (`LaughTale.Core/Performance/RouteRulesMiddleware.cs`), mirroring `LaughTaleCspMiddleware`'s exact
+  shape (constructor-injected `IOptions<T>`, direct header write before calling `_next`), registered via
+  `app.UseLaughTaleRouteRules()` alongside the existing `UseLaughTaleStaticAssetsCaching`. Wired into a
+  real example (`LaughTale.Showcase/Program.cs`: `/Partials` → `public, max-age=60`, since that demo page
+  has no per-request user state) and verified against a real running server, not just unit tests —
+  `curl`'s response headers confirmed the configured value on `/Partials` and confirmed a non-matching
+  page's headers were left untouched. Tests: `RouteRulesOptionsTests.cs` (exact/prefix/no-match/
+  first-match-wins/validation), `RouteRulesMiddlewareTests.cs` (mirroring `CspMiddlewareTests.cs`'s
+  direct-construction harness). Full suite: 429/429.
 - **Nested layouts & outlets**: confirmed to actually be two deliverables, not one. There is no nested
   layout *authoring* convention anywhere in the codebase — every site (Showcase, Docs, the project
   template) resolves to exactly one flat `_Layout.cshtml` via a single global `_ViewStart.cshtml`

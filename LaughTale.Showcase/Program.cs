@@ -13,6 +13,11 @@ builder.Services.AddLaughTale(opt =>
     opt.Localization.DefaultCulture = "en-US";
     opt.Localization.SupportedCultures = ["en-US", "ku", "ckb", "ar-SA", "es-ES", "fr-FR", "de-DE", "tr-TR"];
     opt.Refresh.AllowUndeclaredIslands = true;
+
+    // ROADMAP.v5.md Part E "Route rules": the /Partials demo has no per-request user state, so it's
+    // genuinely safe to let a shared cache serve it briefly - a real example of the config table, not
+    // just a unit-tested-in-isolation feature.
+    opt.RouteRules.AddRule("/Partials", "public, max-age=60");
 });
 
 var supportedCultures = new[]
@@ -45,6 +50,7 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseResponseCompression();
 app.UseLaughTaleStaticAssetsCaching();
+app.UseLaughTaleRouteRules();
 app.UseStaticFiles();
 
 app.UseRequestLocalization(localizationOptions);
