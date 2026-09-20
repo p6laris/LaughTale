@@ -889,7 +889,7 @@ public class ComponentsModel : PageModel
     {
         new("Like", "heart", "like"),
         new("Share", "sharealt", "share"),
-        new("Print", "print", "print"),
+        new("Print", "printer", "print"),
         new("Save", "save", "save"),
         new("Copy", "copy", "copy")
     };
@@ -1195,7 +1195,7 @@ public class ComponentsModel : PageModel
             {
                 new("Filter", "filter", Items: new()
                 {
-                    new("Print", "print")
+                    new("Print", "printer")
                 }),
                 new("List", "list")
             })
@@ -1587,11 +1587,13 @@ public class ComponentsModel : PageModel
                 new(Label: "Send via email", Icon: "mail"),
                 new(Label: "Copy link", Icon: "link"),
                 new(Separator: true),
+                // Lucide dropped dedicated brand/social icons (twitter/facebook/linkedin) from its
+                // core set; "share-2" is the closest available generic stand-in.
                 new(Label: "Social", Toggleable: false, Items: new()
                 {
-                    new(Label: "Twitter", Icon: "twitter"),
-                    new(Label: "Facebook", Icon: "facebook"),
-                    new(Label: "LinkedIn", Icon: "linkedin")
+                    new(Label: "Twitter", Icon: "share-2"),
+                    new(Label: "Facebook", Icon: "share-2"),
+                    new(Label: "LinkedIn", Icon: "share-2")
                 })
             }),
             new(Label: "Rename", Icon: "pencil")
@@ -1803,9 +1805,10 @@ public class ComponentsModel : PageModel
         }),
         new(Label: "Search", Icon: "search"),
         new(Separator: true),
+        // "slack" is a brand icon Lucide no longer ships; "share-2" is the closest generic stand-in.
         new(Label: "Share", Icon: "share2", Items: new()
         {
-            new(Label: "Slack", Icon: "slack"),
+            new(Label: "Slack", Icon: "share-2"),
             new(Label: "Whatsapp", Icon: "phone")
         })
     };
@@ -1832,7 +1835,7 @@ public class ComponentsModel : PageModel
         new(Separator: true),
         new(Label: "Share", Icon: "share2", Items: new()
         {
-            new(Label: "Slack", Icon: "slack", Badge: "2"),
+            new(Label: "Slack", Icon: "share-2", Badge: "2"),
             new(Label: "Whatsapp", Icon: "phone", Badge: "3")
         })
     };
