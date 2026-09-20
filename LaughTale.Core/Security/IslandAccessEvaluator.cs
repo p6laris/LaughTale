@@ -98,11 +98,13 @@ public class IslandAccessEvaluator : IIslandAccessEvaluator
                     "Allowed under compatibility switch AllowUndeclaredIslands.");
             }
 
+            const string undeclaredReason = "has no authorization policy and is not declared public.";
+            LogAudit(services, islandName, null, IslandAccessOutcome.Undeclared, user, undeclaredReason);
             return new IslandAccessDecision(
                 IslandAccessOutcome.Undeclared,
                 islandName,
                 null,
-                $"Island '{islandName}' has no authorization policy and is not declared public.");
+                $"Island '{islandName}' {undeclaredReason}");
         }
 
         // Requiring policy
@@ -160,11 +162,13 @@ public class IslandAccessEvaluator : IIslandAccessEvaluator
                     null);
             }
 
+            var deniedReason = $"User does not satisfy policy '{policyName}'.";
+            LogAudit(services, islandName, policyName, IslandAccessOutcome.Denied, user, deniedReason);
             return new IslandAccessDecision(
                 IslandAccessOutcome.Denied,
                 islandName,
                 policyName,
-                $"User does not satisfy policy '{policyName}'.");
+                deniedReason);
         }
         catch (InvalidOperationException ex)
         {
@@ -182,6 +186,36 @@ public class IslandAccessEvaluator : IIslandAccessEvaluator
                 policyName,
                 $"Authorization evaluation threw an exception for policy '{policyName}': {ex.Message}");
         }
+    }
+
+    /// <summary>
+    /// Emits a structured, `Warning`-level audit log entry for a refused island access decision
+    /// (denied or undeclared) - the only trail of "who was refused access to what island and why"
+    /// that previously existed nowhere in the codebase. Deliberately not called for `Allowed`
+    /// decisions, which would dwarf this in volume without adding security-relevant signal.
+    /// </summary>
+    private static void LogAudit(
+        IServiceProvider services,
+        string islandName,
+        string? policyName,
+        IslandAccessOutcome outcome,
+        ClaimsPrincipal? user,
+        string reason)
+    {
+        var logger = services.GetService<ILogger<IslandAccessEvaluator>>()
+            ?? services.GetService<ILoggerFactory>()?.CreateLogger<IslandAccessEvaluator>();
+        if (logger == null)
+        {
+            return;
+        }
+
+        var userName = user?.Identity?.IsAuthenticated == true
+            ? (user.Identity?.Name ?? "(authenticated, no name claim)")
+            : "(anonymous)";
+
+        logger.LogWarning(
+            "Island access {Outcome} for '{IslandName}' (policy: {PolicyName}), user: {UserName}. {Reason}",
+            outcome, islandName, policyName ?? "(none)", userName, reason);
     }
 
     private static IslandPolicyResolution ResolvePolicy(

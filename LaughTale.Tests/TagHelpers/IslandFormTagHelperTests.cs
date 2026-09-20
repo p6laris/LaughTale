@@ -147,6 +147,23 @@ public class IslandFormTagHelperTests
     }
 
     [Fact]
+    public void Process_SetsRealActionAttribute_ForNoJsFallbackSubmit()
+    {
+        var (antiforgery, viewContext) = CreateRealAntiforgeryContext();
+        viewContext.HttpContext.Request.Path = "/orders/42";
+        var helper = new IslandFormTagHelper(antiforgery)
+        {
+            ViewContext = viewContext,
+            Action = "Save"
+        };
+
+        var (context, output) = CreateTagHelperContext("island-form");
+        helper.Process(context, output);
+
+        Assert.Equal("/orders/42?handler=Save", output.Attributes["action"].Value);
+    }
+
+    [Fact]
     public void Process_ExplicitSwap_OverridesDefault()
     {
         var (antiforgery, viewContext) = CreateRealAntiforgeryContext();

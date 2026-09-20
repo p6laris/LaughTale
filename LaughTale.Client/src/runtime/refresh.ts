@@ -7,11 +7,24 @@
 import { rehydrateIsland } from './hydrator';
 import { getIslandUpdateFn } from './island-instances';
 import { parseAndReviveProps } from './reviver';
+import { emitComponentEvent } from './events';
 import type { IslandContext } from './registry';
 
 export interface RefreshOptions {
     endpoint?: string;
     signal?: AbortSignal;
+}
+
+/**
+ * Thrown by refreshIsland() when the server rejects the refresh with a non-2xx status, carrying
+ * the HTTP status code so callers (and the `laughtale:island:refresh-error` listener below) can
+ * distinguish "not authorized/session expired" (401/403) from any other refresh failure.
+ */
+export class IslandRefreshError extends Error {
+    constructor(public readonly status: number, public readonly islandName: string) {
+        super(`Failed to refresh island '${islandName}': HTTP ${status}`);
+        this.name = 'IslandRefreshError';
+    }
 }
 
 /**
@@ -63,7 +76,12 @@ export async function refreshIsland(
         });
 
         if (!response.ok) {
-            throw new Error(`Failed to refresh island '${name}': HTTP ${response.status}`);
+            if (response.status === 401 || response.status === 403) {
+                // Distinguishable from any other refresh failure so app code can react (e.g. redirect
+                // to login, show a "session expired" toast) instead of treating it as a generic error.
+                emitComponentEvent(container, 'island', 'refresh-unauthorized', { name, status: response.status });
+            }
+            throw new IslandRefreshError(response.status, name);
         }
 
         const html = await response.text();

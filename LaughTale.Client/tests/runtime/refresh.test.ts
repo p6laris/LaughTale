@@ -3,7 +3,7 @@ import { describe, it, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { defineIsland, clearRegistry } from '../../src/runtime/registry.ts';
 import { hydrateIsland } from '../../src/runtime/hydrator.ts';
-import { refreshIsland } from '../../src/runtime/refresh.ts';
+import { refreshIsland, IslandRefreshError } from '../../src/runtime/refresh.ts';
 
 describe('Server-Driven Island Refresh Suite ( / P12)', () => {
     beforeEach(() => {
@@ -72,5 +72,46 @@ describe('Server-Driven Island Refresh Suite ( / P12)', () => {
 
         assert.ok((container as any).island);
         assert.equal(typeof (container as any).island.refresh, 'function');
+    });
+
+    it('throws a typed IslandRefreshError and emits an unauthorized event on a 401 response', async () => {
+        defineIsland('guarded-card', async () => ({
+            default: (el: HTMLElement) => {
+                el.textContent = 'Guarded Content';
+            }
+        }));
+
+        const container = document.createElement('div');
+        container.setAttribute('data-island', 'guarded-card');
+        container.setAttribute('data-hydrate', 'load');
+        document.body.appendChild(container);
+
+        hydrateIsland(container);
+        await new Promise(r => setTimeout(r, 20));
+
+        let unauthorizedDetail: any = null;
+        container.addEventListener('laughtale:island:refresh-unauthorized', (e: any) => {
+            unauthorizedDetail = e.detail;
+        });
+
+        const originalFetch = global.fetch;
+        global.fetch = async () => ({ ok: false, status: 401, text: async () => '' } as any);
+
+        try {
+            await assert.rejects(
+                () => refreshIsland(container),
+                (err: unknown) => {
+                    assert.ok(err instanceof IslandRefreshError);
+                    assert.equal((err as IslandRefreshError).status, 401);
+                    return true;
+                }
+            );
+
+            assert.ok(unauthorizedDetail);
+            assert.equal(unauthorizedDetail.status, 401);
+            assert.equal(unauthorizedDetail.name, 'guarded-card');
+        } finally {
+            global.fetch = originalFetch;
+        }
     });
 });

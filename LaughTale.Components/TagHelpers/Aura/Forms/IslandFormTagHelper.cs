@@ -49,9 +49,16 @@ public class IslandFormTagHelper : TagHelper
     {
         var id = Target?.TrimStart('#') ?? $"lt-form-{context.UniqueId}";
 
+        // A real `action` pointing at the current page + handler, so a plain HTML submit (no-JS,
+        // or l-post's fetch throwing before it can intercept the submit) still lands on the
+        // correct Razor Pages handler instead of GET-navigating to the current URL with no handler.
+        var request = ViewContext!.HttpContext.Request;
+        var action = $"{request.PathBase}{request.Path}?handler={Action}";
+
         output.TagName = "form";
         output.Attributes.SetAttribute("method", "post");
         output.Attributes.SetAttribute("id", id);
+        output.Attributes.SetAttribute("action", action);
         output.Attributes.SetAttribute("l-post", $"?handler={Action}");
         output.Attributes.SetAttribute("l-target", $"#{id}");
         output.Attributes.SetAttribute("l-swap", Swap);
