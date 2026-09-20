@@ -8,11 +8,25 @@ namespace LaughTale.Tests;
 
 public class TagHelperReflectionSnapshotTests
 {
+    /// <summary>
+    /// TagHelpers that legitimately throw when instantiated with all-default property values, because
+    /// a required attribute (with no sensible fallback) is mandatory authoring input, not something
+    /// this generic default-value smoke test can exercise meaningfully. Each has its own dedicated,
+    /// more precise test file exercising both its happy path and its throw-on-empty-required-attribute
+    /// behavior instead (see LaughTale.Components.TagHelpers.Aura.Regions.IslandRegionTagHelper ->
+    /// IslandRegionTagHelperTests.Process_EmptyName_Throws).
+    /// </summary>
+    private static readonly HashSet<Type> RequiresNonDefaultConfiguration = new()
+    {
+        typeof(LaughTale.Components.TagHelpers.Aura.Regions.IslandRegionTagHelper)
+    };
+
     public static IEnumerable<object[]> GetAllComponentTagHelperTypes()
     {
         var assembly = typeof(IslandButtonTagHelper).Assembly;
         var tagHelperTypes = assembly.GetTypes()
             .Where(t => typeof(ITagHelper).IsAssignableFrom(t) && !t.IsAbstract && t.GetConstructor(Type.EmptyTypes) != null)
+            .Where(t => !RequiresNonDefaultConfiguration.Contains(t))
             .OrderBy(t => t.Name);
 
         foreach (var type in tagHelperTypes)

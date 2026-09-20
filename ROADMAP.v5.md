@@ -661,11 +661,65 @@ doesn't forward it as a slot (an author-error case, not a framework gap).
 | Item | From | Effort |
 |---|---|---|
 | **Out-of-order streaming** — flush shell with skeletons, resolve slow data in background tasks, append late fragments as `<template>`. *.NET's real threads and `IAsyncEnumerable` make this cleaner than Node's* | Astro server islands, Next PPR | M · 3 wks |
-| **Partials** — named page regions updated by link/form, everything else untouched. *The most natural fit on this list for what LaughTale already is* | Fresh, Turbo Frames | S–M · 2 wks |
+| **Partials — [CLOSED, this pass]** — named page regions updated by link/form, everything else untouched. *The most natural fit on this list for what LaughTale already is* | Fresh, Turbo Frames | S–M · 2 wks |
 | **Route rules / hybrid rendering** — per-path SSR/SSG/ISR/CSR in one config table | Nuxt `routeRules` | M · 2–3 wks |
 | **Nested layouts & outlets** — morph only the lowest common layout ancestor; sidebar scroll and media survive navigation by default | Nuxt, Next | M · 3 wks |
 | **Delegated event resumability** — one listener on `document.body`, intent in attributes, chunk on first interaction | Qwik | M · 2–3 wks |
 | **Middleware & typed head** — per-route chain (auth, tenant, A/B) plus typed metadata API | Next, Nuxt, Astro | S–M · 2 wks |
+
+**Partials, closed this pass.** Investigated fresh before implementing anything: almost all of the
+underlying machinery already existed and worked. `bindServerAction()`
+(`LaughTale.Client/src/directives/htmx.ts`) is a real, tag-agnostic fragment-swap engine — it computes
+its trigger event by tag name with no gate excluding `<a>`, so a plain `<a l-get="..."
+l-target="#foo">` already fired the engine correctly before this pass, confirmed by reading the code
+directly rather than assumed. The server side was already proven end-to-end too:
+`LaughTale.Showcase/Pages/ServerActions.cshtml`'s `<island-form action="Increment"
+target="#counter-panel">` already targets an ANCESTOR container (not just itself) and swaps in a real
+`Partial("_CounterPartial", ...)` render — "a control updates a *different* named region" already
+worked when hand-wired with a manually-chosen CSS id, and `IslandFormTagHelper`'s existing `Target`
+attribute already accepts any CSS id — so **the form side of Partials needed zero new code**.
+
+What was genuinely missing, and what this pass actually added: (1) `<island-region name="Foo">` (new
+`LaughTale.Components/TagHelpers/Aura/Regions/IslandRegionTagHelper.cs`) — a named, addressable region
+declaration, generating a stable `id="lt-region-Foo"`/`data-region="Foo"`, replacing the previous
+"author hand-picks and manually keeps a raw CSS id in sync" burden; (2) `<a region="Foo" href="...">`
+(new `RegionLinkTagHelper.cs`, same folder) — the first real wiring anywhere in the codebase for a
+*link* to drive a fragment swap of a separate target, reading the final resolved `href` (so it composes
+with `asp-page`/`asp-controller` authoring), setting `l-get`/`l-target`/`l-swap` automatically.
+Deliberately GET-only (no POST variant on `<a>`) so the no-JS fallback (a plain top-level navigation to
+`href`) stays fully intact — the same progressive-enhancement principle Part F's `IslandFormTagHelper`
+`action`-attribute fix already established. Defaults to an `innerHTML` swap, not `outerHTML`: the
+region's own wrapping element is the stable target, and a server partial need only render the inner
+content — an `outerHTML` swap would destroy the addressable container itself unless the partial
+redeclared the exact same id, which there's no reason for it to do (this also sidesteps the
+`outerHTML`+stale-reference gotcha `htmx.ts`'s own comments already document from the `<island-form>`
+work).
+
+One design question resolved by reading the code rather than left to a live-only check: `bindServerAction`'s
+click listener is attached directly on the element and calls `e.preventDefault()` synchronously as the
+first statement, before any `await`; since a DOM event's bubble phase runs element-level listeners
+before the `document`-level listener the SPA router's `handleLinkClick` is attached to (which itself
+checks `e.defaultPrevented` first), an `<a l-get="...">` element already wins against the router's own
+link interception with no extra guard needed. **Confirmed live, not just reasoned about**: a real
+Showcase page (`LaughTale.Showcase/Pages/Partials.cshtml`, new) with 3 region-links was clicked
+end-to-end — the region content updated correctly each time, the URL bar and page title never changed,
+no full reload occurred, and the console stayed clean. One minor, pre-existing, out-of-scope
+observation made during that live check: the router's viewport/hover prefetch manager
+(`router/prefetch.ts`) fires for *any* same-origin `<a>` with an `href`, including a region-link, so it
+issues an extra prefetch GET for a URL that will only ever actually be fetched via `l-get`'s own
+interception, never truly navigated to — wasteful but harmless (idempotent GET, `200 OK`, no console
+errors), and not something this pass touches since it's generic router behavior unrelated to regions
+specifically.
+
+Tests: `LaughTale.Tests/TagHelpers/IslandRegionTagHelperTests.cs` (id/data-region generation, custom
+tag, empty-name throws, child content preserved),
+`LaughTale.Tests/TagHelpers/RegionLinkTagHelperTests.cs` (l-get/l-target/l-swap wiring, custom swap
+mode, no-ops on an empty href, `region` attribute replaced with `data-region`). One existing test
+needed a small update: `TagHelperReflectionSnapshotTests`'s generic all-TagHelpers default-value smoke
+test instantiates every simple TagHelper with default properties, which doesn't fit
+`IslandRegionTagHelper`'s legitimately-required `name` attribute — excluded via a small, documented
+allowlist (the same shape as `IslandFormTagHelper`'s own exclusion, which happens naturally via its
+constructor-injected `IAntiforgery` dependency). Full suite: 407/407.
 
 ---
 

@@ -1,0 +1,60 @@
+@page "/Partials"
+@model LaughTale.Showcase.Pages.PartialsModel
+@{
+    ViewData["Title"] = "Partials";
+}
+
+<div class="app-container" style="max-width: 1100px; display: flex; flex-direction: column; gap: 2rem; padding-bottom: 3rem;">
+
+    <!-- Header Banner -->
+    <div style="background: linear-gradient(135deg, var(--p-surface-0) 0%, var(--p-surface-50) 100%); border: 1px solid var(--p-border-color); border-radius: 1.25rem; padding: 2.5rem 2rem; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04);">
+        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+            <div style="width: 2.5rem; height: 2.5rem; border-radius: 10px; background: linear-gradient(135deg, var(--p-primary-500), var(--p-primary-700)); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800;">
+                &#128196;
+            </div>
+            <div>
+                <h1 style="font-size: 1.875rem; font-weight: 800; color: var(--p-text-color); margin: 0;">Partials</h1>
+                <p style="color: var(--p-text-muted); font-size: 0.875rem; margin: 0.25rem 0 0;">ROADMAP.v5.md Part E: a named page region updated by a plain link - everything else on the page untouched.</p>
+            </div>
+        </div>
+
+        <div style="margin-top: 1.25rem; padding: 0.75rem 1rem; background: var(--p-emerald-50, rgba(16, 185, 129, 0.1)); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 8px; font-size: 0.8125rem; color: #047857; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+            <span>&#128196; <strong>Pipeline:</strong> <code>&lt;a region="preview" href="?handler=Show&amp;id=1"&gt;</code> &rarr; <code>RegionLinkTagHelper</code> (<code>l-get</code>/<code>l-target</code>/<code>l-swap</code>) &rarr; <code>bindServerAction()</code> intercepts click &rarr; <code>OnGetShow</code> &rarr; <code>Partial("_PartialPreview")</code> &rarr; swapped into <code>&lt;island-region name="preview"&gt;</code>, zero page reload.</span>
+            <span class="p-tag p-tag-success" style="font-size: 0.7rem;">New</span>
+        </div>
+    </div>
+
+    <!-- Live Demo -->
+    <div style="background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: 1rem; padding: 1.75rem;">
+        <h2 style="font-size: 1.25rem; font-weight: 800; color: var(--p-text-color); margin: 0 0 0.5rem;">Live Preview</h2>
+        <p style="color: var(--p-text-muted); font-size: 0.8125rem; margin: 0 0 1.5rem;">
+            Clicking an item below fetches just the preview panel's HTML from a named GET handler - the links, page title, and everything else on the page never re-render.
+        </p>
+
+        <div style="display: flex; gap: 2rem; flex-wrap: wrap;">
+            <div style="display: flex; flex-direction: column; gap: 0.5rem; min-width: 160px;">
+                <a region="preview" href="?handler=Show&id=0" class="p-button p-button-outlined" style="text-align: left;">Aurora</a>
+                <a region="preview" href="?handler=Show&id=1" class="p-button p-button-outlined" style="text-align: left;">Borealis</a>
+                <a region="preview" href="?handler=Show&id=2" class="p-button p-button-outlined" style="text-align: left;">Comet</a>
+            </div>
+
+            <island-region name="preview" style="flex: 1; min-width: 240px;">
+                <partial name="_PartialPreview" model="Model" />
+            </island-region>
+        </div>
+    </div>
+
+    <!-- Authoring Contract -->
+    <div style="background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: 1rem; padding: 1.75rem; overflow-x: auto;">
+        <h2 style="font-size: 1.25rem; font-weight: 800; color: var(--p-text-color); margin: 0 0 1rem;">Source: Pages/Partials.cshtml.cs</h2>
+        <pre style="background: var(--p-surface-50); border: 1px solid var(--p-border-color); border-radius: 0.75rem; padding: 1rem 1.25rem; font-size: 0.8125rem; line-height: 1.6; overflow-x: auto; margin: 0;"><code>public IActionResult OnGetShow(int id)
+{
+    SelectedId = id;
+    return Partial("_PartialPreview", this);
+}</code></pre>
+        <p style="color: var(--p-text-muted); font-size: 0.75rem; margin: 0.85rem 0 0;">
+            No JSON, no client-side state, no manual fetch/JS wiring: <code>&lt;a region="preview" href="..."&gt;</code> is still a real, working link (no-JS fallback navigates normally), and <code>&lt;island-region name="preview"&gt;</code> just gives the target panel a stable, addressable id instead of one hand-picked and kept in sync by hand.
+        </p>
+    </div>
+
+</div>
