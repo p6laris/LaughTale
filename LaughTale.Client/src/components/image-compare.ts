@@ -1,6 +1,7 @@
 import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts';
 import type { IslandContext } from '../runtime/registry';
 import { LucideIcons, getLucideIcon } from '../icons/lucide';
+import { getCompareChartSvg } from '../icons/decorative-svgs';
 import { injectIslandStyle } from '../runtime/styles';
 import { emitComponentEvent } from '../runtime/events';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
@@ -243,23 +244,7 @@ export default function CompareIsland(container: HTMLElement, props: CompareProp
         let afterContentHtml: Raw | string = '';
 
         if (isWithChart) {
-            beforeContentHtml = html`
-                <svg class="absolute h-full w-full" data-part="root" viewBox="0 0 644 189" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%;">
-                    <g clip-path="url(#compare_chart_clip)">
-                        <path d="M0.5 118.499C0.5 118.499 82 102.999 113.5 89.4989C145 75.9989 188.444 87.7869 235 77.4989C272.684 69.1719 293.654 62.4939 329 46.9989C409.332 11.7849 479.5 86.5 510.5 78C541.5 69.5 635.951 0.848863 644 1.49886" stroke="var(--lt-primary-500, var(--lt-primary-500))" stroke-width="2.5" />
-                        <path d="M113.5 89.5006C82 103.001 0.5 118.501 0.5 118.501V188.501H644V1.50065C635.951 0.850647 541.5 69.5 510.5 78C479.5 86.5 409.332 11.7866 329 47.0006C293.654 62.4956 272.684 69.1736 235 77.5006C188.444 87.7886 145 76.0006 113.5 89.5006Z" fill="url(#compare_chart_gradient)" />
-                    </g>
-                    <defs>
-                        <clipPath id="compare_chart_clip">
-                            <rect width="644" height="189" fill="white" />
-                        </clipPath>
-                        <linearGradient id="compare_chart_gradient" x1="322.25" x2="322.25" y1="1.477" y2="188.5" gradientUnits="userSpaceOnUse">
-                            <stop stop-color="var(--lt-primary-500, var(--lt-primary-500))" stop-opacity="0.4" />
-                            <stop offset="1" stop-color="var(--lt-primary-500, var(--lt-primary-500))" stop-opacity="0" />
-                        </linearGradient>
-                    </defs>
-                </svg>
-            `;
+            beforeContentHtml = unsafe(getCompareChartSvg());
             afterContentHtml = html`
                 <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: var(--lt-surface-50); color: var(--p-text-muted); font-size: 0.875rem;">
                     <span>Hover to reveal chart trajectory</span>

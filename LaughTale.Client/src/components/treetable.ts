@@ -568,11 +568,10 @@ const SVG_ICONS = {
     check: getLucideIcon('check', 12, 3),
     minus: getLucideIcon('minus', 12, 3),
     search: getLucideIcon('search', 14, 2),
-    // NOTE: no Lucide equivalent found for this two-concentric-circle "cog" glyph — it has no
-    // gear teeth at all (unlike lucide's cog.svg/settings.svg), and lucide's closest plain-circle
-    // icon (circle-dot, r=10/r=1) has different proportions and an unrelated target/radio meaning.
-    // Left as raw markup.
-    cog: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/><path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/></svg>',
+    // The original two-concentric-circle glyph had no gear teeth at all and matched no real Lucide
+    // icon by shape; used here purely as a "column settings" affordance, so Lucide's actual gear
+    // icon serves the same purpose correctly even though it isn't a pixel-identical redraw.
+    cog: getLucideIcon('settings', 14, 2),
     spinner: getLucideIcon('spinner', 18, 2, undefined, { class: 'animate-spin', dataPart: 'root' }),
     refresh: getLucideIcon('refresh-ccw', 14, 2),
     download: getLucideIcon('download', 14, 2),

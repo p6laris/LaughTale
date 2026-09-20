@@ -75,12 +75,6 @@ export default function KnobIsland(container: HTMLElement, props: KnobProps, ctx
     formField.detach();
     setHtml(container, html`
         <div class="laughtale-knob" data-part="root" tabindex="${props.disabled ? '-1' : '0'}" role="slider" aria-valuenow="${currentValue}" aria-valuemin="${min}" aria-valuemax="${max}" aria-label="${(props as any).ariaLabel || 'Knob'}" style="position: relative; display: inline-flex; align-items: center; justify-content: center; width: ${size}px; height: ${size}px; user-select: none; cursor: ${props.disabled ? 'not-allowed' : 'pointer'}; touch-action: none;">
-            <svg width="${size}" height="${size}" style="transform: rotate(-90deg); pointer-events: none;">
-                <!-- Background Circle -->
-                <circle cx="${size / 2}" cy="${size / 2}" r="${radius}" fill="transparent" stroke="var(--lt-surface-200)" stroke-width="${strokeWidth}" />
-                <!-- Progress Arc -->
-                <circle class="knob-progress-circle" cx="${size / 2}" cy="${size / 2}" r="${radius}" fill="transparent" stroke="${props.color || 'var(--lt-primary-600)'}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-dasharray="${circumference}" stroke-dashoffset="${initialOffset}" style="transition: stroke-dashoffset 0.05s ease;" />
-            </svg>
             <span class="knob-value-display" style="position: absolute; font-size: ${size * 0.2}px; font-weight: 700; color: var(--lt-surface-900); pointer-events: none;">
                 ${initialText}
             </span>
@@ -89,8 +83,41 @@ export default function KnobIsland(container: HTMLElement, props: KnobProps, ctx
     formField.reattach();
 
     const knobEl = container.querySelector<HTMLElement>('.laughtale-knob')!;
-    const progressCircle = container.querySelector<SVGCircleElement>('.knob-progress-circle')!;
     const valueDisplay = container.querySelector<HTMLElement>('.knob-value-display')!;
+
+    // Built via the SVG DOM API rather than a markup string: the ring is two plain circles with a
+    // handful of numeric attributes derived from props, and updateVisuals() already mutates it
+    // directly afterward (stroke-dashoffset) - there's no templating need a string literal buys here.
+    const SVG_NS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(SVG_NS, 'svg');
+    svg.setAttribute('width', String(size));
+    svg.setAttribute('height', String(size));
+    svg.style.transform = 'rotate(-90deg)';
+    svg.style.pointerEvents = 'none';
+
+    const backgroundCircle = document.createElementNS(SVG_NS, 'circle');
+    backgroundCircle.setAttribute('cx', String(size / 2));
+    backgroundCircle.setAttribute('cy', String(size / 2));
+    backgroundCircle.setAttribute('r', String(radius));
+    backgroundCircle.setAttribute('fill', 'transparent');
+    backgroundCircle.setAttribute('stroke', 'var(--lt-surface-200)');
+    backgroundCircle.setAttribute('stroke-width', String(strokeWidth));
+
+    const progressCircle = document.createElementNS(SVG_NS, 'circle');
+    progressCircle.classList.add('knob-progress-circle');
+    progressCircle.setAttribute('cx', String(size / 2));
+    progressCircle.setAttribute('cy', String(size / 2));
+    progressCircle.setAttribute('r', String(radius));
+    progressCircle.setAttribute('fill', 'transparent');
+    progressCircle.setAttribute('stroke', props.color || 'var(--lt-primary-600)');
+    progressCircle.setAttribute('stroke-width', String(strokeWidth));
+    progressCircle.setAttribute('stroke-linecap', 'round');
+    progressCircle.setAttribute('stroke-dasharray', String(circumference));
+    progressCircle.setAttribute('stroke-dashoffset', String(initialOffset));
+    progressCircle.style.transition = 'stroke-dashoffset 0.05s ease';
+
+    svg.append(backgroundCircle, progressCircle);
+    knobEl.prepend(svg);
 
     function updateVisuals() {
         progressCircle.style.strokeDashoffset = `${getOffset(currentValue)}`;

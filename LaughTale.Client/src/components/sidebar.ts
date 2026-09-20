@@ -14,6 +14,7 @@ import type { IslandContext } from '../runtime/registry';
 
 import { SidebarItem } from '../types/models';
 import { LucideIcons, getLucideIcon } from '../icons/lucide';
+import { getBrandMarkSvg } from '../icons/decorative-svgs';
 import { injectIslandStyle } from '../runtime/styles';
 import { useFocusTrap } from '../composables/useFocusTrap';
 import { useLocale } from '../composables/useLocale';
@@ -1370,7 +1371,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps, ctx?
             return `
                 <div style="display: flex; align-items: center; gap: 0.65rem; width: 100%; overflow: hidden;">
                     <a href="/" style="display: flex; width: 2.1rem; height: 2.1rem; border-radius: 8px; background: linear-gradient(135deg, var(--lt-primary-500, var(--lt-primary-500)), var(--lt-primary-700, var(--lt-primary-700))); color: #ffffff; align-items: center; justify-content: center; flex-shrink: 0; text-decoration: none;" title="${headerTitle}">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="20" height="20" fill="currentColor"><path d="M26 14 L42 14 C42 42 62 58 84 58 L84 74 C52 74 26 52 26 14 Z" /><circle cx="34" cy="74" r="6" /></svg>
+                        ${getBrandMarkSvg(20)}
                     </a>
                     <span class="p-sidebar-item-label p-sidebar-header-label" style="font-weight: 800; font-size: 0.9375rem; color: var(--lt-text-primary);">${headerTitle}</span>
                 </div>
