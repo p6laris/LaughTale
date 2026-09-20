@@ -736,6 +736,40 @@ possibly-stale figures — all of the below are confirmed still real and still o
   markup allowed it, e.g. `blockui.ts`). Full production build, all three gzip budgets, and all 495
   client tests verified green after the retrofit; the all-in-one bundle also shrank measurably
   (376.93 KB → 372.81 KB gzip) from removing the duplicated inline markup.
+
+  **[CLOSED, 2026-09-20] The remaining 53 closed too — 53 → 4, and the "no current Lucide match"
+  framing above turned out to be overstated for most of them.** Re-verified directly against the
+  actual installed `lucide-static` package rather than trusting the prior pass's own notes: the bulk
+  of the "pre-redesign, no match" icons (`eye`/`eye-off`, `star`, `cog`-named-but-actually-`zap`,
+  `folder-open`, `truck`, `mail`, `shopping-bag`, `id-card`, `chevrons-left/right`, `video`, `pencil`,
+  `settings`, `sparkles`, `square-pen`, `message-circle`, `paperclip`, `trash-2`, `ban`, `shield`,
+  `layers`, `circle-check-big`, and more) DO have a same-named Lucide icon today — Lucide's own global
+  redesign changed the path geometry (sharper/geometric → rounder/organic) since these literals were
+  hand-written; the blocker was a visual-style decision, not a technical one. User confirmed converting
+  all of them to the current shapes. Split across 3 parallel background agents by file group, each
+  matching hand-written paths against the real `node_modules/lucide-static/icons/*.svg` source before
+  substituting (never guessing from a variable/key name — `orgchart.ts`'s icon named `bolt` turned out
+  to actually be a `zap` glyph, confirmed by path-vertex comparison, not by trusting its name).
+  `getLucideIcon()` gained a 5th optional `options` param (`class`, `filled`, `dataPart`) to retire
+  three fragile `.replace()` string-hacks that had been post-processing the module's own output
+  (`tree.ts`/`treetable.ts`'s spinner, `tieredmenu.ts`'s submenu chevron, `toast.ts`'s close icon) and
+  to unlock `rating.ts`'s filled star and `toolbar.ts`'s solid play/pause icons, which the stroke-only
+  template genuinely couldn't produce before. `rawSvgLiterals` (confirmed via `audit-metrics.mjs`)
+  dropped from 53 to **4**, all genuinely irreducible and now documented in source rather than just
+  implied by omission: `sidebar.ts`'s 100×100 custom brand-mark path (not an icon at all), `image-
+  compare.ts`'s decorative sample-chart illustration, `knob.ts`'s data-driven circular-progress
+  `<circle>` arcs, and `treetable.ts`'s `cog` (a plain two-circle glyph with no gear teeth at all —
+  doesn't match any Lucide gear/settings icon by shape, confirmed by direct comparison, not just by
+  name). Full `npm run typecheck`/`npm test` (591/591)/`npm run build` green afterward, all three gzip
+  budgets and all 76 per-island chunk budgets still pass. Live-verified in Showcase: sampled icons
+  across `accordion`/`treetable`/`sidebar` render the correct, current Lucide shapes at their original
+  size; a repo-wide check confirmed every icon id referenced by a converted component resolves to a
+  real symbol in the generated sprite. **An unrelated, pre-existing gap found along the way, spun off
+  as a separate task rather than fixed here**: 54 icon ids referenced somewhere in the Showcase (e.g.
+  `activity`, `folder-tree`, `align-left`, `twitter`, `git-branch`) resolve to nothing because they
+  were never wired through `getLucideIcon()` in the first place, so the sprite generator's static scan
+  never picked them up — confirmed pre-dating this pass via `git show HEAD:...icons.svg`, not a
+  regression from this work.
 - **Two private copies of `escapeHtml`** (corrected from "three, subsumed" above) —
   `directives/tooltip.ts`, `icons/lucide.ts`.
 - **39 `LEGACY_ALIASES`** in the registry (confirmed: exactly 39 today), commented "scheduled for
@@ -895,6 +929,54 @@ needed" line for both was wrong. The genuinely open items are now closed:
   transition (page-load content animates in, same code path as any later toggle) — a conscious
   design choice for uniformity over Vue's opt-in `appear` flag, not an oversight, in case a future pass
   wants an opt-out.
+
+  **[CLOSED, 2026-09-20] `useAutoAnimate.ts`/`dataview.ts` closed too — and re-investigating found a
+  real, currently-shipping bug, not just a test-coverage gap.** `dataview.ts`'s render() rebuilt its
+  ENTIRE container via one top-level `setHtml()` call on every sort/filter/paginate/layout-switch —
+  meaning the `MutationObserver` `useAutoAnimate` installs never survived long enough to observe a
+  real mutation; the "animated" container element itself was destroyed and recreated every single
+  render. `useAutoAnimate.ts` was live code with its one real consumer provably non-functional in
+  every one of `dataview.ts`'s actual interactions, on top of having zero test coverage. Fix: retrofitted
+  `dataview.ts` onto the same shell-mount + `patchList` pattern the `multiselect.ts`/`datatable.ts`/
+  `autocomplete.ts`/`select.ts` retrofit series already established — `render()` split into a one-time
+  `mountShell()` (persistent header/content/paginator slots, delegated event listeners bound once
+  instead of per-render) plus a persistent list/grid container fed through `patchList`'s animated
+  (WAAPI enter/move/exit) path instead of `useAutoAnimate`, which is a strict superset of what the old
+  mechanism did (real exit animations; the old one had none at all). `useAutoAnimate.ts` deleted (zero
+  other consumers), along with the already-confirmed-dead `initAnimationStyles`/`injectRipple` in
+  `styles/animations.ts` and their re-exports in `runtime.ts`/`runtime-core.ts`. `useTransition.ts`
+  left untouched — genuinely serving a different need (single-element enter/exit vs. list reordering),
+  2 real consumers, well-integrated with `l-if`.
+  Added a 12-test characterization suite (`tests/components/dataview.test.ts`, new — this component
+  had zero prior coverage, same situation the four earlier retrofits each found). **Three real
+  test-writing bugs found and fixed while getting the suite green, none of them production bugs**:
+  (1) `assert.equal(nodeA, nodeB, ...)` on raw DOM nodes hangs/OOMs while `util.inspect()`-formatting
+  a failure message against a node's circular document/parent structure — the exact class of gotcha
+  already documented in this file's `datatable.ts` retrofit entry, now hit a second time; fixed by
+  comparing `nodeA === nodeB` (a boolean) instead of the nodes themselves. (2) `patchListAnimated`'s
+  exit removal resolves via a `.then()` microtask even when WAAPI isn't available (happy-dom has no
+  `Element.prototype.animate`) — a test asserting synchronously right after triggering a removal needs
+  one `await Promise.resolve()` first, or it sees stale pre-removal DOM state. (3) The "same node
+  survives a reorder" assertion initially checked the wrong DOM level — `patchList` only guarantees
+  its own synthetic `[data-key]` wrapper's identity, not the inner element a caller renders inside it
+  (the same "thin double-nesting" trade-off `autocomplete.ts`'s own retrofit already documented and
+  accepted); fixed to check the wrapper.
+  Full verification: `npm run typecheck`/`npm test` (591/591, +12 from zero)/`npm run build` green, all
+  bundle-size and per-island chunk budgets pass. Live-verified in Showcase: DataView renders/sorts/
+  paginates/toggles wishlist correctly; a real pagination click DOES correctly start playing exit/enter
+  WAAPI animations (confirmed via `element.getAnimations()` in the live page) — but this specific
+  automated browser pane doesn't reliably drive a WAAPI animation to actual completion (a brand-new,
+  completely framework-independent `el.animate(...)` call in the same page also never fired `onfinish`
+  after 300ms), the same already-documented pane-rendering limitation from this document's own WebKit
+  view-transition entry. Manually forcing the stuck animation to `.finish()` did not unstick it either,
+  consistent with the pane simply not compositing/ticking animations right now rather than a logic bug
+  — the unit tests (environment-independent) already prove the reconciliation and removal logic is
+  correct once a promise actually resolves, which is what matters for real browsers.
+  **A separate, pre-existing, unrelated gap found and spun off rather than fixed here**: live-checking
+  icon rendering during this same pass turned up 54 icon ids referenced somewhere in the Showcase
+  (`activity`, `folder-tree`, `align-left`, `twitter`, `git-branch`, ...) that resolve to nothing
+  because they were never wired through `getLucideIcon()`, so the sprite generator's static scan never
+  picked them up — confirmed via `git show HEAD:...icons.svg` to predate this session entirely.
 - **Two real component retrofits as proof, not a framework-wide rewrite**: `components/multiselect.ts`
   — the cleanest, smallest match for the innerHTML-rebuild complaint below (full item-list rebuild plus
   a full per-row listener rebind on every filter keystroke, no debounce). `selected`/`filterQuery` are
