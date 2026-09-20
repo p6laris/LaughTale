@@ -454,14 +454,93 @@ function hydrateVisible(container: HTMLElement, name: string): void {
     }, { once: true });
 }
 
-function hydrateInteraction(container: HTMLElement, name: string): void {
-    const events = ['mouseenter', 'focusin', 'touchstart', 'click'];
-    const onInteract = () => {
-        events.forEach(e => container.removeEventListener(e, onInteract));
-        executeHydration(container, name);
-    };
+/**
+ * ROADMAP.v5.md Part E "Delegated event resumability": one shared listener per event type on
+ * `document`, not N listeners per interaction-strategy island - the same shared-singleton shape
+ * `hydrateVisible`'s `getSharedVisibleObserver` already established for IntersectionObserver above.
+ *
+ * `mouseover` is used instead of `mouseenter` (the previous, per-container-only event list) because
+ * `mouseenter` does not bubble and therefore cannot be delegated from `document` - the same
+ * bubbling-vs-delegation substitution this codebase's `autocomplete.ts` retrofit already established
+ * for its own delegated hover-highlight listener.
+ */
+const INTERACTION_EVENTS = ['mouseover', 'focusin', 'touchstart', 'click'] as const;
+const MAX_BUFFERED_EVENTS_PER_ISLAND = 3;
 
-    events.forEach(e => container.addEventListener(e, onInteract, { once: true, passive: true }));
+const pendingInteractionContainers = new Set<HTMLElement>();
+const bufferedInteractionEvents = new WeakMap<HTMLElement, Event[]>();
+let interactionListenersBound = false;
+
+function ensureDelegatedInteractionListeners(): void {
+    if (interactionListenersBound || typeof document === 'undefined') return;
+    interactionListenersBound = true;
+    for (const eventName of INTERACTION_EVENTS) {
+        document.addEventListener(eventName, handleDelegatedInteraction, { passive: true });
+    }
+}
+
+function handleDelegatedInteraction(e: Event): void {
+    const target = e.target as HTMLElement | null;
+    const container = target?.closest<HTMLElement>(ISLAND_SELECTOR);
+    if (!container) return;
+
+    if (pendingInteractionContainers.has(container)) {
+        pendingInteractionContainers.delete(container);
+        const name = container.getAttribute('data-island') || container.getAttribute('name');
+        if (!name) return;
+        void executeHydration(container, name).then(() => replayBufferedInteractionEvents(container));
+        return;
+    }
+
+    // A second qualifying interaction landed on the SAME container while its chunk is still loading
+    // (getIslandState is 'pending', not 'idle') - buffer it instead of silently dropping it, rather
+    // than assume every other state ('mounted'/'failed'/unrelated element) needs any action.
+    if (getIslandState(container) === 'pending') {
+        const buffered = bufferedInteractionEvents.get(container) ?? [];
+        if (buffered.length < MAX_BUFFERED_EVENTS_PER_ISLAND) {
+            buffered.push(e);
+            bufferedInteractionEvents.set(container, buffered);
+        }
+    }
+}
+
+/**
+ * Replays any interactions that happened on `container` after its first (hydration-triggering)
+ * interaction but before its chunk finished loading and mounting - e.g. a fast double-click. Replays
+ * the raw event on its ORIGINAL target so any handler the just-mounted component attaches sees it.
+ *
+ * Deliberately does not special-case a native default action (link navigation, form submission) on
+ * the replayed event: that action, if any, already ran synchronously during the event's first, real
+ * dispatch - this delegated listener is `{ passive: true }` and never called `preventDefault()`, so
+ * there is nothing left to double-fire at the browser level. This is a best-effort replay of the
+ * event for the island's OWN JS-driven handlers, matching the common shape of a `hydrate="interaction"`
+ * island (a self-contained widget whose entire behavior is JS, which is the whole reason its
+ * hydration is deferred to interaction in the first place).
+ */
+function replayBufferedInteractionEvents(container: HTMLElement): void {
+    const buffered = bufferedInteractionEvents.get(container);
+    if (!buffered || buffered.length === 0) return;
+    bufferedInteractionEvents.delete(container);
+
+    for (const event of buffered) {
+        try {
+            event.target?.dispatchEvent(event);
+        } catch (err) {
+            console.warn('[LaughTale] Failed to replay a buffered interaction event during hydration:', err);
+        }
+    }
+}
+
+function hydrateInteraction(container: HTMLElement, name: string): void {
+    ensureDelegatedInteractionListeners();
+    pendingInteractionContainers.add(container);
+
+    // Teardown before a first interaction ever arrives (e.g. island removed by a parent re-render)
+    // should stop it from ever triggering hydration via a later, unrelated interaction elsewhere.
+    container.addEventListener('laughtale:unmount', () => {
+        pendingInteractionContainers.delete(container);
+        bufferedInteractionEvents.delete(container);
+    }, { once: true });
 }
 
 function hydrateMedia(container: HTMLElement, name: string, query: string | null): void {

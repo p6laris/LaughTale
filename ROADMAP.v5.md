@@ -660,12 +660,12 @@ doesn't forward it as a slot (an author-error case, not a framework gap).
 
 | Item | From | Effort |
 |---|---|---|
-| **Out-of-order streaming** — flush shell with skeletons, resolve slow data in background tasks, append late fragments as `<template>`. *.NET's real threads and `IAsyncEnumerable` make this cleaner than Node's* | Astro server islands, Next PPR | M · 3 wks |
+| **Out-of-order streaming — [SCOPE CORRECTED, deferred]** — flush shell with skeletons, resolve slow data in background tasks, append late fragments as `<template>`. *.NET's real threads and `IAsyncEnumerable` make this cleaner than Node's* | Astro server islands, Next PPR | M · 3 wks |
 | **Partials — [CLOSED, this pass]** — named page regions updated by link/form, everything else untouched. *The most natural fit on this list for what LaughTale already is* | Fresh, Turbo Frames | S–M · 2 wks |
-| **Route rules / hybrid rendering** — per-path SSR/SSG/ISR/CSR in one config table | Nuxt `routeRules` | M · 2–3 wks |
-| **Nested layouts & outlets** — morph only the lowest common layout ancestor; sidebar scroll and media survive navigation by default | Nuxt, Next | M · 3 wks |
-| **Delegated event resumability** — one listener on `document.body`, intent in attributes, chunk on first interaction | Qwik | M · 2–3 wks |
-| **Middleware & typed head** — per-route chain (auth, tenant, A/B) plus typed metadata API | Next, Nuxt, Astro | S–M · 2 wks |
+| **Route rules / hybrid rendering — [SCOPE CORRECTED, deferred]** — per-path SSR/SSG/ISR/CSR in one config table | Nuxt `routeRules` | M · 2–3 wks |
+| **Nested layouts & outlets — [SCOPE CORRECTED, deferred]** — morph only the lowest common layout ancestor; sidebar scroll and media survive navigation by default | Nuxt, Next | M · 3 wks |
+| **Delegated event resumability — [CLOSED, this pass]** — one listener on `document.body`, intent in attributes, chunk on first interaction | Qwik | M · 2–3 wks |
+| **Middleware & typed head — [CLOSED, this pass]** — per-route chain (auth, tenant, A/B) plus typed metadata API | Next, Nuxt, Astro | S–M · 2 wks |
 
 **Partials, closed this pass.** Investigated fresh before implementing anything: almost all of the
 underlying machinery already existed and worked. `bindServerAction()`
@@ -720,6 +720,82 @@ test instantiates every simple TagHelper with default properties, which doesn't 
 `IslandRegionTagHelper`'s legitimately-required `name` attribute — excluded via a small, documented
 allowlist (the same shape as `IslandFormTagHelper`'s own exclusion, which happens naturally via its
 constructor-injected `IAntiforgery` dependency). Full suite: 407/407.
+
+**Delegated event resumability, closed this pass.** `hydrateInteraction()`
+(`LaughTale.Client/src/runtime/hydrator.ts`) previously attached 4 listeners (`mouseenter`, `focusin`,
+`touchstart`, `click`) directly to EACH interaction-strategy island's own container — investigation
+confirmed real built-in usage was only 2 demo islands, but any consumer app can opt any component into
+`hydrate="interaction"`, so the gap was worth closing properly. Rewritten to the same shared-singleton
+shape `hydrateVisible`'s `IntersectionObserver` already established: one delegated listener per event
+type on `document`, routing via `closest(ISLAND_SELECTOR)` to the correct pending container.
+`mouseenter` was replaced with `mouseover` in the event list — `mouseenter` does not bubble and
+therefore cannot be delegated, the same substitution this codebase's `autocomplete.ts` retrofit already
+established for its own delegated hover-highlight listener. Also closed the real, separate gap the
+investigation surfaced: a second qualifying interaction on the same container while its chunk was still
+loading was previously silently dropped (no buffer/replay existed anywhere). Now buffered (capped at 3
+events per container) and replayed on the event's original target once mount completes — deliberately
+does not attempt to suppress a native default action (link navigation, form submission) on the replayed
+event, since that action, if any, already ran synchronously during the event's first real dispatch
+(the delegated listener is `{ passive: true }` and never calls `preventDefault()`), so there is no
+double-navigation/double-submit risk to guard against. Tests: `hydrator.test.ts` (delegated routing to
+the correct island only, `mouseover` triggers hydration, a buffered second interaction is replayed
+after mount). Full client suite: 595/595.
+
+**Middleware & typed head, closed this pass.** Investigation found the "per-route middleware chain
+(auth, tenant, A/B)" half needs zero LaughTale code — `RequireAuthorization()`, `IEndpointFilter`,
+`MapWhen`/`UseWhen`, `MapGroup()` are all stock ASP.NET Core features that already compose with
+`MapRazorPages()` today. That half closed via documentation only:
+`LaughTale.Docs/content/docs/69-middleware-and-typed-head.md`, reusing Part K's `Func<HttpContext,
+string>` tenant-resolver shape as the tenant-middleware example. The one real gap — every page set
+metadata via untyped `ViewData["Title"] = "..."` strings, zero `<meta>`/OpenGraph emission anywhere —
+got a small typed model: `PageHead` (`LaughTale.Components/Rendering/PageHead.cs`), stored/read via
+`ViewDataDictionary.SetHead()`/`GetHead()` extension methods (falling back to the existing
+`ViewData["Title"]` string when a page never adopts the typed API — full backward compatibility,
+verified live: every existing Showcase page still renders its title unmodified), and rendered by a new
+`<page-head suffix="..." />` TagHelper. `LaughTale.Client`'s SPA router `reconcileHead()` already keys
+and reconciles `<title>`/`meta[name]`/`meta[property]`/`link[rel=canonical]` individually during
+navigation — needed zero changes to interoperate. Wired into `LaughTale.Showcase/Pages/_Layout.cshtml`
+(one line) and one example page (`Partials.cshtml.cs`); verified live (`view-source` showed the correct
+`og:title`/`og:description`/`og:type` tags on the example page, and the untouched-fallback page's
+`<title>` rendered identically to before). Tests: `PageHeadTagHelperTests.cs` (title+suffix, fallback,
+OG defaulting, custom meta, HTML-encoding of untrusted values), `PageHeadViewDataExtensionsTests.cs`.
+
+**Out-of-order streaming, route rules/hybrid rendering, and nested layouts & outlets — investigated,
+scope corrected, explicitly deferred (not silently dropped).** The user asked to "finish Part E once and
+for all"; 5 parallel investigations covering every remaining item found these three are genuinely large
+and, in two cases, don't fit this framework's actual architecture as literally described — shipping a
+thin, unverified version of any of them would be worse than an honest deferral. Presented this finding
+to the user directly and they chose to close the two real items above rather than force-fit these three.
+
+- **Out-of-order streaming**: confirmed 0% built at the transport layer. The existing
+  `awaitStreamingReady()` hook (`LaughTale.Client/src/runtime/streaming.ts`) gates on a `data-streaming`
+  attribute that no server code anywhere ever sets — in production it always takes the immediate-resolve
+  path. There is no `Response.Body.FlushAsync`/`Response.StartAsync`/manual-response-stream code
+  anywhere in the repo outside a test's `MemoryStream` swap, and `IAsyncEnumerable` (the roadmap's own
+  cited advantage) has zero supporting implementation anywhere — pure aspirational prose. Real
+  out-of-order streaming needs a custom response writer that starts flushing HTML before slow data
+  resolves, which cannot be retrofitted onto Razor Pages' buffered PageModel→PageResult contract as-is —
+  this is a genuine architecture design task (interfaces, timeout/error-boundary semantics for a
+  fragment that never resolves, interaction with antiforgery/caching which assume one synchronous
+  render), not a mechanical feature addition. The roadmap's own M/3wk estimate holds up completely here.
+- **Route rules / hybrid rendering**: confirmed no per-path render-mode mechanism, SSG capability, or
+  ISR/output-caching integration exists anywhere. More importantly, a literal "SSR/SSG/ISR/CSR in one
+  table" overstates what's realistic for a Razor Pages app — there is no build-time static-generation
+  pipeline that could pre-render a page to disk without bolting a foreign build system onto Razor Pages
+  (compile-time `HttpContext`, route discovery, file writes, regeneration/invalidation), and CSR-only
+  contradicts the Islands architecture's own SSR-first premise (that's the still-hypothetical Part L
+  "SSR sidecar" work, not this item). The honest smallest real version is "per-page cache-control
+  declarations" via a Razor Pages convention — a materially smaller and different feature than what's
+  described, worth its own corrected roadmap line before scoping/estimating.
+- **Nested layouts & outlets**: confirmed to actually be two deliverables, not one. There is no nested
+  layout *authoring* convention anywhere in the codebase — every site (Showcase, Docs, the project
+  template) resolves to exactly one flat `_Layout.cshtml` via a single global `_ViewStart.cshtml`
+  setting; Razor Pages' own nesting primitive (a layout whose `Layout` property points at another
+  layout) is simply unused. So "morph only the lowest common layout ancestor" has nothing to compute an
+  ancestor over yet. Before any client-side morphing optimization is meaningful, someone has to design
+  and ship a real nested-layout authoring convention (most likely the `<island-outlet>` marker already
+  floated in `FRAMEWORK_FEATURES.md`) — unscoped and unestimated by the current roadmap line, which
+  almost certainly only budgeted for the router-side morphing half.
 
 ---
 

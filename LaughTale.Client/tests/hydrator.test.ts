@@ -88,17 +88,101 @@ describe('Hydrator Tri-State & Shared Viewport Observer Suite (, )', () => {
         container.setAttribute('data-hydrate', 'interaction');
         document.body.appendChild(container);
 
-        hydrateIsland(container); // Attaches interaction listeners
+        hydrateIsland(container); // Registers the island for delegated interaction hydration
 
-        // Fire multiple interaction events rapidly
-        container.dispatchEvent(new Event('mouseenter'));
-        container.dispatchEvent(new Event('focusin'));
-        container.dispatchEvent(new Event('click'));
+        // Fire multiple interaction events rapidly. Interaction hydration is now delegated to a
+        // single document-level listener set (ROADMAP.v5.md Part E), so these must bubble to be
+        // observed at all - 'mouseover' is used, not 'mouseenter', since mouseenter does not bubble.
+        container.dispatchEvent(new Event('mouseover', { bubbles: true }));
+        container.dispatchEvent(new Event('focusin', { bubbles: true }));
+        container.dispatchEvent(new Event('click', { bubbles: true }));
 
         await new Promise(r => setTimeout(r, 80));
 
         assert.equal(loaderInvocationCount, 1, 'Loader was invoked multiple times concurrently');
         assert.equal(getIslandState(container), 'mounted');
+    });
+
+    it('hydrateIsland: delegated interaction listener routes to the correct island only', async () => {
+        let aInvocations = 0;
+        let bInvocations = 0;
+
+        defineIsland('interaction-island-a', () => {
+            aInvocations++;
+            return Promise.resolve({ default: () => {} });
+        });
+        defineIsland('interaction-island-b', () => {
+            bInvocations++;
+            return Promise.resolve({ default: () => {} });
+        });
+
+        const a = document.createElement('div');
+        a.setAttribute('data-island', 'interaction-island-a');
+        a.setAttribute('data-hydrate', 'interaction');
+        const b = document.createElement('div');
+        b.setAttribute('data-island', 'interaction-island-b');
+        b.setAttribute('data-hydrate', 'interaction');
+        document.body.append(a, b);
+
+        hydrateIsland(a);
+        hydrateIsland(b);
+
+        a.dispatchEvent(new Event('click', { bubbles: true }));
+        await new Promise(r => setTimeout(r, 20));
+
+        assert.equal(aInvocations, 1, 'Island A should have hydrated');
+        assert.equal(bInvocations, 0, 'Island B should NOT have hydrated from an interaction on island A');
+    });
+
+    it('hydrateIsland: mouseover (bubbling) triggers interaction hydration', async () => {
+        let mounted = false;
+        defineIsland('hover-widget', () => Promise.resolve({
+            default: () => { mounted = true; }
+        }));
+
+        const container = document.createElement('div');
+        container.setAttribute('data-island', 'hover-widget');
+        container.setAttribute('data-hydrate', 'interaction');
+        document.body.appendChild(container);
+
+        hydrateIsland(container);
+        container.dispatchEvent(new Event('mouseover', { bubbles: true }));
+        await new Promise(r => setTimeout(r, 20));
+
+        assert.equal(mounted, true);
+    });
+
+    it('hydrateIsland: buffers and replays an interaction that arrives while hydration is pending', async () => {
+        let clickCount = 0;
+
+        defineIsland('replay-widget', () => new Promise(resolve => {
+            setTimeout(() => resolve({
+                default: (el: HTMLElement) => {
+                    el.addEventListener('click', () => { clickCount++; });
+                }
+            }), 50);
+        }));
+
+        const container = document.createElement('div');
+        container.setAttribute('data-island', 'replay-widget');
+        container.setAttribute('data-hydrate', 'interaction');
+        document.body.appendChild(container);
+
+        hydrateIsland(container);
+
+        // First click triggers hydration itself (no listener exists yet to count it).
+        container.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+        // Second click, while the chunk is still loading, must be buffered and replayed once the
+        // island's own click listener is actually attached - not silently dropped.
+        container.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+        // Generous margin over the 50ms mount delay above - the full test suite runs hundreds of
+        // tests concurrently, and a thin margin here was observed to flake under that load even
+        // though the underlying behavior is correct (confirmed by running this file in isolation).
+        await new Promise(r => setTimeout(r, 200));
+
+        assert.equal(getIslandState(container), 'mounted');
+        assert.equal(clickCount, 1, 'The buffered second interaction was not replayed after mount');
     });
 
     it('retryIsland: resets failed state and re-attempts hydration to success', async () => {

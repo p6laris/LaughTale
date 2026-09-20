@@ -18,7 +18,13 @@ public class TagHelperReflectionSnapshotTests
     /// </summary>
     private static readonly HashSet<Type> RequiresNonDefaultConfiguration = new()
     {
-        typeof(LaughTale.Components.TagHelpers.Aura.Regions.IslandRegionTagHelper)
+        typeof(LaughTale.Components.TagHelpers.Aura.Regions.IslandRegionTagHelper),
+        // PageHeadTagHelper requires a real [ViewContext]-injected ViewContext (populated by Razor at
+        // render time), which this harness's manual TagHelperContext/TagHelperOutput construction never
+        // supplies - the same class of DI-context dependency IslandFormTagHelper has via constructor
+        // injection (which already excludes it from this scan by having no parameterless constructor).
+        // Covered instead by its own PageHeadTagHelperTests.cs, which constructs a real ViewContext.
+        typeof(LaughTale.Components.TagHelpers.Aura.Seo.PageHeadTagHelper)
     };
 
     public static IEnumerable<object[]> GetAllComponentTagHelperTypes()

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using LaughTale.Components.Rendering;
 
 namespace LaughTale.Showcase.Pages;
 
@@ -20,6 +21,14 @@ public class PartialsModel : PageModel
     public void OnGet()
     {
         SelectedId = 0;
+
+        // ROADMAP.v5.md Part E "Middleware & typed head": demonstrates the typed PageHead API -
+        // every other page in this app is untouched proof the ViewData["Title"] fallback still works
+        // unmodified for pages that never adopt this.
+        ViewData.SetHead(new PageHead(
+            Title: "Partials",
+            Description: "Named page regions updated by a plain link, everything else untouched.",
+            OgType: "website"));
     }
 
     public IActionResult OnGetShow(int id)
