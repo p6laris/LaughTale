@@ -521,6 +521,7 @@ public record ComponentStateProps(
 //   Aura Island Component Props Records (Emitted by LaughTale.Generators)
 // ============================================================================
 
+[IslandAllowAnonymous]
 [Island("input-number")]
 [FormControl(Cardinality = FormCardinality.Single, FieldKind = FormFieldKind.Hidden)]
 public record InputNumberProps(
@@ -532,11 +533,13 @@ public record InputNumberProps(
     string? TargetInput = null, bool Disabled = false, ButtonSeverity? ButtonSeverity = null, string? ButtonClass = null
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("number")]
 public record NumberProps(
     double? Value = null, object? Mode = null, string? Currency = "USD", string? TargetInput = null
 );
 
+[IslandAllowAnonymous]
 [Island("datepicker")]
 [FormControl(Cardinality = FormCardinality.Multiple, FieldKind = FormFieldKind.Hidden)]
 public record DatePickerProps(
@@ -548,6 +551,7 @@ public record DatePickerProps(
     string? Placeholder = null, bool Disabled = false
 );
 
+[IslandAllowAnonymous]
 [Island("select")]
 [FormControl(Cardinality = FormCardinality.Multiple, FieldKind = FormFieldKind.Hidden)]
 public record SelectProps(
@@ -557,6 +561,7 @@ public record SelectProps(
     InputVariant Variant = InputVariant.Outlined, ComponentSize Size = ComponentSize.Normal, bool Disabled = false
 );
 
+[IslandAllowAnonymous]
 [Island("autocomplete")]
 [FormControl(Cardinality = FormCardinality.Single, FieldKind = FormFieldKind.Hidden)]
 public record AutoCompleteProps(
@@ -566,6 +571,7 @@ public record AutoCompleteProps(
     InputVariant Variant = InputVariant.Outlined, ComponentSize Size = ComponentSize.Normal, bool Disabled = false
 );
 
+[IslandAllowAnonymous]
 [Island("cascade-select")]
 [FormControl(Cardinality = FormCardinality.Single, FieldKind = FormFieldKind.Hidden)]
 public record CascadeSelectProps(
@@ -575,6 +581,7 @@ public record CascadeSelectProps(
     bool Fluid = false, InputVariant Variant = InputVariant.Outlined, ComponentSize Size = ComponentSize.Normal, bool Disabled = false
 );
 
+[IslandAllowAnonymous]
 [Island("checkbox")]
 [FormControl(ValueProperty = "Checked", Cardinality = FormCardinality.Boolean, FieldKind = FormFieldKind.Hidden)]
 public record CheckboxProps(
@@ -583,6 +590,7 @@ public record CheckboxProps(
     ComponentSize Size = ComponentSize.Normal, bool Disabled = false
 );
 
+[IslandAllowAnonymous]
 [Island("color-picker")]
 [FormControl(Cardinality = FormCardinality.Single, FieldKind = FormFieldKind.Hidden)]
 public record ColorPickerProps(
@@ -590,6 +598,7 @@ public record ColorPickerProps(
     string? Placeholder = null, string? TargetInput = null, bool Disabled = false
 );
 
+[IslandAllowAnonymous]
 [Island("input-mask")]
 [FormControl(Cardinality = FormCardinality.Single, FieldKind = FormFieldKind.Hidden)]
 public record InputMaskProps(
@@ -598,6 +607,7 @@ public record InputMaskProps(
     InputVariant Variant = InputVariant.Outlined, ComponentSize Size = ComponentSize.Normal, string? Placeholder = null, bool Disabled = false
 );
 
+[IslandAllowAnonymous]
 [Island("input-otp")]
 [FormControl(Cardinality = FormCardinality.Single, FieldKind = FormFieldKind.Hidden)]
 public record InputOtpProps(
@@ -605,6 +615,7 @@ public record InputOtpProps(
     InputVariant Variant = InputVariant.Outlined, ComponentSize Size = ComponentSize.Normal, bool Invalid = false, bool Disabled = false
 );
 
+[IslandAllowAnonymous]
 [Island("input-password")]
 [FormControl(Cardinality = FormCardinality.Single, FieldKind = FormFieldKind.Hidden)]
 public record InputPasswordProps(
@@ -615,6 +626,7 @@ public record InputPasswordProps(
     ComponentSize Size = ComponentSize.Normal, string? Placeholder = null, bool Disabled = false
 );
 
+[IslandAllowAnonymous]
 [Island("input-tags")]
 [FormControl(Cardinality = FormCardinality.Multiple, FieldKind = FormFieldKind.Hidden)]
 public record InputTagsProps(
@@ -626,6 +638,7 @@ public record InputTagsProps(
     ComponentSize Size = ComponentSize.Normal, bool Disabled = false
 );
 
+[IslandAllowAnonymous]
 [Island("input-text")]
 [FormControl(Cardinality = FormCardinality.Single, FieldKind = FormFieldKind.Native)]
 public record InputTextProps(
@@ -635,6 +648,7 @@ public record InputTextProps(
     string? IconLeft = null, string? IconRight = null, string? HelpText = null
 );
 
+[IslandAllowAnonymous]
 [Island("knob")]
 [FormControl(Cardinality = FormCardinality.Single, FieldKind = FormFieldKind.Hidden)]
 public record KnobProps(
@@ -644,6 +658,7 @@ public record KnobProps(
     string? ValueTemplate = "{value}", bool ShowValue = true, bool ReadOnly = false, bool Disabled = false
 );
 
+[IslandAllowAnonymous]
 [Island("listbox")]
 [FormControl(Cardinality = FormCardinality.Multiple, FieldKind = FormFieldKind.Hidden)]
 public record ListboxProps(
@@ -653,6 +668,7 @@ public record ListboxProps(
     int? ListHeight = 250, bool Striped = false, bool Invalid = false, bool Disabled = false
 );
 
+[IslandAllowAnonymous]
 [Island("multiselect")]
 [FormControl(Cardinality = FormCardinality.Multiple, FieldKind = FormFieldKind.Hidden)]
 public record MultiSelectProps(
@@ -665,6 +681,7 @@ public record MultiSelectProps(
     InputVariant Variant = InputVariant.Outlined, ComponentSize Size = ComponentSize.Normal, bool Disabled = false
 );
 
+[IslandAllowAnonymous]
 [Island("radio-button")]
 [FormControl(Cardinality = FormCardinality.Boolean, FieldKind = FormFieldKind.Hidden)]
 public record RadioButtonProps(
@@ -673,6 +690,7 @@ public record RadioButtonProps(
     bool Invalid = false, bool Disabled = false
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("radio-group")]
 public record RadioGroupProps(
     string? Name = null, object? Options = null, string? Value = null, string? SelectedValue = null,
@@ -680,6 +698,7 @@ public record RadioGroupProps(
     ComponentSize Size = ComponentSize.Normal, bool Invalid = false, bool Disabled = false
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("split-button")]
 public record SplitButtonProps(
     string? Label = null, string? Icon = null, string? DropdownIcon = null,
@@ -689,12 +708,14 @@ public record SplitButtonProps(
     string? Action = null, string? AppendTo = "body"
 );
 
+[IslandAllowAnonymous]
 [Island("rating")]
 [FormControl(Cardinality = FormCardinality.Single, FieldKind = FormFieldKind.Hidden)]
 public record RatingProps(
     double? Value = null, string? Name = null, int Stars = 5, bool Cancel = true, bool ReadOnly = false, bool Disabled = false
 );
 
+[IslandAllowAnonymous]
 [Island("select-button")]
 [FormControl(Cardinality = FormCardinality.Multiple, FieldKind = FormFieldKind.Hidden)]
 public record SelectButtonProps(
@@ -703,6 +724,7 @@ public record SelectButtonProps(
     ComponentSize Size = ComponentSize.Normal, bool Fluid = false, bool Invalid = false, bool Disabled = false
 );
 
+[IslandAllowAnonymous]
 [Island("slider")]
 [FormControl(Cardinality = FormCardinality.Multiple, FieldKind = FormFieldKind.Hidden)]
 public record SliderProps(
@@ -710,6 +732,7 @@ public record SliderProps(
     bool Range = false, string? Orientation = "horizontal", bool Disabled = false
 );
 
+[IslandAllowAnonymous]
 [Island("textarea")]
 [FormControl(Cardinality = FormCardinality.Single, FieldKind = FormFieldKind.Native)]
 public record TextareaProps(
@@ -718,6 +741,7 @@ public record TextareaProps(
     bool Invalid = false, string? Placeholder = null, bool Disabled = false
 );
 
+[IslandAllowAnonymous]
 [Island("toggle-button")]
 [FormControl(ValueProperty = "Checked", Cardinality = FormCardinality.Boolean, FieldKind = FormFieldKind.Hidden)]
 public record ToggleButtonProps(
@@ -726,12 +750,14 @@ public record ToggleButtonProps(
     bool Invalid = false, bool Disabled = false
 );
 
+[IslandAllowAnonymous]
 [Island("toggle-switch")]
 [FormControl(ValueProperty = "Checked", Cardinality = FormCardinality.Boolean, FieldKind = FormFieldKind.Native)]
 public record ToggleSwitchProps(
     bool Checked = false, string? Name = null, ComponentSize Size = ComponentSize.Normal, bool Invalid = false, bool Disabled = false
 );
 
+[IslandAllowAnonymous]
 [Island("tree-select")]
 [FormControl(Cardinality = FormCardinality.Multiple, FieldKind = FormFieldKind.Hidden)]
 public record TreeSelectProps(
@@ -742,6 +768,7 @@ public record TreeSelectProps(
     bool Invalid = false, bool Disabled = false, string? Header = null, string? Footer = null
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("datatable")]
 public record DataTableProps(
     object? Value = null, object? Columns = null, bool Paginator = false, int Rows = 10,
@@ -751,6 +778,7 @@ public record DataTableProps(
     bool ShowGridlines = false, ComponentSize Size = ComponentSize.Normal, bool Loading = false
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("dataview")]
 public record DataViewProps(
     object? Value = null, string? Layout = "list", bool Paginator = false,
@@ -758,6 +786,7 @@ public record DataViewProps(
     string? EmptyMessage = null
 );
 
+[IslandAllowAnonymous]
 [Island("orderlist")]
 [FormControl(Cardinality = FormCardinality.Multiple, FieldKind = FormFieldKind.Hidden)]
 public record OrderListProps(
@@ -765,6 +794,7 @@ public record OrderListProps(
     int? ListHeight = 300, bool Filter = false, string? FilterPlaceholder = null, bool Striped = false
 );
 
+[IslandAllowAnonymous]
 [Island("picklist")]
 [FormControl(ValueProperty = "Target", Cardinality = FormCardinality.Multiple, FieldKind = FormFieldKind.Hidden)]
 public record PickListProps(
@@ -773,6 +803,7 @@ public record PickListProps(
     bool Filter = false, bool Striped = false, bool ShowSourceControls = true, bool ShowTargetControls = true
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("treetable")]
 public record TreeTableProps(
     object? Value = null, object? Columns = null, bool Paginator = false, int Rows = 10,
@@ -780,18 +811,21 @@ public record TreeTableProps(
     bool ResizableColumns = false, bool StripedRows = false, bool ShowGridlines = false
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("tree")]
 public record TreeProps(
     object? Value = null, string? SelectionMode = "single", bool Filter = false,
     string? FilterPlaceholder = null, bool Checkboxes = false, bool Loading = false
 );
 
+[IslandAllowAnonymous]
 [Island("orgchart")]
 [FormControl(Cardinality = FormCardinality.Multiple, FieldKind = FormFieldKind.Hidden)]
 public record OrgChartProps(
     object? Value = null, string? Name = null, string? SelectionMode = "single", bool Collapsible = true
 );
 
+[IslandAllowAnonymous]
 [Island("paginator")]
 [FormControl(ValueProperty = "First", Cardinality = FormCardinality.Single, FieldKind = FormFieldKind.Hidden)]
 public record PaginatorProps(
@@ -801,36 +835,43 @@ public record PaginatorProps(
     bool ShowFirstLastIcon = true, bool ShowJumpToPageDropdown = false
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("timeline")]
 public record TimelineProps(
     object? Value = null, string? Align = "left", string? Layout = "vertical"
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("menu")]
 public record MenuProps(
     object? Model = null, bool Popup = false, string? TargetSelector = null
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("menubar")]
 public record MenubarProps(
     object? Model = null
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("breadcrumb")]
 public record BreadcrumbProps(
     object? Model = null, object? Items = null, string? HomeUrl = null, object? Home = null
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("context-menu")]
 public record ContextMenuProps(
     object? Model = null, string? TargetSelector = null
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("tieredmenu")]
 public record TieredMenuProps(
     object? Model = null, bool Popup = false, string? TargetSelector = null
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("galleria")]
 public record GalleriaProps(
     object? Value = null, object? Images = null, object? Items = null,
@@ -840,12 +881,14 @@ public record GalleriaProps(
     bool AutoPlay = false, int? TransitionInterval = 4000, bool Circular = false
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("carousel")]
 public record CarouselProps(
     object? Value = null, int? Page = 0, int? NumVisible = 3, int? NumScroll = 1,
     bool Circular = false, bool AutoPlay = false, int? AutoPlayInterval = 3000, string? Orientation = "horizontal"
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("compare")]
 public record CompareProps(
     string? LeftImage = null, string? RightImage = null, string? BeforeImage = null, string? AfterImage = null,
@@ -855,6 +898,7 @@ public record CompareProps(
     string? DemoType = null, bool Disabled = false, bool Readonly = false
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("image-compare")]
 public record ImageCompareProps(
     string? LeftImage = null, string? RightImage = null, string? BeforeImage = null, string? AfterImage = null,
@@ -864,11 +908,13 @@ public record ImageCompareProps(
     string? DemoType = null, bool Disabled = false, bool Readonly = false
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("popover")]
 public record PopoverProps(
     string? TargetSelector = null, bool Dismissable = true, bool CloseOnEscape = true
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("dialog")]
 public record DialogProps(
     string? Header = null, bool Visible = false, bool Modal = true,
@@ -876,24 +922,28 @@ public record DialogProps(
     bool Resizable = false, bool Maximizable = false, string? Position = "center", string? Width = "50vw"
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("confirm-dialog")]
 public record ConfirmDialogProps(
     string? Group = null, string? Position = "center", string? AriaLabel = null,
     bool DismissableMask = false, bool CloseOnEscape = true
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("confirm-popup")]
 public record ConfirmPopupProps(
     string? Group = null, string? TargetSelector = null, string? Message = null,
     string? AcceptText = null, string? RejectText = null, string? ActionName = null
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("drawer")]
 public record DrawerProps(
     bool Visible = false, string? Position = "left", bool Modal = true,
     bool DismissableMask = true, bool CloseOnEscape = true, bool FullScreen = false, string? Header = null
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("sidebar")]
 public record SidebarProps(
     List<SidebarItem>? Items = null,
@@ -923,12 +973,14 @@ public record SidebarProps(
     string? Header = null
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("toast")]
 public record ToastProps(
     string? Group = "default", string? Position = "top-right", int? Limit = null,
     int? Gap = 8, bool AutoZIndex = true, int? BaseZIndex = 1100
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("tooltip")]
 public record TooltipProps(
     string? Value = null, string? Text = null, string? Target = null,
@@ -936,17 +988,20 @@ public record TooltipProps(
     string? Event = "hover", bool AutoHide = true, bool Escape = true
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("tag")]
 public record TagProps(
     string? Value = null, string? Severity = "info", bool Rounded = false, string? Icon = null
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("progress-bar")]
 public record ProgressBarProps(
     double? Value = 0, string? Mode = "determinate", bool ShowValue = true, string? Unit = "%",
     string? Height = null, string? Color = null
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("meter-group")]
 public record MeterGroupProps(
     object? Values = null, object? Value = null, object? Meters = null,
@@ -954,17 +1009,20 @@ public record MeterGroupProps(
     string? Orientation = "horizontal", string? LabelPosition = "end", string? LabelOrientation = "horizontal"
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("skeleton")]
 public record SkeletonProps(
     string? Shape = "rectangle", string? Size = null, string? Width = "100%",
     string? Height = "1.25rem", string? BorderRadius = null, string? Animation = "wave"
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("blockui")]
 public record BlockUIProps(
     bool Blocked = false, bool FullScreen = false, bool AutoZIndex = true, int? BaseZIndex = 1100
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("speed-dial")]
 public record SpeedDialProps(
     object? Model = null, string? Direction = "up", string? Type = "linear",
@@ -973,100 +1031,119 @@ public record SpeedDialProps(
     string? Template = null, object? TooltipOptions = null
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("scroll-top")]
 public record ScrollTopProps(
     string? Target = "window", int Threshold = 400, string? Icon = null, string? Behavior = "smooth"
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("stepper")]
 public record StepperProps(
     int? ActiveStep = 0, bool Linear = false, string? Orientation = "horizontal", object? Steps = null
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("tabs")]
 public record TabsProps(
     string? Value = null, bool Scrollable = false, object? Items = null
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("accordion")]
 public record AccordionProps(
     bool Multiple = false, int? ActiveIndex = null, object? Tabs = null
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("toolbar")]
 public record ToolbarProps(
     string? AriaLabel = null
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("splitter")]
 public record SplitterProps(
     string? Layout = "horizontal", int GutterSize = 4, object? PanelSizes = null, object? MinSizes = null
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("fieldset")]
 public record FieldsetProps(
     string? Legend = null, bool Toggleable = false, bool Collapsed = false,
     bool Controlled = false, string? ToggleIcon = "plusMinus"
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("panel")]
 public record PanelProps(
     string? Header = null, bool Toggleable = false, bool Collapsed = false,
     bool Controlled = false, string? ToggleIcon = "chevron"
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("scrollarea")]
 public record ScrollAreaProps(
     string? Type = "hover", string? Scrollbars = "auto"
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("divider")]
 public record DividerProps(
     string? Layout = "horizontal", string? Type = "solid", string? Align = "left"
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("input-group")]
 public record InputGroupProps(
     ComponentSize Size = ComponentSize.Normal, bool Fluid = false
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("input-group-addon")]
 public record InputGroupAddonProps(
     string? Text = null, string? Icon = null
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("float-label")]
 public record FloatLabelProps(
     string? Label = null, FloatLabelVariant Variant = FloatLabelVariant.Over, bool Invalid = false
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("ifta-label")]
 public record IftaLabelProps(
     string? Label = null, bool Invalid = false
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("icon-field")]
 public record IconFieldProps(
     string? Position = "left"
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("badge")]
 public record BadgeProps(
     string? Value = null, string? Severity = null, ComponentSize Size = ComponentSize.Normal
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("avatar")]
 public record AvatarProps(
     string? Label = null, string? Icon = null, string? Image = null,
     string? Size = null, string? Shape = "circle", string? Bg = null, string? Badge = null, string? BadgeSeverity = null
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("avatar-group")]
 public record AvatarGroupProps(
     object? Avatars = null, object? Items = null,
     int? Max = 4, string? Size = "md", string? Shape = "circle"
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("fileupload")]
 public record FileUploadProps(
     string? Mode = "basic", string? Name = "file", string? Url = null, bool Multiple = false,
@@ -1074,6 +1151,7 @@ public record FileUploadProps(
     string? ChooseLabel = null, string? UploadLabel = null, string? CancelLabel = null
 );
 
+[IslandAllowAnonymous]
 [Island("dropzone")]
 [FormControl(Cardinality = FormCardinality.Multiple, FieldKind = FormFieldKind.Native)]
 public record DropzoneProps(
@@ -1081,6 +1159,7 @@ public record DropzoneProps(
     string? Accept = null, int? MaxFileSize = null, string? Message = null
 );
 
+[IslandAllowAnonymous]
 [Island("inplace")]
 [FormControl(Cardinality = FormCardinality.Single, FieldKind = FormFieldKind.Hidden)]
 public record InplaceProps(
@@ -1093,12 +1172,14 @@ public record InplaceProps(
     string? Active = "false"
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("theme-studio")]
 public record ThemeStudioProps(
     bool Visible = false,
     string? Position = "right"
 );
 
+[IslandAllowAnonymous]
 [LaughTale.Core.Attributes.Island("command")]
 public record CommandProps(
     string? Placeholder = null,

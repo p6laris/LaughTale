@@ -14,17 +14,22 @@ public record DocFrontmatter
     public string Section { get; set; } = "General";
 }
 
+[IslandAllowAnonymous]
 [Island("interactive-counter", DefaultStrategy = HydrateStrategy.Load)]
 public record CounterProps(int InitialCount, int Step, string Label);
 
+[IslandAllowAnonymous]
 [Island("event-broadcaster", DefaultStrategy = HydrateStrategy.Interaction)]
 public record EventBroadcasterProps(string ChannelName, string ButtonLabel);
 
+[IslandAllowAnonymous]
 [Island("event-receiver", DefaultStrategy = HydrateStrategy.Idle)]
 public record EventReceiverProps(string ChannelName, string InitialMessage);
 
+[IslandAllowAnonymous]
 [Island("modal-dialog", DefaultStrategy = HydrateStrategy.Interaction)]
 public record SecurityModalProps(string TriggerButtonText, string DialogTitle);
 
+[IslandAllowAnonymous]
 [Island("persistent-telemetry", DefaultStrategy = HydrateStrategy.Load)]
 public record SystemTelemetryProps(string MetricName, int RefreshIntervalSeconds);

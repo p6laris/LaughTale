@@ -6,6 +6,7 @@ namespace LaughTale.Showcase.Models;
 /// <summary>
 /// Interactive numeric stepper island props.
 /// </summary>
+[IslandAllowAnonymous]
 [Island("interactive-counter", DefaultStrategy = HydrateStrategy.Load)]
 public record CounterProps(
     int InitialCount,
@@ -16,6 +17,7 @@ public record CounterProps(
 /// <summary>
 /// Drag & Drop enterprise document uploader props.
 /// </summary>
+[IslandAllowAnonymous]
 [Island("file-dropzone", DefaultStrategy = HydrateStrategy.Visible)]
 public record DropzoneProps(
     string TargetInputName,
@@ -27,6 +29,7 @@ public record DropzoneProps(
 /// <summary>
 /// Hierarchical organizational department tree props.
 /// </summary>
+[IslandAllowAnonymous]
 [Island("cascade-tree", DefaultStrategy = HydrateStrategy.Visible)]
 public record DepartmentTreeProps(
     string Placeholder,
@@ -43,6 +46,7 @@ public record DepartmentNode(
 /// <summary>
 /// Inter-island event bus broadcaster props.
 /// </summary>
+[IslandAllowAnonymous]
 [Island("event-broadcaster", DefaultStrategy = HydrateStrategy.Interaction)]
 public record EventBroadcasterProps(
     string ChannelName,
@@ -52,6 +56,7 @@ public record EventBroadcasterProps(
 /// <summary>
 /// Inter-island event bus receiver props.
 /// </summary>
+[IslandAllowAnonymous]
 [Island("event-receiver", DefaultStrategy = HydrateStrategy.Idle)]
 public record EventReceiverProps(
     string ChannelName,
@@ -61,6 +66,7 @@ public record EventReceiverProps(
 /// <summary>
 /// Enterprise security modal dialog with server slot projection.
 /// </summary>
+[IslandAllowAnonymous]
 [Island("modal-dialog", DefaultStrategy = HydrateStrategy.Interaction)]
 public record SecurityModalProps(
     string TriggerButtonText,
@@ -70,6 +76,7 @@ public record SecurityModalProps(
 /// <summary>
 /// Persistent system telemetry widget across View Transitions.
 /// </summary>
+[IslandAllowAnonymous]
 [Island("persistent-telemetry", DefaultStrategy = HydrateStrategy.Load)]
 public record SystemTelemetryProps(
     string MetricName,

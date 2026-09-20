@@ -1276,13 +1276,27 @@ island writes a `data-props` JSON blob into the HTML, and nothing about that pat
 `IIslandAuthorizationRegistry` is a sound design. The problems are the permissive default (§1.2) and
 how much of the enterprise story stops at that one policy string.
 
-- **Deny by default. — [PARTIAL, runtime already correct]** Investigated fresh rather than trusted:
-  the runtime behavior described here is already true today — `IslandAccessEvaluator` treats an
-  undeclared island (neither `[IslandAllowAnonymous]` nor `[IslandAuthorize(Policy=...)]`) as denied
-  unless the `AllowUndeclaredIslands` compatibility switch is explicitly turned on (and that path logs
-  a warning). What's actually still missing is only the compile-time analyzer half — flagging a
-  refresh-reachable island with neither attribute at build time instead of finding out at request
-  time. Small, well-bounded; not yet scheduled.
+- **Deny by default. — [CLOSED, this pass]** The runtime half was already true (`IslandAccessEvaluator`
+  denies an undeclared island unless the `AllowUndeclaredIslands` compatibility switch is on). Added
+  the missing compile-time half: `LTI007` (Warning, not Error — the runtime default is already safe,
+  and an island whose policy is registered imperatively via `IslandRefreshOptions.IslandPolicies`/
+  `AnonymousIslands` rather than an attribute is a false positive this generator can't rule out) fires
+  on any `[Island]`-attributed type with neither `[IslandAllowAnonymous]` nor `[IslandAuthorize]`.
+  Verifying it against this repo's own real consumer projects (the same bar `LTI006` was held to)
+  surfaced something worth fixing properly rather than shipping noisy: **none of the ~93 built-in
+  framework/demo islands** (`LaughTale.Components/Models/ComponentModels.cs`,
+  `LaughTale.Showcase/Models/ShowcaseIslands.cs`, `LaughTale.Docs/Models/DocModels.cs`) declared either
+  attribute, so the analyzer would have fired ~93 times on every build of the framework itself. Asked
+  the user how to treat the framework's own components rather than deciding unilaterally (marking
+  library authorization attributes is a real security-posture decision, not a mechanical cleanup) —
+  confirmed adding `[IslandAllowAnonymous]` to all of them: these are generic UI shells with no
+  inherent secrets of their own, the real security boundary is the page/data endpoint (already covered
+  by item 2, closed via Spec 041), not a Select or DataTable's own refresh gate. Re-verified `dotnet
+  build` on Components/Showcase/Docs individually afterward: 0 `LTI007` warnings. 4 new tests
+  (`LaughTale.Tests/Generators/MissingAuthorizationDeclarationDiagnosticTests.cs`, mirroring
+  `UnguardedFieldAllowlistDiagnosticTests`'s `CSharpGeneratorDriver` harness) plus a manual probe
+  (a scratch undeclared island added and removed) confirming it still fires for a genuinely undeclared
+  island. Full C# suite: 379/379.
 - **Authorize the data endpoint too. — [CLOSED, stale]** Already fully enforced: `MapIslandData<T>`
   requires a mandatory, non-nullable `IslandFieldPolicy` per call site (Spec 041) and the endpoint
   itself runs authorization before executing any query. This bullet described a real gap in an earlier

@@ -31,6 +31,8 @@ public partial class IslandGenerator : IIncrementalGenerator
     private const string JsonIgnoreAttributeName = "System.Text.Json.Serialization.JsonIgnoreAttribute";
     private const string GenerateTypeScriptAttributeName = "LaughTale.Core.Attributes.GenerateTypeScriptAttribute";
     private const string FormControlAttributeName = "LaughTale.Core.Attributes.FormControlAttribute";
+    private const string IslandAllowAnonymousAttributeName = "LaughTale.Core.Attributes.IslandAllowAnonymousAttribute";
+    private const string IslandAuthorizeAttributeName = "LaughTale.Core.Attributes.IslandAuthorizeAttribute";
 
     /// <summary>
     /// Explicit (props-record type name, property name) -> ILaughTaleLocalizer key map for the
@@ -123,6 +125,24 @@ public partial class IslandGenerator : IIncrementalGenerator
         id: "LTI006",
         title: "Unguarded Field Allowlist",
         messageFormat: "IslandFieldPolicy.AllMappedProperties exposes every public property on the queried type to client-driven filtering, sorting, and search. If any field shouldn't be queryable by a client, use IslandFieldPolicy.For(...) to allowlist specific fields instead.",
+        category: "LaughTale.Security",
+        defaultSeverity: DiagnosticSeverity.Warning,
+        isEnabledByDefault: true
+    );
+
+    /// <summary>
+    /// ROADMAP.v5.md Part K item 1: at runtime, <c>IslandAccessEvaluator</c> already denies refresh for
+    /// any island with neither attribute (deny-by-default, Spec 041) unless the `AllowUndeclaredIslands`
+    /// compatibility switch is on - this diagnostic just surfaces that same fact at compile time instead
+    /// of at first request. A Warning, not an Error: the runtime default is already safe (denies), and
+    /// promoting an intentionally-anonymous island (or one whose policy is registered imperatively via
+    /// `IslandRefreshOptions.IslandPolicies`/`AnonymousIslands` rather than an attribute) to a hard build
+    /// failure would be a false positive this generator can't rule out.
+    /// </summary>
+    private static readonly DiagnosticDescriptor MissingAuthorizationDeclarationRule = new(
+        id: "LTI007",
+        title: "Island Missing Explicit Authorization Declaration",
+        messageFormat: "Island '{0}' ('{1}') has neither [IslandAllowAnonymous] nor [IslandAuthorize]. It will deny refresh and data requests by default (deny-by-default) unless explicitly registered via IslandRefreshOptions at startup. Add [IslandAllowAnonymous] if this island is intentionally public, or [IslandAuthorize(Policy = \"...\")] to require a specific policy.",
         category: "LaughTale.Security",
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true
@@ -322,6 +342,23 @@ public partial class IslandGenerator : IIncrementalGenerator
 
         var propertyDiagnostics = new List<Diagnostic>();
         var properties = new List<PropertyModel>();
+
+        // Diagnostic LTI007: an island declaring neither attribute is only safe by accident of the
+        // runtime's own deny-by-default behavior - flag it so the gap is visible at compile time.
+        var hasAllowAnonymous = symbol.GetAttributes().Any(a =>
+            a.AttributeClass?.ToDisplayString() == IslandAllowAnonymousAttributeName);
+        var hasAuthorize = symbol.GetAttributes().Any(a =>
+            a.AttributeClass?.ToDisplayString() == IslandAuthorizeAttributeName);
+
+        if (!hasAllowAnonymous && !hasAuthorize)
+        {
+            propertyDiagnostics.Add(Diagnostic.Create(
+                MissingAuthorizationDeclarationRule,
+                ctx.TargetNode.GetLocation(),
+                islandName,
+                symbol.Name
+            ));
+        }
 
         foreach (var member in symbol.GetMembers().OfType<IPropertySymbol>())
         {
