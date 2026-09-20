@@ -29,7 +29,6 @@ export { emitIslandEvent, onIslandEvent, emitComponentEvent, EVENT_PREFIX, EVENT
 export { IslandStore, useSharedState } from './runtime/state';
 export { parseAndReviveProps, reviveTuple } from './runtime/reviver';
 export { importWithRetry, type RetryOptions } from './runtime/retry';
-export { awaitStreamingReady } from './runtime/streaming';
 export { hasSsrContent, getSsrRoot, markSsrHydrated, SSR_ATTR, SSR_HYDRATED_ATTR } from './runtime/ssr';
 export { renderSkeleton, renderEmptyState, renderErrorState } from './runtime/states';
 export type { ComponentStateProps, SkeletonOptions, StateMessageOptions } from './types/states';

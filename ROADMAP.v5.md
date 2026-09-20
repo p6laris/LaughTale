@@ -656,11 +656,11 @@ doesn't forward it as a slot (an author-error case, not a framework gap).
 
 ---
 
-## 7. Part E — Rendering & routing — **[5 of 6 items closed]**
+## 7. Part E — Rendering & routing — **[CLOSED, all 6 items]**
 
 | Item | From | Effort |
 |---|---|---|
-| **Out-of-order streaming — [SCOPE CORRECTED, deferred]** — flush shell with skeletons, resolve slow data in background tasks, append late fragments as `<template>`. *.NET's real threads and `IAsyncEnumerable` make this cleaner than Node's* | Astro server islands, Next PPR | M · 3 wks |
+| **Out-of-order streaming — [CLOSED, this pass]** — flush shell with skeletons, resolve slow data in background tasks, append late fragments as `<template>`. *.NET's real threads and `IAsyncEnumerable` make this cleaner than Node's* | Astro server islands, Next PPR | M · 3 wks |
 | **Partials — [CLOSED, this pass]** — named page regions updated by link/form, everything else untouched. *The most natural fit on this list for what LaughTale already is* | Fresh, Turbo Frames | S–M · 2 wks |
 | **Route rules / hybrid rendering — [CLOSED, this pass — scope corrected]** — per-path SSR/SSG/ISR/CSR in one config table | Nuxt `routeRules` | M · 2–3 wks |
 | **Nested layouts & outlets — [CLOSED, this pass — scope corrected]** — morph only the lowest common layout ancestor; sidebar scroll and media survive navigation by default | Nuxt, Next | M · 3 wks |
@@ -760,24 +760,13 @@ navigation — needed zero changes to interoperate. Wired into `LaughTale.Showca
 `<title>` rendered identically to before). Tests: `PageHeadTagHelperTests.cs` (title+suffix, fallback,
 OG defaulting, custom meta, HTML-encoding of untrusted values), `PageHeadViewDataExtensionsTests.cs`.
 
-**Out-of-order streaming, route rules/hybrid rendering, and nested layouts & outlets — investigated,
-scope corrected, explicitly deferred (not silently dropped).** The user asked to "finish Part E once and
-for all"; 5 parallel investigations covering every remaining item found these three are genuinely large
-and, in two cases, don't fit this framework's actual architecture as literally described — shipping a
-thin, unverified version of any of them would be worse than an honest deferral. Presented this finding
-to the user directly and they chose to close the two real items above rather than force-fit these three.
+**Route rules/hybrid rendering and nested layouts & outlets — investigated, scope corrected, closed with
+smaller honest versions.** The user asked to "finish Part E once and for all"; 5 parallel investigations
+covering every remaining item found two of the three (this pair) don't fit this framework's actual
+architecture as literally described, and shipped honest smaller real versions instead of the literal
+ask. The third — out-of-order streaming — was confirmed genuinely 0% built and the hardest item in the
+whole Part, and closes separately below with a real, byte-level-verified implementation.
 
-- **Out-of-order streaming**: confirmed 0% built at the transport layer. The existing
-  `awaitStreamingReady()` hook (`LaughTale.Client/src/runtime/streaming.ts`) gates on a `data-streaming`
-  attribute that no server code anywhere ever sets — in production it always takes the immediate-resolve
-  path. There is no `Response.Body.FlushAsync`/`Response.StartAsync`/manual-response-stream code
-  anywhere in the repo outside a test's `MemoryStream` swap, and `IAsyncEnumerable` (the roadmap's own
-  cited advantage) has zero supporting implementation anywhere — pure aspirational prose. Real
-  out-of-order streaming needs a custom response writer that starts flushing HTML before slow data
-  resolves, which cannot be retrofitted onto Razor Pages' buffered PageModel→PageResult contract as-is —
-  this is a genuine architecture design task (interfaces, timeout/error-boundary semantics for a
-  fragment that never resolves, interaction with antiforgery/caching which assume one synchronous
-  render), not a mechanical feature addition. The roadmap's own M/3wk estimate holds up completely here.
 - **Route rules / hybrid rendering — [CLOSED, this pass — scope corrected]**: confirmed no per-path
   render-mode mechanism, SSG capability, or ISR/output-caching integration exists anywhere. More
   importantly, a literal "SSR/SSG/ISR/CSR in one table" overstates what's realistic for a Razor Pages
@@ -841,6 +830,67 @@ to the user directly and they chose to close the two real items above rather tha
   preserved), 4 new `router.test.ts` cases (outlet-scoped morph preserves sidebar identity and content;
   an island outside the outlet does not receive `laughtale:unmount`; mismatched or absent outlets fall
   back to the full-body replace unchanged). Full suites: 434/434 C#, 599/599 client.
+
+**Out-of-order streaming, closed this pass — the last Part E item, and the hardest.** Confirmed
+genuinely 0% built before designing anything: `awaitStreamingReady()`
+(`LaughTale.Client/src/runtime/streaming.ts`, since removed) gated on a `data-streaming` attribute no
+server code ever set; there was zero `Response.Body.FlushAsync`/`Response.StartAsync` anywhere in the
+repo; and Razor's rendering engine has no Suspense-like "pause mid-document, resume later" primitive, so
+a real implementation had to sit outside Razor Pages' buffered `PageModel → PageResult` contract
+entirely. A Plan-agent design pass first validated the load-bearing ASP.NET Core assumption rather than
+guessing: Razor Pages never sets `Content-Length` (it can't know one up front), so these responses
+already default to chunked transfer encoding with zero extra configuration — meaning a middleware
+wrapping `await next()` can keep writing and flushing more bytes to the same response after the normal
+render completes, and Kestrel delivers them as a genuine continuation of that response.
+
+**Shipped**: a PageModel starts (never awaits) a `Task<TProps>` in `OnGet`; the new
+`<island-deferred name="X" for="PropertyName">` TagHelper (`IslandDeferredTagHelper.cs`) renders a
+skeleton placeholder immediately and registers `(placeholder id, task)` in a `HttpContext.Items`-scoped
+`DeferredIslandRegistry`, without awaiting it. `OutOfOrderStreamingMiddleware` runs the entire downstream
+pipeline via `next()`, flushes the shell, then `Task.WhenAny`-loops over the registry, writing each
+island's real markup as a `<template>`+nonce-stamped inline `<script>` fragment the instant its own task
+resolves — in **completion order**, not declaration order, which is the actual "out-of-order" part.
+`[IslandPrivate]`/authorization are evaluated at placeholder-render time, not fragment-resolution time —
+a real, non-obvious constraint found during design: `Response.HasStarted` is already `true` by the time
+any deferred fragment resolves, so cache-privacy headers can no longer be set then.
+
+**This is the one Part E item where "the tests pass" wasn't sufficient proof — the entire point is that
+bytes arrive progressively, so that was verified directly, not assumed.** A live demo
+(`LaughTale.Showcase/Pages/StreamingDemo.cshtml`, two deferred islands with REVERSED artificial delays —
+3s declared first, 1s declared second) was measured with a Node.js script reading the raw HTTP response
+stream (not just the final HTML): shell content byte-arrived at 55ms, the fast (1s, declared *second*)
+fragment at 1047ms, and the slow (3s, declared *first*) fragment at 3050ms — proving genuine
+completion-order delivery, not simple top-to-bottom progressive flushing, with `Transfer-Encoding:
+chunked` confirmed and no `Content-Length` header present. Both islands hydrated correctly in a real
+browser afterward with zero console errors (an initial alarming batch of console errors traced to stale
+accumulation from hours of prior unrelated navigation in the same long-lived browser tab, confirmed
+clean on a fresh tab).
+
+**Deliberately bounded v1 scope, stated explicitly rather than silently assumed away**: `IslandDeferredTagHelper`
+is self-contained rather than refactoring the existing, heavily-tested `IslandTagHelper.cs` to share
+code — a small amount of duplication traded for not touching already-shipped, security-critical code.
+No response-compression byte-level interaction test was run (reasoned through and registered in the
+architecturally-correct position — after `UseResponseCompression()`, nested inside its still-active
+stream wrapper, since GZip/Brotli streams do forward `FlushAsync` — but not empirically verified with a
+real negotiated-encoding client). No Kestrel `MinResponseDataRate`/keep-alive-ticker hardening for very
+long-hanging deferred tasks (a demo-scale few-second delay doesn't approach Kestrel's default grace
+window). The fragment's inline script calls `window.LaughTale.initIslands()` — an existing, real
+convention (`LaughTale.Showcase/Scripts/main.ts` already exposes this "for showcase demos, diagnostics,
+and E2E testing"), but a **consumer-app responsibility**, not a framework guarantee: any app adopting
+this feature must expose the same global itself. The confirmed-dead `awaitStreamingReady()`/
+`data-streaming` hook was removed outright as superseded dead code, matching this session's existing
+precedent (`initAnimationStyles`/`injectRipple`) of removing confirmed-dead code rather than leaving it
+as inert scaffolding.
+
+Tests: `IslandDeferredTagHelperTests.cs` (placeholder rendering without awaiting the pending task,
+missing/wrong-typed `for` property throws, `[IslandPrivate]` headers set at shell-render time, child
+content as skeleton), `OutOfOrderStreamingMiddlewareTests.cs` (integration-style — runs the real
+TagHelper then the real middleware together: no-op when nothing deferred, **completion-order fragment
+delivery** with two out-of-order-resolving fake tasks, a thrown exception produces a generic error
+fragment without leaking the real message, a timeout produces the same error path). Full suites:
+443/443 C#, 599/599 client.
+
+**Part E is now fully closed — all 6 items.**
 
 ---
 

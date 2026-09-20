@@ -15,13 +15,13 @@ import { createReactIsland } from '../../src/adapters/react.ts';
 const React = await import('react');
 
 // Fixed short delay for the plain-vanilla-mount test below, where hydrateIsland()'s own
-// fire-and-forget async chain (awaitStreamingReady, importWithRetry) just needs a couple of
+// fire-and-forget async chain (importWithRetry) just needs a couple of
 // event-loop turns - no framework scheduler involved.
 const settle = (ms = 20): Promise<void> => new Promise(resolve => setTimeout(resolve, ms));
 
 // React's concurrent root schedules its commit on a macrotask whose exact delay is not
 // contractual, and this file additionally goes through hydrateIsland()'s own async chain
-// (awaitStreamingReady, importWithRetry, this test's own async mount wrapper) before React's
+// (importWithRetry, this test's own async mount wrapper) before React's
 // dynamic imports and scheduler even start. A fixed delay guess was observed to flake under
 // parallel test-file load. Poll for the real condition instead, up to a generous ceiling.
 async function waitFor(check: () => boolean, timeoutMs = 2000, intervalMs = 10): Promise<void> {

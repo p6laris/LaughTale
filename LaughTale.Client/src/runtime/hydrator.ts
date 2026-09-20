@@ -1,14 +1,13 @@
 /**
  * LaughTale: Multi-Strategy Client Hydration Engine (Hardened Edition)
  * Supercharged with Astro-grade prop revival, query retry, singleton child viewport observation,
- * streaming SSR, tri-state lifecycle tracking ('idle' | 'pending' | 'mounted' | 'failed'), and explicit retry recovery.
+ * tri-state lifecycle tracking ('idle' | 'pending' | 'mounted' | 'failed'), and explicit retry recovery.
  */
 
 import { getIslandDefinition, normalizeMountResult, onIslandRegistered, type IslandContext } from './registry';
 import { setIslandUpdateFn, clearIslandUpdateFn } from './island-instances';
 import { parseAndReviveProps } from './reviver';
 import { importWithRetry } from './retry';
-import { awaitStreamingReady } from './streaming';
 import { renderErrorBoundary } from './error-boundary';
 import { refreshIsland } from './refresh';
 import { initDesignTokens } from '../styles/design-tokens';
@@ -221,14 +220,11 @@ async function executeHydration(container: HTMLElement, name: string): Promise<v
     }
 
     try {
-        // 1. Await streaming SSR completion if applicable
-        await awaitStreamingReady(container);
-
-        // 2. Parse & revive props (Date, Uint8Array, Map, Set, BigInt, URL)
+        // 1. Parse & revive props (Date, Uint8Array, Map, Set, BigInt, URL)
         const rawProps = container.getAttribute('data-props') || container.getAttribute('props-json') || container.getAttribute('props');
         const props = parseAndReviveProps(rawProps);
 
-        // 3. Load component module with retry resilience
+        // 2. Load component module with retry resilience
         const module: any = await importWithRetry(definition.loader);
         const mount = module?.default || module;
 
@@ -236,14 +232,14 @@ async function executeHydration(container: HTMLElement, name: string): Promise<v
             throw new Error(`Island '${name}' module does not export a mount function.`);
         }
 
-        // 4. Attach imperative handle if defined, otherwise attach standard island handle
+        // 3. Attach imperative handle if defined, otherwise attach standard island handle
         const customHandle = typeof module?.createHandle === 'function' ? module.createHandle(container, props) : {};
         (container as any).island = {
             ...customHandle,
             refresh: (newProps?: Record<string, any>) => refreshIsland(container, newProps)
         };
 
-        // 5. Construct structural IslandContext (, )
+        // 4. Construct structural IslandContext (, )
         const abortController = new AbortController();
         const cleanups: (() => void)[] = [];
 
@@ -277,7 +273,7 @@ async function executeHydration(container: HTMLElement, name: string): Promise<v
         const nestedBeforeMount = Array.from(container.querySelectorAll<HTMLElement>(ISLAND_SELECTOR))
             .filter((el) => !hasIslandAncestorWithin(el, container));
 
-        // 6. Mount island with context and register unmount hook
+        // 5. Mount island with context and register unmount hook
         const mountResult = await mount(container, props, ctx);
         const { unmount, update } = normalizeMountResult(mountResult);
 

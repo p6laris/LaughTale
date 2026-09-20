@@ -1,0 +1,47 @@
+@page "/StreamingDemo"
+@model LaughTale.Showcase.Pages.StreamingDemoModel
+@{
+    ViewData["Title"] = "Out-of-Order Streaming";
+}
+
+<div class="app-container" style="max-width: 900px; display: flex; flex-direction: column; gap: 2rem; padding-bottom: 3rem;">
+
+    <div style="background: linear-gradient(135deg, var(--p-surface-0) 0%, var(--p-surface-50) 100%); border: 1px solid var(--p-border-color); border-radius: 1.25rem; padding: 2.5rem 2rem; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04);">
+        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+            <div style="width: 2.5rem; height: 2.5rem; border-radius: 10px; background: linear-gradient(135deg, var(--p-primary-500), var(--p-primary-700)); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800;">
+                &#9203;
+            </div>
+            <div>
+                <h1 style="font-size: 1.875rem; font-weight: 800; color: var(--p-text-color); margin: 0;">Out-of-Order Streaming</h1>
+                <p style="color: var(--p-text-muted); font-size: 0.875rem; margin: 0.25rem 0 0;">ROADMAP.v5.md Part E: the shell arrives immediately; slow islands stream in as fragments the moment their data resolves - in completion order, not declaration order.</p>
+            </div>
+        </div>
+
+        <div style="margin-top: 1.25rem; padding: 0.75rem 1rem; background: var(--p-emerald-50, rgba(16, 185, 129, 0.1)); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 8px; font-size: 0.8125rem; color: #047857;">
+            &#9203; <strong>Pipeline:</strong> <code>OnGet</code> starts (never awaits) two <code>Task&lt;TProps&gt;</code> &rarr; <code>&lt;island-deferred for="SlowFact"&gt;</code>/<code>&lt;island-deferred for="FastFact"&gt;</code> render skeletons immediately &rarr; <code>OutOfOrderStreamingMiddleware</code> streams each fragment the instant its task resolves.
+        </div>
+    </div>
+
+    <div style="background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: 1rem; padding: 1.75rem;">
+        <h2 style="font-size: 1.25rem; font-weight: 800; color: var(--p-text-color); margin: 0 0 0.5rem;">This text rendered instantly</h2>
+        <p style="color: var(--p-text-muted); font-size: 0.8125rem; margin: 0 0 1.5rem;">
+            The two panels below are declared SLOW-first, FAST-second - but the FAST one (1 second) will
+            visibly resolve before the SLOW one (3 seconds), proving genuine out-of-order delivery.
+        </p>
+
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <island-deferred name="slow-fact" for="SlowFact" hydrate="Load">
+                <div style="padding: 1rem 1.25rem; border: 1px dashed var(--p-border-color); border-radius: var(--p-border-radius); color: var(--p-text-muted); font-size: 0.8125rem;">
+                    Loading (declared first, resolves in ~3s)&hellip;
+                </div>
+            </island-deferred>
+
+            <island-deferred name="slow-fact" for="FastFact" hydrate="Load">
+                <div style="padding: 1rem 1.25rem; border: 1px dashed var(--p-border-color); border-radius: var(--p-border-radius); color: var(--p-text-muted); font-size: 0.8125rem;">
+                    Loading (declared second, resolves in ~1s)&hellip;
+                </div>
+            </island-deferred>
+        </div>
+    </div>
+
+</div>

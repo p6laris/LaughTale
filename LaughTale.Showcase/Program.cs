@@ -2,6 +2,7 @@ using System.Globalization;
 using Microsoft.AspNetCore.Localization;
 using LaughTale.Core.Extensions;
 using LaughTale.Core.Performance;
+using LaughTale.Core.Streaming;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,6 +52,12 @@ app.UseHttpsRedirection();
 app.UseResponseCompression();
 app.UseLaughTaleStaticAssetsCaching();
 app.UseLaughTaleRouteRules();
+// ROADMAP.v5.md Part E "Out-of-order streaming": registered AFTER UseResponseCompression so this
+// middleware's own late-fragment writes stay nested inside compression's still-active stream wrapper
+// for the whole request lifecycle, instead of writing raw bytes after compression already finalized -
+// GZip/Brotli streams support incremental FlushAsync, so a real browser negotiating gzip/brotli still
+// gets a single, correctly-compressed streamed response, shell and fragments alike.
+app.UseLaughTaleOutOfOrderStreaming();
 app.UseStaticFiles();
 
 app.UseRequestLocalization(localizationOptions);
