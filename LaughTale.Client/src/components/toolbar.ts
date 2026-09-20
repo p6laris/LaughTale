@@ -7,6 +7,7 @@ import type { IslandContext } from '../runtime/registry';
  */
 
 import { injectIslandStyle } from '../runtime/styles';
+import { getLucideIcon } from '../icons/lucide';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import { setRovingTabindex, handleRovingKeydown } from '../accessibility/aria';
 import type { PatternDeclaration } from '../accessibility/patterns';
@@ -97,6 +98,10 @@ html.dark .p-toolbar .p-button-active-toggle,
     background: var(--p-surface-100) !important;
     color: var(--p-primary-color, #10b981) !important;
 }
+
+.p-toolbar-play-icon {
+    margin-inline-start: 2px;
+}
 `;
 
 export interface ToolbarProps {
@@ -105,8 +110,8 @@ export interface ToolbarProps {
     studioOverrides?: Record<string, any>;
 }
 
-const PLAY_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="margin-inline-start: 2px;"><polygon points="6 3 20 12 6 21 6 3"/></svg>`;
-const PAUSE_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>`;
+const PLAY_ICON_SVG = getLucideIcon('play', 20, 1, undefined, { class: 'p-toolbar-play-icon', filled: true });
+const PAUSE_ICON_SVG = getLucideIcon('pause', 20, 1, undefined, { filled: true });
 
 export default function ToolbarIsland(container: HTMLElement, props: ToolbarProps, ctx?: IslandContext) {
     injectIslandStyle('toolbar', TOOLBAR_CSS);

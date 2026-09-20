@@ -762,7 +762,7 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
                     ${!hasFiles ? html`
                         <div class="p-fileupload-empty" data-click-trigger tabindex="0">
                             <div class="p-fileupload-empty-icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/><polyline points="12 13 12 9 10 11"/><polyline points="12 9 14 11"/></svg>
+                                ${unsafe(getLucideIcon('cloud-upload', 24, 2))}
                             </div>
                             <div class="p-fileupload-empty-title">${emptyTitle}</div>
                             <div class="p-fileupload-empty-subtitle">${emptySubtitle}</div>
@@ -787,7 +787,7 @@ export default function FileUploadIsland(container: HTMLElement, props: FileUplo
                                             <img src="${safeUrl(f.previewUrl)}" alt="${f.name}" class="p-fileupload-thumbnail" />
                                         ` : html`
                                             <div class="p-fileupload-thumbnail">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--p-text-muted);"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                                                <span style="color: var(--p-text-muted); display: inline-flex;">${unsafe(getLucideIcon('file', 20, 2))}</span>
                                             </div>
                                         `}
                                         <div class="p-fileupload-file-details">

@@ -326,10 +326,10 @@ const ICONS = {
     last: getLucideIcon('chevrons-right', 14, 2.5),
     // Matches lucide's "refresh-ccw" (counter-clockwise arrow direction), not "refresh-cw".
     refresh: getLucideIcon('refresh-ccw', 14, 2),
-    // NOTE: "settings" left as a raw literal — lucide-static's current settings.svg uses a
-    // differently-shaped gear outline (this literal's older many-tooth path vs the current
-    // rounded-notch dodecagon path); not an exact shape-data match.
-    settings: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>'
+    // Classic pre-redesign 8-tooth gear + circle — same "settings" icon family as lucide's
+    // current settings.svg (circle r=3 plus a gear-tooth outline), just with rounded-notch
+    // curves instead of straight 1.65-radius notches.
+    settings: getLucideIcon('settings', 14, 2)
 };
 
 // Scenic nature images with reliable fallback

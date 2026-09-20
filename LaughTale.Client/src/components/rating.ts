@@ -8,6 +8,7 @@ import type { IslandContext } from '../runtime/registry';
 
 import { injectIslandStyle } from '../runtime/styles';
 import { emitComponentEvent } from '../runtime/events';
+import { getLucideIcon } from '../icons/lucide';
 import { useControllableState } from '../composables/useControllableState';
 import { useFormField } from '../composables/useFormField';
 import { useLocale } from '../composables/useLocale';
@@ -255,9 +256,9 @@ html.dark .p-rating-text-item.p-rating-item-active,
 }
 `;
 
-const starFilledSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
-const starEmptySvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
-const cancelSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>`;
+const starFilledSvg = getLucideIcon('star', 20, 2, undefined, { filled: true });
+const starEmptySvg = getLucideIcon('star', 20, 2);
+const cancelSvg = getLucideIcon('ban', 16, 2);
 
 export default function RatingIsland(container: HTMLElement, props: RatingProps, ctx?: IslandContext) {
     injectIslandStyle('laughtale-rating', CSS);

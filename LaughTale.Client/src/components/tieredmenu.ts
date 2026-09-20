@@ -343,7 +343,7 @@ export default function TieredMenuIsland(container: HTMLElement, props: TieredMe
         return '';
     }
 
-    const chevronRightSvg = getLucideIcon('chevron-right', 14, 2).replace('"p-icon p-icon-chevron-right"', '"p-icon p-icon-chevron-right p-tieredmenu-submenu-icon"').replace('<svg ', '<svg data-part="root" ');
+    const chevronRightSvg = getLucideIcon('chevron-right', 14, 2, undefined, { class: 'p-tieredmenu-submenu-icon', dataPart: 'root' });
 
     function renderMenuItems(itemsList: MenuItem[], level: number = 0): Raw[] {
         return itemsList.map((item, idx) => {

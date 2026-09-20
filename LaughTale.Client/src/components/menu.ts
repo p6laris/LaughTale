@@ -473,7 +473,7 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps, ctx
             startHtml = html`
                 <div class="p-menu-start" style="padding: 0.65rem 0.85rem; display: flex; align-items: center; gap: 0.65rem;">
                     <span style="display: inline-flex; align-items: center; justify-content: center; width: 1.75rem; height: 1.75rem; background: var(--p-primary-500, #10b981); border-radius: 6px; color: #ffffff;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg>
+                        ${unsafe(getLucideIcon('layers', 16, 2.5))}
                     </span>
                     <span style="font-weight: 700; font-size: 0.9375rem; letter-spacing: -0.01em; color: var(--p-text-color);">PRIME<span style="color: var(--p-primary-color, #10b981);">APP</span></span>
                 </div>

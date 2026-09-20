@@ -28,17 +28,13 @@ const SVG_ICONS = {
     chevronDown: unsafe(getLucideIcon('chevron-down', 14, 2.5)),
     chevronRight: unsafe(getLucideIcon('chevron-right', 14, 2.5)),
     folder: unsafe(getLucideIcon('folder', 16, 2)),
-    // NOTE: no exact Lucide match found for this two-path "folder-open" glyph (predates Lucide's
-    // single-path redesign; current folder-open.svg has different path data) - left as raw markup.
-    folderOpen: html`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 14 1.5-6h13l-2.5 6H6Z"/><path d="M4 18h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2Z"/></svg>`,
+    folderOpen: unsafe(getLucideIcon('folder-open', 16, 2)),
     plus: unsafe(getLucideIcon('plus', 14, 2.5)),
     minus: unsafe(getLucideIcon('minus', 14, 2.5)),
     check: unsafe(getLucideIcon('check', 12, 3)),
     user: unsafe(getLucideIcon('user-round', 16, 2)),
     shield: unsafe(getLucideIcon('shield', 16, 2)),
-    // NOTE: no exact Lucide match found for this polygon-based "zap" glyph (current zap.svg was
-    // redesigned with curved bezier paths, not a straight-edged polygon) - left as raw markup.
-    zap: html`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`
+    zap: unsafe(getLucideIcon('zap', 16, 2))
 };
 
 const ACCORDION_CSS = `

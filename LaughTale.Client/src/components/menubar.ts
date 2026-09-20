@@ -442,7 +442,7 @@ export default function MenubarIsland(container: HTMLElement, props: MenubarProp
             startHtml = html`
                 <div class="p-menubar-start">
                     <span style="display: inline-flex; align-items: center; justify-content: center; width: 2rem; height: 2rem; background: var(--lt-primary-500); border-radius: 6px; color: var(--lt-surface-0, var(--lt-surface-0)); margin-inline-end: 0.5rem;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg>
+                        ${unsafe(getLucideIcon('layers', 16, 2.5))}
                     </span>
                     <span style="font-weight: 700; font-size: 0.9375rem;">PRIME<span style="color: var(--lt-primary-500);">APP</span></span>
                 </div>
@@ -461,7 +461,7 @@ export default function MenubarIsland(container: HTMLElement, props: MenubarProp
             `;
         }
 
-        const hamburgerSvg = html`<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>`;
+        const hamburgerSvg = unsafe(getLucideIcon('menu', 18, 2));
 
         const customClass = props.class || (props as any).Class || '';
         const customStyle = props.style || (props as any).Style || '';

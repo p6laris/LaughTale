@@ -412,7 +412,7 @@ html.dark .p-toast-close-button:hover,
 }
 `;
 
-const CLOSE_SVG = getLucideIcon('x', 14, 2).replace('"p-icon p-icon-x"', '"p-icon p-icon-x p-toast-close-icon"').replace('<svg ', '<svg data-part="root" ');
+const CLOSE_SVG = getLucideIcon('x', 14, 2, undefined, { class: 'p-toast-close-icon', dataPart: 'root' });
 
 export class ToastService {
     private registeredContainers: Map<string, HTMLElement> = new Map();

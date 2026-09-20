@@ -556,23 +556,27 @@ const SVG_ICONS = {
     chevronRight: getLucideIcon('chevron-right', 14, 2.5),
     chevronDown: getLucideIcon('chevron-down', 14, 2.5),
     chevronLeft: getLucideIcon('chevron-left', 14, 2.5),
-    firstPage: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m11 17-5-5 5-5"/><path d="m18 17-5-5 5-5"/><path d="M6 19V5"/></svg>',
-    lastPage: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 17 5-5-5-5"/><path d="m13 17 5-5-5-5"/><path d="M18 19V5"/></svg>',
+    firstPage: getLucideIcon('chevrons-left', 14, 2),
+    lastPage: getLucideIcon('chevrons-right', 14, 2),
     sortAsc: getLucideIcon('chevron-up', 13, 2.5),
     sortDesc: getLucideIcon('chevron-down', 13, 2.5),
     sortNone: getLucideIcon('chevrons-up-down', 13, 2),
     folder: getLucideIcon('folder', 15, 2),
-    file: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg>',
+    file: getLucideIcon('file', 15, 2),
     image: getLucideIcon('image', 15, 2),
-    video: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2" ry="2"/></svg>',
+    video: getLucideIcon('video', 15, 2),
     check: getLucideIcon('check', 12, 3),
     minus: getLucideIcon('minus', 12, 3),
     search: getLucideIcon('search', 14, 2),
+    // NOTE: no Lucide equivalent found for this two-concentric-circle "cog" glyph — it has no
+    // gear teeth at all (unlike lucide's cog.svg/settings.svg), and lucide's closest plain-circle
+    // icon (circle-dot, r=10/r=1) has different proportions and an unrelated target/radio meaning.
+    // Left as raw markup.
     cog: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/><path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/></svg>',
-    spinner: '<svg class="animate-spin" data-part="root" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>',
+    spinner: getLucideIcon('spinner', 18, 2, undefined, { class: 'animate-spin', dataPart: 'root' }),
     refresh: getLucideIcon('refresh-ccw', 14, 2),
     download: getLucideIcon('download', 14, 2),
-    pencil: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>',
+    pencil: getLucideIcon('pencil', 14, 2),
     trash: getLucideIcon('trash', 14, 2),
     plus: getLucideIcon('plus', 14, 2)
 };

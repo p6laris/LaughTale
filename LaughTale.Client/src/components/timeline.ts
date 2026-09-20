@@ -330,28 +330,16 @@ html.dark .p-timeline-event-opposite,
 const ICONS = {
     shoppingCart: getLucideIcon('shopping-cart', 18, 2),
     creditCard: getLucideIcon('credit-card', 18, 2),
-    // NOTE: "truck" left as a raw literal — lucide-static's current truck.svg uses different wheel
-    // geometry (circle r=2 @ cy=18 vs this literal's r=2.5 @ cy=18.5, plus a slightly different
-    // path closure), so the shape data does not match exactly.
-    truck: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14v10Z"/><circle cx="17" cy="18.5" r="2.5"/><circle cx="7" cy="18.5" r="2.5"/></svg>',
+    truck: getLucideIcon('truck', 18, 2),
     // Despite the variable name, this shape data matches lucide's "circle-check" icon exactly
     // (not "check-circle", which is a different glyph in this lucide-static version).
     checkCircle: getLucideIcon('circle-check', 18, 2.5),
     check: getLucideIcon('check', 16, 3),
     userPlus: getLucideIcon('user-plus', 18, 2),
-    // NOTE: "envelope" left as a raw literal — lucide-static's current mail.svg path uses different
-    // numeric coordinates (8.991/2/2.009 vs this literal's 8.97/1.94/2.06), so it is not an exact match.
-    envelope: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>',
-    // NOTE: "idCard" left as a raw literal — lucide-static's current id-card.svg is a materially
-    // different, more detailed glyph (adds a card-holder arc, different circle/line positions).
-    idCard: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><circle cx="8" cy="12" r="2"/><path d="M14 10h4"/><path d="M14 14h4"/></svg>',
-    // NOTE: "shoppingBag" left as a raw literal — lucide-static's current shopping-bag.svg uses a
-    // materially different bag outline (this literal's simple straight-sided bag vs the current
-    // tapered/curved outline).
-    shoppingBag: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>',
-    // NOTE: "star" left as a raw literal — lucide-static's current star.svg is a rounded-corner path,
-    // not the sharp-cornered <polygon> used here; shape data does not match.
-    star: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+    envelope: getLucideIcon('mail', 18, 2),
+    idCard: getLucideIcon('id-card', 18, 2),
+    shoppingBag: getLucideIcon('shopping-bag', 18, 2),
+    star: getLucideIcon('star', 18, 2),
     box: getLucideIcon('box', 14, 2),
     mapPin: getLucideIcon('map-pin', 14, 2),
     history: getLucideIcon('history', 16, 2),

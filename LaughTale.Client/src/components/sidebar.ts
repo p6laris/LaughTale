@@ -1331,7 +1331,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps, ctx?
 
                 const chevronSvg = getLucideIcon('chevron-down', 13, 2).replace('"p-icon p-icon-chevron-down"', `"p-icon p-icon-chevron-down p-sidebar-submenu-chevron ${isSubExpanded ? 'p-expanded' : ''}"`);
                 const ellipsisSvg = getLucideIcon('ellipsis-vertical', 14, 2).replace('"p-icon p-icon-ellipsis-vertical"', '"p-icon p-icon-ellipsis-vertical p-sidebar-menu-action"');
-                const trashSvg = `<button type="button" class="p-sidebar-menu-action" title="Delete conversation" aria-label="Delete conversation" style="border:none;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button>`;
+                const trashSvg = `<button type="button" class="p-sidebar-menu-action" title="Delete conversation" aria-label="Delete conversation" style="border:none;">${getLucideIcon('trash-2', 13, 2)}</button>`;
 
                 const actionButton = demoType === 'chat' ? trashSvg : (it.badge === undefined ? ellipsisSvg : '');
 
@@ -1378,8 +1378,8 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps, ctx?
         }
 
         if (demoType === 'chat') {
-            const chatGptSparkleIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>`;
-            const newChatPenIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.375 2.625a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4Z"/></svg>`;
+            const chatGptSparkleIcon = getLucideIcon('sparkles', 14, 2);
+            const newChatPenIcon = getLucideIcon('square-pen', 14, 2);
 
             return `
                 <ul class="p-sidebar-menu">
@@ -1530,13 +1530,13 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps, ctx?
 
     function renderMainContent(): string {
         const triggerIconSvg = getLucideIcon('panel-left', 16, 2);
-        const chatIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>`;
+        const chatIconSvg = getLucideIcon('message-circle', 16, 2);
 
         if (demoType === 'chat') {
-            const chatGptSparkle = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>`;
+            const chatGptSparkle = getLucideIcon('sparkles', 14, 2);
             const arrowUpSend = getLucideIcon('arrow-up', 14, 2.5);
-            const paperclipIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>`;
-            const newChatPenIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.375 2.625a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4Z"/></svg>`;
+            const paperclipIcon = getLucideIcon('paperclip', 15, 2);
+            const newChatPenIcon = getLucideIcon('square-pen', 15, 2);
 
             return `
                 <div class="p-sidebar-main">

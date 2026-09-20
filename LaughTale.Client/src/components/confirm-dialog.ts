@@ -284,10 +284,7 @@ const INFO_ICON_SVG = unsafe(getLucideIcon('info', 28, 2));
 const DANGER_ALERT_SVG = unsafe(getLucideIcon('triangle-alert', 28, 2));
 const QUESTION_SVG = unsafe(getLucideIcon('circle-help', 28, 2));
 const CHECK_SVG = unsafe(getLucideIcon('check', 16, 2.2));
-// NOTE: left as a raw literal — lucide-static's current circle-check-big.svg uses a differently
-// parameterized arc (`M21.801 10A10 10 0 1 1 17 3.335`) than this literal's
-// (`M22 11.08V12a10 10 0 1 1-5.93-9.14`); not an exact shape-data match.
-const CHECK_LARGE_SVG = html`<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`;
+const CHECK_LARGE_SVG = unsafe(getLucideIcon('circle-check-big', 32, 2.5));
 const LOCK_SVG = unsafe(getLucideIcon('lock', 32, 2));
 
 // Global Confirmation Controller Instance

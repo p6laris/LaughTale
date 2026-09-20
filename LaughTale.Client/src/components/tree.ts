@@ -355,16 +355,12 @@ const SVG_ICONS = {
     plusCircle: getLucideIcon('circle-plus', 14, 2),
     minusCircle: getLucideIcon('circle-minus', 14, 2),
     folder: getLucideIcon('folder', 16, 2),
-    // NOTE: no exact Lucide match found for this two-path "folder-open" glyph (predates Lucide's
-    // single-path redesign; current folder-open.svg has different path data) - left as raw markup.
-    folderOpen: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 14 1.5-6h13.5L19 14Z"/><path d="M6 14H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.69.9H19a2 2 0 0 1 2 2v2"/></svg>',
-    // NOTE: no exact Lucide match found for this straight-corner "file" glyph (current file.svg
-    // uses a redesigned rounded-corner dog-ear path) - left as raw markup.
-    file: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg>',
+    folderOpen: getLucideIcon('folder-open', 16, 2),
+    file: getLucideIcon('file', 16, 2),
     check: getLucideIcon('check', 12, 3),
     minus: getLucideIcon('minus', 12, 3),
     search: getLucideIcon('search', 15, 2),
-    spinner: getLucideIcon('spinner', 16, 2).replace('"p-icon p-icon-loader-circle"', '"p-icon p-icon-loader-circle animate-spin"').replace('<svg ', '<svg data-part="root" '),
+    spinner: getLucideIcon('spinner', 16, 2, undefined, { class: 'animate-spin', dataPart: 'root' }),
     plus: getLucideIcon('plus', 14, 2),
     refresh: getLucideIcon('refresh-ccw', 14, 2)
 };

@@ -8,7 +8,7 @@ import type { IslandContext } from '../runtime/registry';
  * zero lingering flex gaps, auto-dismiss life timers, and full WAI-ARIA alert accessibility.
  */
 
-import { LucideIcons } from '../icons/lucide';
+import { LucideIcons, getLucideIcon } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
@@ -490,7 +490,7 @@ export default function MessageIsland(container: HTMLElement, props: MessageProp
         return '';
     }
 
-    const closeIconSvg = html`<svg class="p-message-close-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
+    const closeIconSvg = unsafe(getLucideIcon('x', 14, 2, undefined, { class: 'p-message-close-icon' }));
 
     function renderSingleMessage(p: MessageProps, initialHtmlText?: string): Raw {
         const severity = p.severity || 'info';

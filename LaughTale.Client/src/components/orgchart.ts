@@ -293,10 +293,10 @@ const ICONS = {
     globe: getLucideIcon('globe', 18, 2),
     shield: getLucideIcon('shield', 18, 2),
     box: getLucideIcon('box', 18, 2),
-    // NOTE: legacy "bolt" lightning-bolt path (`M13 2 3 14h9l-1 8 10-12h-9l1-8z`) does not match
-    // the current lucide-static "zap" (rounded outline) or "bolt" (rounded-rect + circle) icons
-    // in this repo's installed version (v1.33.0) — left as a hand-drawn literal, no exact match found.
-    bolt: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>'
+    // Despite the "bolt" key, this glyph's zigzag vertices (13,2 / 3,14 / 12,14 / 11,22 / 21,10 /
+    // 12,10 / 13,2) are the classic lightning-bolt shape, i.e. Lucide's "zap" icon family
+    // (redesigned with curved bezier edges) — not lucide's unrelated "bolt" fastener/hex icon.
+    bolt: getLucideIcon('zap', 18, 2)
 };
 
 export default function OrgChartIsland<T = any>(container: HTMLElement, props: OrgChartProps<T>, ctx?: IslandContext) {

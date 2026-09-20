@@ -25,15 +25,27 @@ function escapeHtml(text: string): string {
     return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
+export interface LucideIconOptions {
+    /** Appended to the generated `p-icon p-icon-<id>` class list. */
+    class?: string;
+    /** Renders `fill="currentColor" stroke="none"` instead of the default stroke-only template. */
+    filled?: boolean;
+    /** Rendered as `data-part="<value>"` on the root `<svg>`, for pt/passthrough styling hooks. */
+    dataPart?: string;
+}
+
 /**
  * @param title Accessible label. When provided, the icon is exposed to assistive tech as
  * `role="img"` with a `<title>`. Omit for a purely decorative icon (default: `aria-hidden`).
  */
-export function getLucideIcon(name: string, size: number = 16, strokeWidth: number = 2, title?: string): string {
+export function getLucideIcon(name: string, size: number = 16, strokeWidth: number = 2, title?: string, options?: LucideIconOptions): string {
     if (!name) return '';
     const iconId = normalizeLucideId(name);
     const a11yAttrs = title ? `role="img" aria-label="${escapeHtml(title)}"` : 'aria-hidden="true"';
-    return `<svg class="p-icon p-icon-${iconId}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round" ${a11yAttrs}><use href="/_lt/icons.svg#${iconId}"></use></svg>`;
+    const className = options?.class ? `p-icon p-icon-${iconId} ${options.class}` : `p-icon p-icon-${iconId}`;
+    const fillAttrs = options?.filled ? 'fill="currentColor" stroke="none"' : 'fill="none" stroke="currentColor"';
+    const dataPartAttr = options?.dataPart ? `data-part="${escapeHtml(options.dataPart)}" ` : '';
+    return `<svg ${dataPartAttr}class="${className}" width="${size}" height="${size}" viewBox="0 0 24 24" ${fillAttrs} stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round" ${a11yAttrs}><use href="/_lt/icons.svg#${iconId}"></use></svg>`;
 }
 
 // Global safe proxy: LucideIcons.anyName NEVER returns undefined!
