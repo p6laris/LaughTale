@@ -448,6 +448,31 @@ behaviour, and the fixes are sitting unused in `src/composables/`.
   is expected to be pixel-identical to its LTR one, a known, already-documented gap
   (`directives/tooltip.ts` was not part of the RTL adoption pass), not a test bug.
 
+  **[CLOSED] Remaining ~68 sections shipped 2026-09-20.** Extended `components.visual.spec.ts`
+  from 8 to all 76 `Components.cshtml` sections, light theme, default/closed-idle state — same v1
+  scope boundary as the original 8's Dialog/Popover/Tooltip (no click-choreography to open
+  overlays). Dark theme and RTL remain scoped to the original 8-section slice, not extended to all
+  76 — a deliberate, named boundary, not an oversight: tripling the already-largest baseline set
+  (76 × 3 variants) wasn't judged worth it for a first full-coverage pass.
+  **A third real bug found the same way as the first two — by inspecting actual generated pixels,
+  not trusting a green run**: `_Layout.cshtml`'s `.app-header` is `position: sticky; top: 0`. For
+  any section taller than one viewport, Playwright's own tall-element screenshot capture has to
+  scroll/resize to stitch the full element, and the sticky header re-renders at each scroll
+  increment it passes — bleeding a breadcrumb/telemetry bar into the middle of the captured
+  image. This affected **every theme, not just dark/RTL** (first surfaced investigating `sidebar`,
+  the tallest of the 68 new sections, but latent in the original 8 too — `datatable`, the tallest
+  of those, was confirmed affected). Fixed by extending the existing FAB-hiding CSS rule
+  (previously applied only in the dark/RTL describe blocks) to also hide `.app-header`, and
+  applying it in **all three** describe blocks — light had never had any hide-CSS at all before
+  this fix. Baselines regenerated via `workflow_dispatch` on `ubuntu-latest`: all 68 new
+  light-theme sections plus the 8 original sections' dark/RTL variants (to pick up the header-bleed
+  fix). Of the 24 pre-existing baselines, only `datatable-dark` and `datatable-rtl` actually
+  changed content — the other 22 came back byte-identical, since the bug only manifested for
+  sections tall enough to trigger multi-viewport screenshot stitching. Spot-checked `sidebar`
+  (tallest multi-section page), `datatable-rtl` (tallest single section, 12267px), and `blockui`
+  (shortest) directly before committing — no chrome bleed, correct RTL mirroring. Real `e2e` CI job
+  (not just the baseline-generation job) confirmed green with the new baselines in place.
+
 ---
 
 ## 6. Part D — Adapters
