@@ -1347,7 +1347,7 @@ element reference throughout resolved it correctly. `autocomplete.ts`/`multisele
 
 ## 11. Part J — Performance
 
-- **Stop leaking listeners** (§1.3) — the largest runtime problem in the codebase.
+- **Stop leaking listeners (§1.3) — [CLOSED; stale duplicate reference, this pass]** This bullet was a leftover pointer to §1.3, which the roadmap's own "URGENT — three shipped bugs" section (top of this file) already records as **closed in Spec 040** (`040-teardown-lifecycle`) — nobody removed the duplicate line from Part J after that closure landed. Verified live, not just trusted: `npm run lint:metrics` (an enforced CI gate, part of `npm run verify`) reports `listenersUnmanaged: 0` out of `listenersTotal: 474` today, against the original audit's `374` unmanaged — and that `0` is a baseline the gate actively regresses against, not a one-time measurement.
 - **Replace `innerHTML` rebuilds with targeted updates — [CLOSED (four components), this pass].** Real
   signals plus a new keyed list-patch helper (Part I) fixed this for `multiselect.ts`, `datatable.ts`
   (needed its own local keyed-row helper, `patchTbodyRows` — see Part I for why `patchList` itself
@@ -1360,7 +1360,7 @@ element reference throughout resolved it correctly. `autocomplete.ts`/`multisele
   keyed-reconciliation helper is what actually solves "destroys focus/selection," since for a text
   filter the triggering state genuinely changes every keystroke — the fix isn't skipping re-runs, it's
   reusing unchanged DOM nodes within them.
-- **Wire up `useVirtualizer`** so the 100,000-row claim is true on the client too.
+- **Wire up `useVirtualizer` — [CLOSED; stale duplicate reference, this pass]** Another leftover pointer to work Part C's own Spec 043 already closed above (`useVirtualizer` across all 6/6 long collection components). Verified live: `datatable.ts`, `treetable.ts`, `tree.ts`, `select.ts`, `listbox.ts`, and `orderlist.ts` all import and use it today.
 - **Real budgets in CI — [CLOSED (mechanical part), this pass].** There was no CI at all in this repo
   before this pass — confirmed, no `.github/workflows` directory existed — so the existing gzip check
   (and every C# test) only ever ran if a developer happened to run it by hand. Added
