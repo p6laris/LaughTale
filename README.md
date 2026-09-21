@@ -29,7 +29,7 @@ An enterprise-grade, high-performance **Islands Architecture framework for ASP.N
 | **`LaughTale.Generators`** | Roslyn Source Generator & Diagnostic Analyzers (`SMI001`–`SMI008`). | `netstandard2.0` |
 | **`LaughTale.Templates`** | `dotnet new` project templates (`laughtale-web`, `laughtale-island`). | `net10.0` |
 | **`LaughTale.Cli`** | Global .NET CLI and NPM binary (`npx laughtale`) for listing and ejecting components. | `net10.0` / Node.js |
-| **`LaughTale.Client`** | Standalone runtime (`dist/runtime.js`, ~38 KB gz) or full bundle with all 76 components (`dist/index.js`, ~224 KB gz), router, adapters, and Tailwind preset. | `laughtale` (NPM) |
+| **`LaughTale.Client`** | Recommended path: the split ESM build (`dist/index.mjs`, ~8 KB gz entry - each of the 76 components is its own lazily-loaded chunk, downloaded only when actually used), router, adapters, and Tailwind preset. A monolithic IIFE bundle with everything inlined (`dist/index.js`, ~373 KB gz, published at the `laughtale/iife` subpath) is also available as a script-tag-droppable escape hatch for pages with no bundler - not the default. | `laughtale` (NPM) |
 | **`LaughTale.Showcase`** | Enterprise showcase demonstrating all components, theming, and hydration modes. | `net10.0` Web App |
 | **`LaughTale.Docs`** | Interactive documentation portal with runnable live examples. | `net10.0` Web App |
 | **`LaughTale.Tests`** | Comprehensive automated test suite (**200 .NET tests, 268 JS tests, 0 failures**). | `net10.0` |

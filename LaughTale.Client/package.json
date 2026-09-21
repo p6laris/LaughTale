@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Ultra-lightweight multi-strategy client-side hydration engine for LaughTale Islands Architecture",
   "type": "module",
-  "main": "dist/index.js",
+  "main": "dist/index.mjs",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "bin": {
@@ -13,18 +13,20 @@
     ".": {
       "import": "./dist/index.mjs",
       "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+      "default": "./dist/index.mjs"
     },
     "./runtime": {
       "import": "./dist/runtime.mjs",
       "types": "./dist/runtime.d.ts",
-      "default": "./dist/runtime.js"
+      "default": "./dist/runtime.mjs"
     },
     "./islands": {
       "import": "./dist/runtime.mjs",
       "types": "./dist/runtime.d.ts",
-      "default": "./dist/runtime.js"
+      "default": "./dist/runtime.mjs"
     },
+    "./iife": "./dist/index.js",
+    "./iife/runtime": "./dist/runtime.js",
     "./adapters/react": "./dist/adapters/react.js",
     "./adapters/vue": "./dist/adapters/vue.js",
     "./adapters/svelte": "./dist/adapters/svelte.js",
