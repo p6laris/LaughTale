@@ -16,7 +16,7 @@
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap"></noscript>
     <!-- Aura-Inspired Stylesheet -->
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" lt-integrity="true" />
     <script>
         // Synchronous theme initialization (prevents flash)
         const savedTheme = localStorage.getItem('theme');
@@ -144,7 +144,7 @@
     <island-state-script />
 
     <!-- Load Islands Bundle -->
-    <script type="module" src="~/js/main.js" asp-append-version="true"></script>
+    <script type="module" src="~/js/main.js" asp-append-version="true" lt-integrity="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

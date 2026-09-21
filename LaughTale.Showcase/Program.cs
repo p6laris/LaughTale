@@ -1,5 +1,6 @@
 using System.Globalization;
 using Microsoft.AspNetCore.Localization;
+using LaughTale.Core.Assets;
 using LaughTale.Core.Caching;
 using LaughTale.Core.Configuration;
 using LaughTale.Core.Extensions;
@@ -38,6 +39,9 @@ builder.Services.AddLaughTaleOutputCache(options =>
         .Expire(TimeSpan.FromSeconds(15))
         .AddPolicy(typeof(RespectNoStorePolicy)));
 });
+
+// ROADMAP.v5.md Part B "Asset pipeline" (integrity manifest): enables lt-integrity on <script>/<link>.
+builder.Services.AddLaughTaleAssetIntegrity();
 
 var supportedCultures = new[]
 {
