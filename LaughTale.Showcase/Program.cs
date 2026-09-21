@@ -1,5 +1,6 @@
 using System.Globalization;
 using Microsoft.AspNetCore.Localization;
+using LaughTale.Core.Caching;
 using LaughTale.Core.Configuration;
 using LaughTale.Core.Extensions;
 using LaughTale.Core.Performance;
@@ -26,6 +27,17 @@ builder.Services.AddLaughTale(opt =>
 // ROADMAP.v5.md Part F "Typed config & sessions": AdminApiKey stays server-only; PublicApiBaseUrl and
 // FeatureFlagName ([ClientExposed]) are dehydrated into ctx.state('config') on every request.
 builder.Services.AddLaughTaleTypedConfig<ShowcaseAppConfig>(builder.Configuration.GetSection("ShowcaseApp"));
+
+// ROADMAP.v5.md Part F "Cache tags & live invalidation" / "Incremental regeneration": a NAMED policy
+// (not the global base policy) so only /CacheTagsDemo opts in - RespectNoStorePolicy is chained since
+// this policy caches more than one known-always-public route class, matching this feature's own
+// safety requirement (see RespectNoStorePolicy's doc comment).
+builder.Services.AddLaughTaleOutputCache(options =>
+{
+    options.AddPolicy("laughtale-demo", b => b
+        .Expire(TimeSpan.FromSeconds(15))
+        .AddPolicy(typeof(RespectNoStorePolicy)));
+});
 
 var supportedCultures = new[]
 {
@@ -70,6 +82,8 @@ app.UseStaticFiles();
 app.UseRequestLocalization(localizationOptions);
 
 app.UseRouting();
+
+app.UseLaughTaleOutputCache();
 
 app.MapRazorPages();
 
