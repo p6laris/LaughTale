@@ -224,7 +224,7 @@ delivery is one of the healthier subsystems.
 
 ---
 
-## 4. Part B — The compiler & build pipeline
+## 4. Part B — The compiler & build pipeline — **[CLOSED except 1 explicitly-deferred sub-item: true handler-level chunk splitting inside the Optimizer row — see below]**
 
 | Item | From | Effort |
 |---|---|---|
