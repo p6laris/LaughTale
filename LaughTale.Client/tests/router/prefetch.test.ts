@@ -5,6 +5,8 @@ import {
     PrefetchManager,
     prefetchManager
 } from '../../src/router/prefetch.ts';
+import { defineIsland, clearRegistry } from '../../src/runtime/registry.ts';
+import { clearChunkPrefetchState } from '../../src/router/chunk-prefetch.ts';
 
 describe('Router Predictive Prefetching Suite', () => {
     beforeEach(() => {
@@ -74,5 +76,33 @@ describe('Router Predictive Prefetching Suite', () => {
 
         cleanup();
         anchor.remove();
+    });
+
+    it('warms an island chunk discovered in a speculatively-fetched page\'s HTML (ROADMAP.v5.md Part B)', async () => {
+        clearRegistry();
+        clearChunkPrefetchState();
+
+        let loaderCalls = 0;
+        defineIsland('destination-widget', () => {
+            loaderCalls++;
+            return Promise.resolve({ default: () => {} });
+        });
+
+        const originalFetch = globalThis.fetch;
+        (globalThis as any).fetch = async () => ({
+            ok: true,
+            text: async () => '<div data-island="destination-widget" data-props="{}"></div>'
+        });
+
+        try {
+            const mgr = new PrefetchManager();
+            await mgr.prefetch('/destination-page');
+
+            assert.equal(loaderCalls, 1, 'The destination page\'s island loader must be called once to warm its chunk');
+        } finally {
+            globalThis.fetch = originalFetch;
+            clearRegistry();
+            clearChunkPrefetchState();
+        }
     });
 });

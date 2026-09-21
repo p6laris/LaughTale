@@ -2,6 +2,7 @@
  * LaughTale: Router Predictive Prefetching & Response Cache
  * Anticipates navigation via hover intent (150ms) and viewport visibility with data saver awareness.
  */
+import { prefetchIslandChunksInHtml } from './chunk-prefetch';
 
 export interface CachedResponse {
     html: string;
@@ -145,6 +146,9 @@ export class PrefetchManager {
                 if (!res.ok) return null;
                 const html = await res.text();
                 this.setCachedResponse(key, html);
+                // ROADMAP.v5.md Part B "Speculative prefetch worker": the destination page's own
+                // islands are now known - warm their chunks too, not just its HTML.
+                prefetchIslandChunksInHtml(html);
                 return html;
             } catch {
                 return null;

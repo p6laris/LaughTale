@@ -48,6 +48,7 @@ export { laughtaleTailwindPreset } from './styles/tailwind.preset';
 export { renderThemeMatrix, captureStyleSignature, type MatrixPermutation, type ComponentMatrixSnapshot } from './testing/visual-harness';
 export { measureHydration, measureThroughput, recordHydrationMetric, getHydrationMetrics, clearHydrationMetrics, calculatePercentiles, type BenchmarkMetric, type HydrationMetric } from './runtime/benchmark';
 export { PrefetchManager, prefetchManager, type CachedResponse, type PrefetchOptions } from './router/prefetch';
+export { prefetchIslandChunk, prefetchIslandChunksInHtml } from './router/chunk-prefetch';
 export { extractIconSymbols, generateSubsetSprite, computeSpriteHash } from './icons/subset-generator';
 export { announce, clearAnnouncements, getAnnouncerElement, type AnnouncePriority } from './accessibility/announcer';
 export { applyAriaAttributes, setRovingTabindex, handleRovingKeydown } from './accessibility/aria';
