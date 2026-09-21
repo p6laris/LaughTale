@@ -46,6 +46,15 @@
                       ReferenceOutputAssembly="false" />
   </ItemGroup>
 
+  <!-- ROADMAP.v5.md Part H "Deployment presets": see LaughTale.Showcase.csproj's identical exclusion
+       for why - a consuming project's `dotnet publish` fails with NETSDK1152 otherwise, since this
+       project's package.json/package-lock.json collide with the consumer's own at the same publish
+       output path. -->
+  <ItemGroup>
+    <Content Remove="package.json" />
+    <Content Remove="package-lock.json" />
+  </ItemGroup>
+
   <Import Project="..\LaughTale.Generators\buildTransitive\LaughTale.Generators.targets" Condition="Exists('..\LaughTale.Generators\buildTransitive\LaughTale.Generators.targets')" />
 
 </Project>

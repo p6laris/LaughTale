@@ -1,0 +1,13 @@
+# ROADMAP.v5.md Part H "Deployment presets" - keeps the build context small and avoids copying
+# host-platform-specific artifacts (e.g. a Windows esbuild native binary under node_modules) into a
+# Linux build stage that reinstalls everything fresh anyway.
+**/bin/
+**/obj/
+**/node_modules/
+**/dist/
+**/wwwroot/js/
+.git/
+.claude/
+**/*.user
+**/test-results/
+**/playwright-report/

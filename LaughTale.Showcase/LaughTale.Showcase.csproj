@@ -38,6 +38,19 @@
                       ReferenceOutputAssembly="false" />
   </ItemGroup>
 
+  <!-- ROADMAP.v5.md Part H "Deployment presets": `dotnet publish` (unlike plain `dotnet build`, which
+       nothing in this repo's own tooling had ever actually exercised before this pass - confirmed by
+       hitting this for real) fails with NETSDK1152 ("multiple publish output files with the same
+       relative path") because the SDK's default content glob picks up this project's own
+       package.json/package-lock.json AND LaughTale.Showcase.Islands' identically-named files (via its
+       ProjectReference's static web assets), both landing at the same output-relative path. Neither
+       file has any purpose in a published web app - they're npm bookkeeping for the build step, which
+       has already run by the time `dotnet publish` gets here. -->
+  <ItemGroup>
+    <Content Remove="package.json" />
+    <Content Remove="package-lock.json" />
+  </ItemGroup>
+
   <!-- Auto-bundle TypeScript islands before build -->
   <Target Name="BuildIslandsJs" BeforeTargets="AssignTargetPaths;ResolveStaticWebAssetsInputs;BeforeBuild" Condition="'$(DesignTimeBuild)' != 'true'">
     <Exec Command="npm run build" WorkingDirectory="$(ProjectDir)" Condition="Exists('$(ProjectDir)package.json')" />

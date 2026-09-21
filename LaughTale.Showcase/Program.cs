@@ -43,6 +43,12 @@ builder.Services.AddLaughTaleOutputCache(options =>
 // ROADMAP.v5.md Part B "Asset pipeline" (integrity manifest): enables lt-integrity on <script>/<link>.
 builder.Services.AddLaughTaleAssetIntegrity();
 
+// ROADMAP.v5.md Part H "Deployment presets": a real health endpoint, not a stub - every target this
+// preset covers (Azure App Service, a container orchestrator, an IIS/ARR front end) wants one to
+// probe. Deliberately unauthenticated/uncached (no antiforgery, no [IslandPrivate] on the path) so an
+// external prober never gets tangled in this app's own auth or output-cache policies.
+builder.Services.AddHealthChecks();
+
 var supportedCultures = new[]
 {
     new CultureInfo("en-US"),
@@ -89,6 +95,7 @@ app.UseRouting();
 
 app.UseLaughTaleOutputCache();
 
+app.MapHealthChecks("/healthz");
 app.MapRazorPages();
 
 app.Run();
