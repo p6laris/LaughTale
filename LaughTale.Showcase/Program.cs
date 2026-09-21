@@ -1,8 +1,10 @@
 using System.Globalization;
 using Microsoft.AspNetCore.Localization;
+using LaughTale.Core.Configuration;
 using LaughTale.Core.Extensions;
 using LaughTale.Core.Performance;
 using LaughTale.Core.Streaming;
+using LaughTale.Showcase.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +22,10 @@ builder.Services.AddLaughTale(opt =>
     // just a unit-tested-in-isolation feature.
     opt.RouteRules.AddRule("/Partials", "public, max-age=60");
 });
+
+// ROADMAP.v5.md Part F "Typed config & sessions": AdminApiKey stays server-only; PublicApiBaseUrl and
+// FeatureFlagName ([ClientExposed]) are dehydrated into ctx.state('config') on every request.
+builder.Services.AddLaughTaleTypedConfig<ShowcaseAppConfig>(builder.Configuration.GetSection("ShowcaseApp"));
 
 var supportedCultures = new[]
 {
@@ -52,6 +58,7 @@ app.UseHttpsRedirection();
 app.UseResponseCompression();
 app.UseLaughTaleStaticAssetsCaching();
 app.UseLaughTaleRouteRules();
+app.UseLaughTaleTypedConfig();
 // ROADMAP.v5.md Part E "Out-of-order streaming": registered AFTER UseResponseCompression so this
 // middleware's own late-fragment writes stay nested inside compression's still-active stream wrapper
 // for the whole request lifecycle, instead of writing raw bytes after compression already finalized -
