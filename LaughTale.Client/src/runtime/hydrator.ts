@@ -13,6 +13,7 @@ import { refreshIsland } from './refresh';
 import { initDesignTokens } from '../styles/design-tokens';
 import { useLocale } from '../composables/useLocale';
 import { useSharedState } from './state';
+import { useAmbientState } from './ambient-state';
 
 export type HydrateStrategy = 'load' | 'idle' | 'visible' | 'media' | 'interaction' | 'never';
 export type HydrationState = 'idle' | 'pending' | 'mounted' | 'failed';
@@ -259,7 +260,10 @@ async function executeHydration(container: HTMLElement, name: string): Promise<v
             hydrate: container.hasChildNodes(),
             // Reaches the existing (previously unwired) useSharedState composable - see IslandContext's
             // own doc comment for why this is `sharedState`, not `state` (ROADMAP.v5.md Part D vs Part F).
-            sharedState: useSharedState
+            sharedState: useSharedState,
+            // ROADMAP.v5.md Part F (Ambient state pool): seeded from the server-dehydrated
+            // __LAUGHTALE_STATE__ blob when IslandStateScriptTagHelper rendered one.
+            state: useAmbientState
         };
 
         const localeHelpers = useLocale(ctx);

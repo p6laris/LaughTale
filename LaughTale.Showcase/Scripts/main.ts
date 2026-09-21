@@ -26,6 +26,7 @@ defineIsland('event-receiver', () => import('./islands/receiver'));
 defineIsland('modal-dialog', () => import('./islands/modal-dialog'));
 defineIsland('persistent-telemetry', () => import('./islands/persistent-player'));
 defineIsland('slow-fact', () => import('./islands/slow-fact'));
+defineIsland('ambient-counter', () => import('./islands/ambient-counter'));
 
 // 2. Register Polyglot Multi-Framework Live Islands
 defineIsland('polyglot-react', () => import('./islands/polyglot-react'));

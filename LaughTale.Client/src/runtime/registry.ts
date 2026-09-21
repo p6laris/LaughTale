@@ -25,11 +25,17 @@ export interface IslandContext {
     /**
      * Reaches `runtime/state.ts`'s existing (previously unwired) `useSharedState` composable, so an
      * island can read/write cross-island state without a separate import. Deliberately named
-     * `sharedState`, not `state` - ROADMAP.v5.md Part F already earmarks `ctx.state` for a distinct,
-     * not-yet-built server-dehydration mechanism (`IslandStatePool`); this is the narrower, client-only
-     * piece Part D actually asks for.
+     * `sharedState`, not `state` - see `state` below for the server-dehydrated counterpart
+     * (ROADMAP.v5.md Part F).
      */
     sharedState?<T = any>(key: string, initialValue?: T): IslandStore<T>;
+    /**
+     * ROADMAP.v5.md Part F (Ambient state pool): `runtime/ambient-state.ts`'s `useAmbientState`,
+     * seeded from the server-rendered `<script id="__LAUGHTALE_STATE__">` blob when present. Shares
+     * `sharedState`'s underlying store, so a key set via `ctx.state` is also visible to `ctx.sharedState`
+     * calls for the same key and vice versa - only the INITIAL seed differs.
+     */
+    state?<T = any>(key: string, initialValue?: T): IslandStore<T>;
 }
 
 /**

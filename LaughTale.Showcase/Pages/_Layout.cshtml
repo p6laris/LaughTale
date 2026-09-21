@@ -139,6 +139,10 @@
         </div>
     </div>
 
+    <!-- Ambient State Pool dehydration (ROADMAP.v5.md Part F) - must render before the islands bundle
+         so ctx.state() can read it the moment an island hydrates. -->
+    <island-state-script />
+
     <!-- Load Islands Bundle -->
     <script type="module" src="~/js/main.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)

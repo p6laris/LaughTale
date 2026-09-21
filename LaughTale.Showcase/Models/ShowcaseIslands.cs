@@ -82,3 +82,15 @@ public record SystemTelemetryProps(
     string MetricName,
     int RefreshIntervalSeconds
 );
+
+/// <summary>
+/// ROADMAP.v5.md Part F "Ambient state pool" live demo island - two independent instances on the same
+/// page both read/write the same `ctx.state('visitCount')` store, seeded from the server via
+/// <c>HttpContext.SetAmbientState</c>, to prove the server's initial value survives into the client
+/// AND that both instances share one reactive store (Nuxt <c>useState</c>-equivalent).
+/// </summary>
+[IslandAllowAnonymous]
+[Island("ambient-counter", DefaultStrategy = HydrateStrategy.Load)]
+public record AmbientCounterProps(
+    string Label
+);

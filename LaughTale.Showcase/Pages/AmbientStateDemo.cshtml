@@ -1,0 +1,20 @@
+@page "/AmbientStateDemo"
+@model LaughTale.Showcase.Pages.AmbientStateDemoModel
+@using LaughTale.Showcase.Models
+@{
+    ViewData["Title"] = "Ambient State Pool";
+}
+
+<div class="app-container" style="max-width: 900px; display: flex; flex-direction: column; gap: 2rem; padding-bottom: 3rem;">
+
+    <div style="background: linear-gradient(135deg, var(--p-surface-0) 0%, var(--p-surface-50) 100%); border: 1px solid var(--p-border-color); border-radius: 1.25rem; padding: 2.5rem 2rem; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04);">
+        <h1 style="font-size: 1.875rem; font-weight: 800; color: var(--p-text-color); margin: 0;">Ambient State Pool</h1>
+        <p style="color: var(--p-text-muted); font-size: 0.875rem; margin: 0.25rem 0 0;">ROADMAP.v5.md Part F: the server seeds <code>visitCount = 7</code> via <code>HttpContext.SetAmbientState</code>, dehydrated into a single <code>&lt;script id="__LAUGHTALE_STATE__"&gt;</code> blob. Both islands below read it with <code>ctx.state('visitCount')</code> and share one reactive store - incrementing in either updates both.</p>
+    </div>
+
+    <div style="background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: 1rem; padding: 1.75rem; display: flex; flex-direction: column; gap: 1rem;">
+        <island name="ambient-counter" props="@(new AmbientCounterProps("Instance A"))" hydrate="Load" />
+        <island name="ambient-counter" props="@(new AmbientCounterProps("Instance B"))" hydrate="Load" />
+    </div>
+
+</div>

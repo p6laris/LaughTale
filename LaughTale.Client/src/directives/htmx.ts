@@ -45,11 +45,26 @@ export function bindServerAction(element: HTMLElement): void {
         const indicator = indicatorSelector ? document.querySelector<HTMLElement>(indicatorSelector) : null;
         if (indicator) indicator.style.display = 'block';
 
+        // ROADMAP.v5.md Part F (Server actions - submit state): disable the form's submit controls
+        // for the duration of the request, so a slow handler can't be double-submitted by an
+        // impatient click/Enter. Captures each control's PRE-EXISTING disabled state (not just
+        // `false`) so a control the author already disabled for other reasons doesn't get
+        // incorrectly re-enabled when this request finishes.
+        const submitScope = element.closest('form') ?? (element as HTMLElement);
+        const submitControls = Array.from(
+            submitScope.querySelectorAll<HTMLButtonElement | HTMLInputElement>(
+                'button[type="submit"], input[type="submit"], button:not([type])'
+            )
+        );
+        const priorDisabled = submitControls.map((c) => c.disabled);
+        submitControls.forEach((c) => { c.disabled = true; });
+
         try {
-            // ROADMAP.v5.md Part G/L (Server Actions): marks the closest form as mid-submission so
-            // e.g. CSS/other directives can react (disable inputs, show a spinner). Cleared in the
-            // existing finally block below.
+            // ROADMAP.v5.md Part G/L (Server Actions): marks the form (and the triggering element
+            // itself, for non-form triggers) as mid-submission so CSS/other directives can react
+            // (spinners, dimming, etc). Cleared in the existing finally block below.
             element.closest('form')?.setAttribute('data-lt-submitting', 'true');
+            element.setAttribute('data-lt-submitting', 'true');
 
             let requestUrl = url;
             let body: any = null;
@@ -148,6 +163,8 @@ export function bindServerAction(element: HTMLElement): void {
         } finally {
             if (indicator) indicator.style.display = 'none';
             element.closest('form')?.removeAttribute('data-lt-submitting');
+            element.removeAttribute('data-lt-submitting');
+            submitControls.forEach((c, i) => { c.disabled = priorDisabled[i]; });
         }
     };
 
