@@ -1484,10 +1484,21 @@ island writes a `data-props` JSON blob into the HTML, and nothing about that pat
   in `LaughTale.Components/Forms/DynamicFormSchema.cs` and `LaughTale.Core/Data/QueryableExtensions.cs`;
   the legacy imperative `IslandTagHelper.Props` reflection path) — out of scope for this pass, reported
   rather than silenced.
-- **The props object is still rebuilt per render.** Unchanged by this pass — the generator emits a
-  fresh `WireProps` instance per TagHelper invocation, then serializes it. For a table of 500 rows with
-  an island per cell that is still 500 allocations and 500 serializations of near-identical JSON.
-  *Fix: cache by value, or hoist shared props to the ambient state pool (Part F). (M · 2 wks)*
+- **The props object is still rebuilt per render — [CLOSED, this pass; measured, not a real bottleneck]**
+  Investigated before building a caching layer for it, and it's a good thing this pass did: a real
+  stopwatch benchmark against a realistic 18-field `WireProps`-shaped record (matching
+  `<island-datatable>`'s actual generated shape) measured **0.008 ms per `SerializeProps` call** —
+  identical whether the 500 instances were literally the same object or all genuinely distinct (each
+  with a different `Rows` value), meaning `System.Text.Json`'s own internal `JsonTypeInfo` caching (by
+  `Type`, not by instance) already absorbs the "rebuilt per render" cost the roadmap worried about. 500
+  rows × an island per cell costs **~4 ms total** — immaterial against real page-render/network
+  latency, and the "cache by value" fix this row itself suggested would have been actively worse than
+  doing nothing: for the row's own motivating scenario (500 table rows with genuinely different data
+  per row), a value-keyed cache mostly MISSES (each row's props differ), so it would pay full
+  serialization cost anyway PLUS the overhead of maintaining an ever-growing, effectively-unbounded
+  dictionary of one-off cache entries that never get reused — a real memory-growth risk introduced to
+  chase a savings that the same scenario doesn't actually have. Correctly diagnosed, over-estimated
+  severity — the pattern this session has found repeatedly elsewhere on this roadmap.
 - **No compression story for the attribute payload.** Unchanged. `data-props` is inline HTML, so it
   compresses with the document — but it defeats any future streaming or partial-update path that wants
   to send markup without re-sending props.
