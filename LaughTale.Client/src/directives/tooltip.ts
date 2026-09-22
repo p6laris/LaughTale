@@ -7,6 +7,7 @@
 
 import { injectIslandStyle } from '../runtime/styles';
 import { escapeHtml } from '../runtime/html';
+import { useDisclosure } from '../composables/useDisclosure';
 
 const TOOLTIP_CSS = `
 .p-tooltip {
@@ -107,6 +108,20 @@ let currentTargetEl: HTMLElement | null = null;
 let showTimeoutId: any = null;
 let hideTimeoutId: any = null;
 let globalTooltipDelegationBound = false;
+
+// ROADMAP.v5.md Part M "Adopt - State machine": tooltip.ts is a page-wide SINGLETON (one shared
+// `activeTooltipEl`, matching popover.ts's own already-retrofitted architecture) whose "is the
+// tooltip currently visible" state was only ever the `.p-tooltip-active` class itself, toggled
+// independently from `currentTargetEl`, `showTimeoutId` and `hideTimeoutId` - three loosely related
+// mutable variables standing in for what a real disclosure guard now owns directly.
+const tooltipDisclosure = useDisclosure({
+    onOpen: () => {
+        activeTooltipEl?.classList.add('p-tooltip-active');
+    },
+    onClose: () => {
+        activeTooltipEl?.classList.remove('p-tooltip-active');
+    }
+});
 
 function findTooltipTarget(startEl: HTMLElement | null): HTMLElement | null {
     let curr = startEl;
@@ -256,6 +271,16 @@ function showTooltipForElement(targetEl: HTMLElement, config: TooltipConfig) {
         showTimeoutId = null;
     }
 
+    // ROADMAP.v5.md Part M: track the pending/current target SYNCHRONOUSLY, not only once the
+    // tooltip actually becomes visible - a real, pre-existing bug this retrofit surfaced. Before this,
+    // `currentTargetEl` was only assigned inside `triggerShow`, i.e. after `showDelay` elapsed. The
+    // `mouseout` handler below guards on `target === currentTargetEl` before calling
+    // `hideActiveTooltip()` at all, so a mouseout that arrived DURING the show-delay window (pointer
+    // left the element before its delayed tooltip ever appeared) failed that guard - `currentTargetEl`
+    // was still `null` - and silently did nothing, leaving `showTimeoutId` armed. The delayed tooltip
+    // then popped up anyway once the timer fired, anchored to an element the pointer had already left.
+    currentTargetEl = targetEl;
+
     const triggerShow = () => {
         if (!activeTooltipEl) {
             activeTooltipEl = document.createElement('div');
@@ -264,7 +289,6 @@ function showTooltipForElement(targetEl: HTMLElement, config: TooltipConfig) {
             document.body.appendChild(activeTooltipEl);
         }
 
-        currentTargetEl = targetEl;
         const pos = config.position || 'right';
         activeTooltipEl.className = `p-tooltip p-component p-tooltip-${pos} ${config.class || ''}`;
         if (!config.autoHide) {
@@ -284,7 +308,7 @@ function showTooltipForElement(targetEl: HTMLElement, config: TooltipConfig) {
         }
 
         positionTooltip(activeTooltipEl, targetEl, pos);
-        activeTooltipEl.classList.add('p-tooltip-active');
+        tooltipDisclosure.open();
     };
 
     if (config.showDelay && config.showDelay > 0) {
@@ -306,10 +330,8 @@ function hideActiveTooltip(delay: number = 0) {
     }
 
     const triggerHide = () => {
-        if (activeTooltipEl) {
-            activeTooltipEl.classList.remove('p-tooltip-active');
-            currentTargetEl = null;
-        }
+        tooltipDisclosure.close();
+        currentTargetEl = null;
     };
 
     if (delay > 0) {
@@ -367,7 +389,7 @@ export function initGlobalTooltipDelegation() {
 
     // Escape Key Handler
     window.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && activeTooltipEl) {
+        if (e.key === 'Escape' && tooltipDisclosure.isOpen) {
             hideActiveTooltip(0);
         }
     });

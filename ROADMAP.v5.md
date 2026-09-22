@@ -1077,9 +1077,9 @@ survives internal changes — which is what makes `eject` a good idea rather tha
   after skipping 14 that duplicated a hand-written class), so **82 of 82** TagHelpers now reach the
   template method. Every capability parked on it — SSR, localization, RTL — inherits that reach.
 - **Adopt — State machine** *(Zag.js, XState)* for overlays. Ends the
-  `isOpen && !isDisabled && hasFocus` boolean soup. **[CLOSED (real infrastructure + 5 of ~18
+  `isOpen && !isDisabled && hasFocus` boolean soup. **[CLOSED (real infrastructure + 7 of ~18
   components fully migrated), this pass]** - the primitive itself is genuinely done and tested;
-  retrofitting the remaining ~13 overlay components (dropdown, tooltip, drawer, ...) is explicitly
+  retrofitting the remaining ~11 overlay components (dropdown, menu, menubar, ...) is explicitly
   left as ongoing/opportunistic work, the same posture Part C's own "headless core" item already
   takes, not silently claimed as finished.
   `runtime/state-machine.ts` (new) is a real, hand-written finite state machine - deliberately not the
@@ -1172,7 +1172,39 @@ survives internal changes — which is what makes `eject` a good idea rather tha
   actual/expected diff to format. Confirmed via a bundled, non-`tsx` reproduction
   (`node --test dist/tests/components/dialog.test.js`) that this was not a `tsx`/test-runner-integration
   artifact - it hangs identically under the project's real `npm test` pipeline.
-  Verified: `npm run typecheck`/`build` (bundle budgets unaffected), `npm test` (697/697).
+  **Two more components migrated in a follow-up pass, `drawer.ts` and `tooltip.ts` (a directive, not
+  an overlay component, but the same singleton-disclosure shape as popover.ts) - each with its own
+  real bug found along the way:**
+  `drawer.ts` had the exact same accessibility gap dialog.ts's own global delegation had before this
+  pass, and drawer.ts didn't even have a per-instance handle to begin with - its
+  `data-drawer-target`/`data-drawer-open`/`data-drawer-close`/backdrop-click delegation manipulated
+  `maskEl.classList`/`document.body.style.overflow` directly, by hand, in three separate places, and
+  never called `trap.activate()`/`trap.deactivate()` at all. Fixed the same way dialog.ts was: an
+  internal `__ltDrawerInstance` handle (`doOpen`/`doClose`/`doToggle`, backed by `useDisclosure`)
+  stashed on the container, with every delegated path now routed through it. 9 new tests, including one
+  proving the `data-drawer-position` override still repositions the mask before it opens. Live-verified
+  against the Showcase (`/Components#sec-drawer`): the delegated trigger opens the drawer and moves
+  focus inside it, confirmed with direct timer instrumentation showing the focus-trap's internal 10ms
+  autofocus callback fires and lands focus on the close button - the exact behavior the old delegation
+  path never produced. (Aside, not a code issue: this session's own browser-automation pane
+  intermittently lost OS-level window focus mid-verification, the same class of tooling limitation
+  already documented for Part J's Core Web Vitals work and Part M's context-menu.ts pass - a handful of
+  live checks had to be repeated to get a clean run, not because the retrofit was flaky.)
+  `tooltip.ts` is a page-wide singleton (one shared tooltip element, the same architecture as
+  popover.ts's own retrofit) whose visibility was three loosely-related mutable variables - a DOM
+  class, `currentTargetEl`, and two `setTimeout` ids - instead of one guarded disclosure. Retrofitting
+  it surfaced a real, pre-existing bug: `currentTargetEl` was only ever assigned once a *delayed*
+  tooltip actually became visible (inside the `showDelay` timer's own callback), not when the hover
+  that triggered it began. The `mouseout` handler guards on `target === currentTargetEl` before
+  cancelling anything, so a mouseout arriving *during* the show-delay window - the pointer left before
+  the tooltip ever appeared - failed that guard, found nothing to cancel, and left the pending timer
+  armed; the tooltip then popped up late, anchored to an element the pointer had already left. Fixed by
+  assigning `currentTargetEl` synchronously, the moment a hover starts, not once its delayed timer
+  fires. 6 new tests, including one reproducing this exact race. Live-verified against the Showcase's
+  own `p-tooltip="Aura Enterprise Verified"` badge (300ms showDelay): a hover held past 300ms shows the
+  real tooltip text; a hover-then-leave within the 300ms window now correctly shows nothing, even after
+  waiting well past where the stale timer would have fired.
+  Verified: `npm run typecheck`/`build` (bundle budgets unaffected), `npm test` (712/712).
 - **Adopt — Observer/signals** — **[CLOSED, already adopted before this session — stale]**.
   `runtime/signals.ts` already ships a real, dependency-free `signal`/`computed`/`effect`/`batch`
   implementation (Preact Signals/SolidJS family), retrofitted into `multiselect.ts`, `datatable.ts`,

@@ -7,6 +7,7 @@
 
 import { injectIslandStyle } from '../runtime/styles';
 import { useFocusTrap } from '../composables/useFocusTrap';
+import { useDisclosure } from '../composables/useDisclosure';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
@@ -314,6 +315,23 @@ export interface DrawerProps {
 
 let globalDrawerDelegationBound = false;
 
+// ROADMAP.v5.md Part M "Adopt - State machine": this delegated handler used to duplicate the mask
+// active-class and body-overflow DOM sequence by hand, in three separate places, none of which called
+// `trap.activate()`/`trap.deactivate()` - a REAL accessibility bug, the same class already found and
+// fixed in dialog.ts's own global delegation: a drawer opened via a `data-drawer-target`/
+// `data-drawer-open` trigger (or closed via the backdrop/close button) never had focus trapped inside
+// it and never had focus restored to the trigger on close, unlike a drawer driven through the
+// imperative `.open()/.close()/.toggle()` handle stashed on the container below. Routing every path
+// through that same per-instance handle (`doOpen`/`doClose`, backed by `useDisclosure`) closes that
+// gap for every drawer on the page at once, not just newly-authored ones.
+const DRAWER_INSTANCE_KEY = '__ltDrawerInstance';
+
+interface DrawerInstance {
+    open(): void;
+    close(): void;
+    toggle(): void;
+}
+
 function initGlobalDrawerDelegation(signal?: AbortSignal) {
     if (globalDrawerDelegationBound || typeof document === 'undefined') return;
     globalDrawerDelegationBound = true;
@@ -321,7 +339,7 @@ function initGlobalDrawerDelegation(signal?: AbortSignal) {
     document.addEventListener('click', (e) => {
         const target = e.target as HTMLElement;
         const trigger = target.closest<HTMLElement>('[data-drawer-target], [data-drawer-open]');
-        
+
         if (trigger) {
             e.preventDefault();
             const drawerId = trigger.getAttribute('data-drawer-target') || trigger.getAttribute('data-drawer-open');
@@ -329,17 +347,12 @@ function initGlobalDrawerDelegation(signal?: AbortSignal) {
             if (drawerId) {
                 const drawerContainer = document.getElementById(drawerId);
                 const maskEl = drawerContainer?.querySelector<HTMLElement>('.p-drawer-mask');
-                if (maskEl) {
-                    if (pos) {
-                        const cleanPos = pos.toLowerCase().replace(/[^a-z]/g, '');
-                        maskEl.className = maskEl.className.replace(/p-drawer-(left|right|top|bottom|full)/g, '');
-                        maskEl.classList.add(`p-drawer-${cleanPos}`);
-                    }
-                    maskEl.classList.add('p-drawer-mask-active');
-                    if (maskEl.classList.contains('p-drawer-mask-modal')) {
-                        document.body.style.overflow = 'hidden';
-                    }
+                if (pos && maskEl) {
+                    const cleanPos = pos.toLowerCase().replace(/[^a-z]/g, '');
+                    maskEl.className = maskEl.className.replace(/p-drawer-(left|right|top|bottom|full)/g, '');
+                    maskEl.classList.add(`p-drawer-${cleanPos}`);
                 }
+                (drawerContainer as any)?.[DRAWER_INSTANCE_KEY]?.open();
             }
             return;
         }
@@ -348,11 +361,8 @@ function initGlobalDrawerDelegation(signal?: AbortSignal) {
         const closeBtn = target.closest<HTMLElement>('.p-drawer-close-button, [data-drawer-close]');
         if (closeBtn) {
             e.preventDefault();
-            const maskEl = closeBtn.closest<HTMLElement>('.p-drawer-mask');
-            if (maskEl) {
-                maskEl.classList.remove('p-drawer-mask-active');
-                document.body.style.overflow = '';
-            }
+            const drawerContainer = closeBtn.closest<HTMLElement>('[data-island="drawer"]');
+            (drawerContainer as any)?.[DRAWER_INSTANCE_KEY]?.close();
             return;
         }
 
@@ -369,8 +379,7 @@ function initGlobalDrawerDelegation(signal?: AbortSignal) {
                 } catch {}
             }
             if (dismissable) {
-                target.classList.remove('p-drawer-mask-active');
-                document.body.style.overflow = '';
+                (container as any)?.[DRAWER_INSTANCE_KEY]?.close();
             }
         }
 
@@ -446,9 +455,48 @@ export default function DrawerIsland(container: HTMLElement, props: DrawerProps,
         signal: ctx?.signal
     });
 
+    // ROADMAP.v5.md Part M "Adopt - State machine": single source of truth for open/close, now backed
+    // by the same `useDisclosure` guard every other retrofitted overlay uses (matching
+    // select.ts/tieredmenu.ts/context-menu.ts/popover.ts/dialog.ts) instead of a bare
+    // `classList.contains(...)` check repeated at every call site - reused by the initial `visible`
+    // prop, the Escape handler below, and the global delegation above.
+    const drawerDisclosure = useDisclosure({
+        onOpen: () => {
+            maskEl!.classList.add('p-drawer-mask-active');
+            if (maskEl!.classList.contains('p-drawer-mask-modal')) {
+                document.body.style.overflow = 'hidden';
+            }
+            trap.activate();
+        },
+        onClose: () => {
+            trap.deactivate();
+            maskEl!.classList.remove('p-drawer-mask-active');
+            document.body.style.overflow = '';
+        }
+    });
+
+    function doOpen(): void {
+        drawerDisclosure.open();
+    }
+
+    function doClose(): void {
+        drawerDisclosure.close();
+    }
+
+    function doToggle(): void {
+        drawerDisclosure.toggle();
+    }
+
+    const instance: DrawerInstance = { open: doOpen, close: doClose, toggle: doToggle };
+    (container as any)[DRAWER_INSTANCE_KEY] = instance;
+    ctx?.onCleanup(() => {
+        if ((container as any)[DRAWER_INSTANCE_KEY] === instance) {
+            delete (container as any)[DRAWER_INSTANCE_KEY];
+        }
+    });
+
     if (props.visible || (props as any).Visible) {
-        maskEl.classList.add('p-drawer-mask-active');
-        trap.activate();
+        doOpen();
     }
 
     const closeBtn = drawerEl.querySelector('.p-drawer-close-button');
@@ -460,10 +508,8 @@ export default function DrawerIsland(container: HTMLElement, props: DrawerProps,
 
     // Escape Key Handler for this Drawer instance
     window.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && maskEl?.classList.contains('p-drawer-mask-active')) {
-            trap.deactivate();
-            maskEl.classList.remove('p-drawer-mask-active');
-            document.body.style.overflow = '';
+        if (e.key === 'Escape' && drawerDisclosure.isOpen) {
+            doClose();
         }
     }, { signal: ctx?.signal });
 }
