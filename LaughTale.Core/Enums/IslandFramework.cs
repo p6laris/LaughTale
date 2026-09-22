@@ -10,5 +10,6 @@ public enum IslandFramework
     React,
     Vue,
     Alpine,
-    Svelte
+    Svelte,
+    WebComponents
 }

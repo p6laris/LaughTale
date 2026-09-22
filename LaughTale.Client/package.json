@@ -32,6 +32,7 @@
     "./adapters/svelte": "./dist/adapters/svelte.js",
     "./adapters/preact": "./dist/adapters/preact.js",
     "./adapters/vanilla": "./dist/adapters/vanilla.js",
+    "./adapters/web-components": "./dist/adapters/web-components.js",
     "./tailwind": "./dist/styles/tailwind.preset.js"
   },
   "scripts": {

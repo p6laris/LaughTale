@@ -29,6 +29,9 @@ const win = new Window({
 (globalThis as any).localStorage = win.localStorage;
 (globalThis as any).sessionStorage = win.sessionStorage;
 (globalThis as any).DOMParser = win.DOMParser;
+// ROADMAP.v5.md Part D "New adapters" (Web Components): happy-dom implements the real Custom
+// Elements API on its own Window, just not exposed as a bare global by this file until now.
+(globalThis as any).customElements = win.customElements;
 (globalThis as any).requestAnimationFrame = (cb: () => void) => setTimeout(cb, 16);
 
 // `navigator` is only a built-in Node global since Node 21+ - on Node 20 (what CI's

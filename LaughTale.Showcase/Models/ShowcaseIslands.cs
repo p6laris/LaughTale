@@ -94,3 +94,14 @@ public record SystemTelemetryProps(
 public record AmbientCounterProps(
     string Label
 );
+
+/// <summary>
+/// ROADMAP.v5.md Part D "New adapters" live demo - a real Custom Element (no Lit, no framework)
+/// mounted through <c>createWebComponentIsland</c>.
+/// </summary>
+[IslandAllowAnonymous]
+[Island("polyglot-web-component", DefaultStrategy = HydrateStrategy.Load)]
+public record PolyglotWebComponentProps(
+    string Label,
+    int InitialCount
+);

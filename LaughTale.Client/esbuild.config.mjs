@@ -104,7 +104,8 @@ await esbuild.build({
         'adapters/vue': 'src/adapters/vue.ts',
         'adapters/svelte': 'src/adapters/svelte.ts',
         'adapters/preact': 'src/adapters/preact.ts',
-        'adapters/vanilla': 'src/adapters/vanilla.ts'
+        'adapters/vanilla': 'src/adapters/vanilla.ts',
+        'adapters/web-components': 'src/adapters/web-components.ts'
     },
     bundle: true,
     outdir: 'dist',

@@ -1,7 +1,7 @@
 @page "/polyglot"
 @model LaughTale.Showcase.Pages.PolyglotModel
 @{
-    ViewData["Title"] = "Polyglot Islands Lab (React + Vue + Svelte + Preact + Vanilla)";
+    ViewData["Title"] = "Polyglot Islands Lab (React + Vue + Svelte + Preact + Vanilla + Web Components)";
 }
 
 <!-- Top Header Hero -->
@@ -10,12 +10,12 @@
         <div>
             <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
                 <span class="aura-tag tag-indigo">Polyglot Architecture</span>
-                <span class="aura-tag tag-emerald">5 Frameworks Live</span>
+                <span class="aura-tag tag-emerald">6 Frameworks Live</span>
                 <span class="aura-tag tag-slate">Inter-Island Event Bus</span>
             </div>
             <h1 style="font-size: 2rem; font-weight: 800; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Polyglot Multi-Framework Lab</h1>
             <p style="font-size: 1rem; color: var(--p-text-muted); margin: 0; max-width: 800px;">
-                Demonstrating <strong>React 19</strong>, <strong>Vue 3</strong>, <strong>Svelte 5</strong>, <strong>Preact</strong>, and <strong>Vanilla TypeScript</strong> running concurrently on this single ASP.NET Core Razor page with real-time cross-island event communication.
+                Demonstrating <strong>React 19</strong>, <strong>Vue 3</strong>, <strong>Svelte 5</strong>, <strong>Preact</strong>, <strong>Vanilla TypeScript</strong>, and a real <strong>Web Component</strong> (ROADMAP.v5.md Part D - no framework, no runtime download) running concurrently on this single ASP.NET Core Razor page with real-time cross-island event communication.
             </p>
         </div>
         <div>
@@ -47,7 +47,7 @@
 
 </div>
 
-<!-- 2-Column Bottom Grid: Preact & Vanilla -->
+<!-- Bottom Grid: Preact, Vanilla & Web Component -->
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.5rem;">
 
     <!-- 4. PREACT ISLAND -->
@@ -60,6 +60,12 @@
     <island name="polyglot-vanilla"
             framework="Vanilla"
             props="@(new { LogTitle = "Inter-Island Event Ledger" })"
+            hydrate="Load" />
+
+    <!-- 6. WEB COMPONENT ISLAND (ROADMAP.v5.md Part D "New adapters") -->
+    <island name="polyglot-web-component"
+            framework="WebComponents"
+            props="@(new PolyglotWebComponentProps("Real Custom Element", 0))"
             hydrate="Load" />
 
 </div>

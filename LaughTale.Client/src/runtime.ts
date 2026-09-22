@@ -31,6 +31,10 @@ export { hasSsrContent, getSsrRoot, markSsrHydrated, SSR_ATTR, SSR_HYDRATED_ATTR
 export { renderSkeleton, renderEmptyState, renderErrorState } from './runtime/states';
 export type { ComponentStateProps, SkeletonOptions, StateMessageOptions } from './types/states';
 export { createVanillaIsland } from './adapters/vanilla';
+// Web Components adds zero weight here (no dynamic import, pure native browser APIs) unlike
+// react/vue/svelte/preact below, which is exactly why this lean, framework-agnostic entry point can
+// include it without compromising its own "no heavy framework deps" purpose.
+export { createWebComponentIsland, type WebComponentAdapterOptions } from './adapters/web-components';
 // createReactIsland/createVueIsland/createSvelteIsland/createPreactIsland are deliberately NOT
 // re-exported here (they ARE from runtime-core.ts, consumed by the "index" all-in-one bundle) - each
 // framework adapter's `await import('react'|'vue'|'svelte'|'preact')` is only truly optional in a
