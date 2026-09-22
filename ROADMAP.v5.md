@@ -1077,11 +1077,11 @@ survives internal changes — which is what makes `eject` a good idea rather tha
   after skipping 14 that duplicated a hand-written class), so **82 of 82** TagHelpers now reach the
   template method. Every capability parked on it — SSR, localization, RTL — inherits that reach.
 - **Adopt — State machine** *(Zag.js, XState)* for overlays. Ends the
-  `isOpen && !isDisabled && hasFocus` boolean soup. **[CLOSED (real infrastructure + one full
-  component migration), this pass]** - the primitive itself is genuinely done and tested; retrofitting
-  every one of the ~18 overlay components (dialog, dropdown, tooltip, popover, drawer, context-menu,
-  tieredmenu, ...) to use it is explicitly left as ongoing/opportunistic work, the same posture Part
-  C's own "headless core" item already takes, not silently claimed as finished.
+  `isOpen && !isDisabled && hasFocus` boolean soup. **[CLOSED (real infrastructure + 3 of ~18
+  components fully migrated), this pass]** - the primitive itself is genuinely done and tested;
+  retrofitting the remaining ~15 overlay components (dialog, dropdown, tooltip, popover, drawer, ...)
+  is explicitly left as ongoing/opportunistic work, the same posture Part C's own "headless core" item
+  already takes, not silently claimed as finished.
   `runtime/state-machine.ts` (new) is a real, hand-written finite state machine - deliberately not the
   actual Zag.js/XState packages (both cited as prior art, not a literal dependency requirement; this
   repo's own `runtime/signals.ts` set the exact same "write the dependency-free equivalent" precedent
@@ -1108,8 +1108,35 @@ survives internal changes — which is what makes `eject` a good idea rather tha
   browser (not just the test harness): a disabled `<island-select>` mounted fresh and clicked stays
   closed, `aria-expanded` stays `"false"`; an enabled sibling opens normally. 2 new tests on the real
   component (in addition to the 14 already-passing tests re-verified against this rewrite).
-  Verified: `npm run typecheck`/`build` (bundle budgets unaffected, +0.3 KB gzip), `npm test`
-  (668/668).
+  **Two more components migrated in a follow-up pass, each surfacing its own real, pre-existing bug**:
+  `tieredmenu.ts`'s popup mode had `isOpen` mutated at three separate close sites (outside-click,
+  item-click, Escape) that had each grown their own slightly different side effects - outside-click
+  destroyed the floating-position controller and reset the trigger's `aria-expanded`; item-click and
+  Escape did neither. Centralizing into `useDisclosure`'s `onOpen`/`onClose` fixed that inconsistency
+  for real, not just cosmetically - proven by a new test asserting item-click close resets
+  `aria-expanded` too, which it did not before. Two more real, unrelated bugs surfaced along the way
+  by the new tests themselves: (1) the popup's `display: none;` initial style was built via
+  `${isPopup ? 'style="display: none;"' : ''}` inside an `html` tagged template - a *string*
+  interpolated into an escaping-safe template gets HTML-entity-escaped like any other value, so the
+  real rendered attribute was the garbage `style="&quot;display:" none=""` the whole time, not a
+  working inline style (silently masked because the CSS class already defaulted to hidden - fixed
+  with the existing `attr()` helper, which returns a pre-escaped `Raw`). (2) Escape was silently
+  swallowed by `useKeyboardNav`'s `handleKeyDown`, which always returns `true` for Escape and calls
+  `options.onEscape?.()` - but this call site never passed `onEscape`, so the switch-statement's own
+  `case 'Escape'` further down (which had real close logic) was dead code that could never run; fixed
+  by wiring a real `onEscape` callback instead of relying on unreachable code. 7 new tests, live
+  browser-verified via the exposed `.toggle()` instance API (`display: none` -> `block` -> `none`).
+  `context-menu.ts`'s `showMenu()`/`hideMenu()` were already centralized (no multi-site
+  inconsistency like tieredmenu's), so this was a smaller, lower-risk swap of the raw `isMenuOpen`
+  boolean for the same guarded tracking, for consistency with every other retrofitted component. 6 new
+  tests. Live-verified the synchronous half in a real browser (`display`/`visibility` flip correctly
+  on a real `contextmenu` event); the `requestAnimationFrame`-gated `.p-contextmenu-active` class
+  addition could not be observed live in this session's browser-automation tool specifically because
+  `document.hidden` reports `true` there even after explicitly fronting the tab - the same
+  Page-Visibility tooling limitation already documented for Part J's Core Web Vitals work, not a new
+  gap in this feature. The jsdom test suite (where `requestAnimationFrame` is correctly mocked, see
+  `tests/setup.ts`) is the authoritative proof for that half instead, and passes cleanly.
+  Verified: `npm run typecheck`/`build` (bundle budgets unaffected), `npm test` (681/681).
 - **Adopt — Observer/signals** — **[CLOSED, already adopted before this session — stale]**.
   `runtime/signals.ts` already ships a real, dependency-free `signal`/`computed`/`effect`/`batch`
   implementation (Preact Signals/SolidJS family), retrofitted into `multiselect.ts`, `datatable.ts`,

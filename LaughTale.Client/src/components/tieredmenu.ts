@@ -16,6 +16,7 @@ import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtim
 import { setRovingTabindex, handleRovingKeydown } from '../accessibility/aria';
 import { useKeyboardNav } from '../composables/useKeyboardNav';
 import { useLocale } from '../composables/useLocale';
+import { useDisclosure } from '../composables/useDisclosure';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
@@ -310,7 +311,6 @@ export default function TieredMenuIsland(container: HTMLElement, props: TieredMe
 
     const model: MenuItem[] = props.model || props.items || [];
     const isPopup = props.popup === true;
-    let isOpen = !isPopup;
 
     function getIconSvg(iconName?: string): string {
         if (!iconName) return '';
@@ -403,7 +403,7 @@ export default function TieredMenuIsland(container: HTMLElement, props: TieredMe
         ].filter(Boolean).join(' ');
 
         const menuHtml = html`
-            <div class="${rootClasses}" ${isPopup ? 'style="display: none;"' : ''} data-tieredmenu-root role="menu">
+            <div class="${rootClasses}" ${isPopup ? attr('style', 'display: none;') : ''} data-tieredmenu-root role="menu">
                 <ul class="p-tieredmenu-root-list" role="none">
                     ${renderMenuItems(model)}
                 </ul>
@@ -433,39 +433,50 @@ export default function TieredMenuIsland(container: HTMLElement, props: TieredMe
         const rootEl = container.querySelector<HTMLElement>('[data-tieredmenu-root]');
         if (!rootEl) return;
 
-        // Position & Toggle Popup Mode
+        // Position & Toggle Popup Mode. ROADMAP.v5.md Part M "Adopt - State machine": `isOpen` used
+        // to be a raw variable, mutated directly at three separate call sites (outside-click, item-
+        // click, Escape) that had each grown their own SLIGHTLY different close side effects - the
+        // item-click and Escape paths never destroyed `popupFloatingCtrl` or reset the trigger's
+        // `aria-expanded`, unlike the outside-click path. Centralizing the open/close side effects
+        // into `useDisclosure`'s `onOpen`/`onClose` (called from every site below) closes that real,
+        // previously-silent inconsistency, not just the variable itself.
         let popupFloatingCtrl: { update(): void; destroy(): void } | null = null;
+        let popupAnchorEl: HTMLElement | null = null;
+        const triggerEl = container.querySelector<HTMLElement>('[data-tieredmenu-trigger]')
+            || (props.triggerId ? document.getElementById(props.triggerId) : null);
+
+        const popupDisclosure = useDisclosure({
+            defaultIsOpen: !isPopup,
+            onOpen: () => {
+                rootEl.style.display = 'block';
+                triggerEl?.setAttribute('aria-expanded', 'true');
+
+                popupFloatingCtrl?.destroy();
+                const effectiveSignal = ctx?.signal || new AbortController().signal;
+                popupFloatingCtrl = useFloatingPosition(popupAnchorEl || triggerEl || container, rootEl, {
+                    placement: 'bottom-start',
+                    offset: 4,
+                    strategy: 'absolute',
+                    boundary: (rootEl.offsetParent as HTMLElement) || undefined,
+                    reposition: 'follow',
+                    signal: effectiveSignal,
+                    isRtl: locale.isRtl
+                });
+                popupFloatingCtrl.update();
+            },
+            onClose: () => {
+                popupFloatingCtrl?.destroy();
+                popupFloatingCtrl = null;
+                rootEl.style.display = 'none';
+                triggerEl?.setAttribute('aria-expanded', 'false');
+                closeAllSubmenus(rootEl);
+            }
+        });
+
         if (isPopup) {
-            const triggerEl = container.querySelector<HTMLElement>('[data-tieredmenu-trigger]') 
-                || (props.triggerId ? document.getElementById(props.triggerId) : null);
-
             const togglePopup = (targetEl: HTMLElement) => {
-                isOpen = !isOpen;
-                if (isOpen) {
-                    rootEl.style.display = 'block';
-                    triggerEl?.setAttribute('aria-expanded', 'true');
-
-                    popupFloatingCtrl?.destroy();
-                    const effectiveSignal = ctx?.signal || new AbortController().signal;
-                    popupFloatingCtrl = useFloatingPosition(targetEl, rootEl, {
-                        placement: 'bottom-start',
-                        offset: 4,
-                        strategy: 'absolute',
-                        boundary: (rootEl.offsetParent as HTMLElement) || undefined,
-                        reposition: 'follow',
-                        signal: effectiveSignal,
-                        isRtl: locale.isRtl
-                    });
-                    popupFloatingCtrl.update();
-                } else {
-                    if (popupFloatingCtrl) {
-                        popupFloatingCtrl.destroy();
-                        popupFloatingCtrl = null;
-                    }
-                    rootEl.style.display = 'none';
-                    triggerEl?.setAttribute('aria-expanded', 'false');
-                    closeAllSubmenus(rootEl);
-                }
+                popupAnchorEl = targetEl;
+                popupDisclosure.toggle();
             };
 
             if (triggerEl) {
@@ -483,15 +494,8 @@ export default function TieredMenuIsland(container: HTMLElement, props: TieredMe
 
             // Global click outside dismiss
             document.addEventListener('click', (e) => {
-                if (isOpen && !rootEl.contains(e.target as Node) && (!triggerEl || !triggerEl.contains(e.target as Node))) {
-                    isOpen = false;
-                    if (popupFloatingCtrl) {
-                        popupFloatingCtrl.destroy();
-                        popupFloatingCtrl = null;
-                    }
-                    rootEl.style.display = 'none';
-                    triggerEl?.setAttribute('aria-expanded', 'false');
-                    closeAllSubmenus(rootEl);
+                if (popupDisclosure.isOpen && !rootEl.contains(e.target as Node) && (!triggerEl || !triggerEl.contains(e.target as Node))) {
+                    popupDisclosure.close();
                 }
             }, { signal: ctx?.signal });
         }
@@ -628,9 +632,7 @@ export default function TieredMenuIsland(container: HTMLElement, props: TieredMe
 
                 // Close all if in popup mode
                 if (isPopup) {
-                    isOpen = false;
-                    rootEl.style.display = 'none';
-                    closeAllSubmenus(rootEl);
+                    popupDisclosure.close();
                 } else {
                     closeAllSubmenus(rootEl);
                 }
@@ -649,6 +651,18 @@ export default function TieredMenuIsland(container: HTMLElement, props: TieredMe
             onHighlight: (index) => {
                 setRovingTabindex(links, index);
                 links[index]?.focus();
+            },
+            // Real, previously-latent bug found retrofitting this component (ROADMAP.v5.md Part M):
+            // `handleKeyDown` below always returns `true` for Escape, calling `onEscape` if provided -
+            // but this call site never provided one, so the switch-statement's own `case 'Escape'`
+            // further down (which DID have real close logic) was unreachable dead code, silently
+            // never running. Wiring a real `onEscape` here is the fix; the switch case was removed.
+            onEscape: () => {
+                if (isPopup) {
+                    popupDisclosure.close();
+                } else {
+                    closeAllSubmenus(rootEl);
+                }
             }
         });
 
@@ -703,15 +717,6 @@ export default function TieredMenuIsland(container: HTMLElement, props: TieredMe
                 case ' ': {
                     e.preventDefault();
                     activeEl.click();
-                    break;
-                }
-                case 'Escape': {
-                    e.preventDefault();
-                    if (isPopup) {
-                        isOpen = false;
-                        rootEl.style.display = 'none';
-                    }
-                    closeAllSubmenus(rootEl);
                     break;
                 }
                 case 'Home': {

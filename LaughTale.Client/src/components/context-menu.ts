@@ -17,6 +17,7 @@ import { setRovingTabindex, handleRovingKeydown } from '../accessibility/aria';
 import { useKeyboardNav } from '../composables/useKeyboardNav';
 import type { PatternDeclaration } from '../accessibility/patterns';
 import { useLocale } from '../composables/useLocale';
+import { useDisclosure } from '../composables/useDisclosure';
 
 export const a11y: PatternDeclaration = {
     kind: 'pattern',
@@ -561,7 +562,11 @@ export default function ContextMenuIsland(container: HTMLElement, props: Context
     `);
 
     const menuEl = container.querySelector<HTMLElement>('[data-contextmenu-root]')!;
-    let isMenuOpen = false;
+    // ROADMAP.v5.md Part M "Adopt - State machine": tracks open/closed through the same guarded
+    // primitive every other retrofitted overlay uses, instead of a raw boolean - showMenu()/
+    // hideMenu() below keep doing their own positioning/animation work exactly as before, this only
+    // replaces what tracked the flag itself.
+    const disclosure = useDisclosure();
     let selectedTargetEl: HTMLElement | null = null;
     let rootFloatingCtrl: { update(): void; destroy(): void } | null = null;
 
@@ -585,7 +590,7 @@ export default function ContextMenuIsland(container: HTMLElement, props: Context
 
         requestAnimationFrame(() => {
             menuEl.classList.add('p-contextmenu-active');
-            isMenuOpen = true;
+            disclosure.open();
         });
 
         // Adjust submenus collision
@@ -616,7 +621,7 @@ export default function ContextMenuIsland(container: HTMLElement, props: Context
     }
 
     function hideMenu() {
-        if (!isMenuOpen) return;
+        if (!disclosure.isOpen) return;
         if (rootFloatingCtrl) {
             rootFloatingCtrl.destroy();
             rootFloatingCtrl = null;
@@ -628,7 +633,7 @@ export default function ContextMenuIsland(container: HTMLElement, props: Context
             }
         }, 120);
         ctx?.onCleanup?.(() => clearTimeout(t));
-        isMenuOpen = false;
+        disclosure.close();
 
         if (selectedTargetEl) {
             selectedTargetEl.style.borderColor = 'transparent';
@@ -728,7 +733,7 @@ export default function ContextMenuIsland(container: HTMLElement, props: Context
     });
 
     document.addEventListener('keydown', (e) => {
-        if (!isMenuOpen) return;
+        if (!disclosure.isOpen) return;
         if (e.key === 'Escape' || e.key === 'Tab') {
             hideMenu();
             return;
