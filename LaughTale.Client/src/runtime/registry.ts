@@ -94,59 +94,6 @@ export interface IslandDefinition<TProps = any, THandle = any> {
 }
 
 /**
- * Historical and shorthand aliases mapped to canonical kebab-case island names.
- * Scheduled for removal in LaughTale v4.
- */
-export const LEGACY_ALIASES: Readonly<Record<string, string>> = Object.freeze({
-    // Media
-    'imagecompare': 'image-compare',
-    'compare': 'image-compare',
-    'p-compare': 'image-compare',
-    'island-compare': 'image-compare',
-
-    // Data
-    'tree-table': 'treetable',
-    'p-treetable': 'treetable',
-    'island-treetable': 'treetable',
-    'datagrid': 'datatable',
-
-    // Form
-    'togglebutton': 'toggle-button',
-    'chips': 'input-tags',
-    'inputtags': 'input-tags',
-    'tags': 'input-tags',
-    'file-upload': 'fileupload',
-    'confirmdialog': 'confirm-dialog',
-    'radio': 'radio-button',
-    'inputgroup': 'input-group',
-    'inputgroup-addon': 'input-group-addon',
-    'enhanced-input': 'input-text',
-
-    // Menu & Overlay
-    'commandmenu': 'command',
-    'command-menu': 'command',
-    'command-palette': 'command',
-    'commandpalette': 'command',
-    'p-menubar': 'menubar',
-    'island-menubar': 'menubar',
-    'p-menu': 'menu',
-    'contextmenu': 'context-menu',
-    'p-contextmenu': 'context-menu',
-    'island-contextmenu': 'context-menu',
-    'tooltip': 'tooltip-component',
-    'p-sidebar': 'sidebar',
-    'sidebar-layout': 'sidebar',
-    'tiered-menu': 'tieredmenu',
-    'p-tieredmenu': 'tieredmenu',
-    'island-tieredmenu': 'tieredmenu',
-    'p-message': 'message',
-    'inline-message': 'message',
-    'inlinemessage': 'message',
-    'p-toast': 'toast',
-    'island-toast': 'toast'
-});
-
-/**
  * The registry's backing Map lives on `globalThis`, not module scope. A page can load more
  * than one independently-built bundle that each carry their own copy of this module's code —
  * e.g. the framework's own runtime bundle alongside a separately-built bundle for
@@ -172,17 +119,11 @@ function getSharedRegistry(): Map<string, IslandLoader> {
 const registry = getSharedRegistry();
 
 /**
- * Resolves an island name to its canonical identifier, issuing a deprecation warning if an alias is used.
+ * Resolves an island name to its canonical identifier. LaughTale v4 dropped the pre-v4
+ * `LEGACY_ALIASES` shorthand/historical name table (ROADMAP.v5.md Part M) - every caller is
+ * expected to use a component's real canonical name today.
  */
 export function resolveIslandName(name: string): string {
-    if (registry.has(name)) {
-        return name;
-    }
-    if (LEGACY_ALIASES[name]) {
-        const canonical = LEGACY_ALIASES[name];
-        console.warn(`[LaughTale] Island alias "${name}" is deprecated and will be removed in v4. Use canonical name "${canonical}" instead.`);
-        return canonical;
-    }
     return name;
 }
 

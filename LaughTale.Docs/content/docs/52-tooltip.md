@@ -19,7 +19,7 @@ category: Overlays & Dialogs
 </div>
 
 
-`<island-tooltip />` is an accessible, high-performance Aura component built for ASP.NET Core with server-side rendering (SSR), progressive hydration, and Dark Mode awareness.
+`<island-tooltip-component />` is an accessible, high-performance Aura component built for ASP.NET Core with server-side rendering (SSR), progressive hydration, and Dark Mode awareness.
 
 ---
 
@@ -42,8 +42,8 @@ category: Overlays & Dialogs
 
 ## 🎨 3. Client & Event Interactivity
 
-You can attach LaughTale declarative directives or client event handlers to `<island-tooltip />`:
+You can attach LaughTale declarative directives or client event handlers to `<island-tooltip-component />`:
 
 ```razor
-<island-tooltip hydrate="Visible" />
+<island-tooltip-component hydrate="Visible" />
 ```

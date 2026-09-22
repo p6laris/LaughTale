@@ -7,7 +7,6 @@ import {
     getIslandLoader,
     getIslandDefinition,
     resolveIslandName,
-    LEGACY_ALIASES,
     clearRegistry
 } from '../src/runtime/registry';
 import { registerAdapter, clearAdapterRegistry } from '../src/adapters/registry';
@@ -30,44 +29,24 @@ describe('Island Registry & Canonical Alias Resolution Suite', () => {
         });
     });
 
-    it('resolves legacy aliases to canonical name and logs deprecation warning', () => {
+    it('resolveIslandName is an identity function (ROADMAP.v5.md Part M: LEGACY_ALIASES dropped for v4)', () => {
         const dummyLoader = async () => ({ default: () => {} });
         defineIsland('image-compare', dummyLoader);
 
-        const warnings: string[] = [];
-        const originalWarn = console.warn;
-        console.warn = (msg: string) => warnings.push(msg);
+        // Pre-v4 shorthand/historical names no longer resolve - only the real canonical name does.
+        assert.equal(hasIsland('imagecompare'), false);
+        assert.equal(hasIsland('p-compare'), false);
+        assert.equal(getIslandLoader('compare'), undefined);
+        assert.equal(getIslandDefinition('island-compare'), undefined);
 
-        try {
-            // Test lookup by alias
-            assert.equal(hasIsland('imagecompare'), true);
-            assert.equal(hasIsland('p-compare'), true);
-            assert.equal(getIslandLoader('compare'), dummyLoader);
-
-            const def = getIslandDefinition('island-compare');
-            assert.ok(def);
-            assert.equal(def.name, 'image-compare');
-            assert.equal(def.loader, dummyLoader);
-
-            assert.ok(warnings.length > 0);
-            assert.ok(warnings.some(w => w.includes('deprecated and will be removed in v4')));
-        } finally {
-            console.warn = originalWarn;
-        }
+        assert.equal(hasIsland('image-compare'), true);
+        assert.equal(resolveIslandName('image-compare'), 'image-compare');
     });
 
     it('returns undefined for non-existent islands', () => {
         assert.equal(hasIsland('unknown-island'), false);
         assert.equal(getIslandLoader('unknown-island'), undefined);
         assert.equal(getIslandDefinition('unknown-island'), undefined);
-    });
-
-    it('maps all expected legacy aliases', () => {
-        assert.equal(LEGACY_ALIASES['tree-table'], 'treetable');
-        assert.equal(LEGACY_ALIASES['p-treetable'], 'treetable');
-        assert.equal(LEGACY_ALIASES['chips'], 'input-tags');
-        assert.equal(LEGACY_ALIASES['p-toast'], 'toast');
-        assert.equal(LEGACY_ALIASES['commandmenu'], 'command');
     });
 
     it('anchors its backing Map on globalThis, not module scope (ROADMAP.v5.md Part B)', () => {

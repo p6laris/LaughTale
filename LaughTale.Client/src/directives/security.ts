@@ -304,6 +304,21 @@ export function sanitizeHtml(html: string): string {
 }
 
 /**
+ * Facade (ROADMAP.v5.md Part M "Adopt - Facade over directives/security.ts") bundling every
+ * sanitization/sandboxing primitive this module exposes behind one entry point, so a consumer can
+ * write `safe.html(...)`/`safe.url(...)` instead of importing five separate named functions. The
+ * individual named exports above stay as the module's real API (existing call sites are unaffected);
+ * `safe` is an additive, equivalent alias onto the same functions, not a reimplementation.
+ */
+export const safe = {
+    html: sanitizeHtml,
+    url: sanitizeUrl,
+    property: isSafeProperty,
+    attribute: isSafeAttribute,
+    sandboxState: createSandboxState,
+} as const;
+
+/**
  * Creates a restricted sandbox proxy around the state object.
  */
 export function createSandboxState(state: Record<string, any>): Record<string, any> {

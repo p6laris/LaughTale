@@ -6,6 +6,7 @@
  */
 
 import { injectIslandStyle } from '../runtime/styles';
+import { escapeHtml } from '../runtime/html';
 
 const TOOLTIP_CSS = `
 .p-tooltip {
@@ -316,15 +317,6 @@ function hideActiveTooltip(delay: number = 0) {
     } else {
         triggerHide();
     }
-}
-
-function escapeHtml(str: string): string {
-    return str
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
 }
 
 export function initGlobalTooltipDelegation() {

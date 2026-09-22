@@ -916,7 +916,7 @@ fragment without leaking the real message, a timeout produces the same error pat
 
 ---
 
-## 9. Part M — Architecture, debloat & patterns
+## 9. Part M — Architecture, debloat & patterns — [CLOSED except "Adopt - State machine for overlays", explicitly deferred as a cross-cutting, independently-scoped rewrite - see that bullet]
 
 **Start with what's right, because it constrains the fix.** Component coupling is excellent: across 76
 components there is *not one* import of a sibling. Dependencies flow one way into `runtime` (227),
@@ -1016,15 +1016,45 @@ possibly-stale figures — all of the below are confirmed still real and still o
   `rawSvgLiterals` (`node scripts/audit-metrics.mjs --json`) is now **0**, baseline regenerated
   (`scripts/metrics-baseline.json`). Full `npm run typecheck`/`npm test` (592/592)/`npm run build`
   stayed green; commit `b476aeb`.
-- **Two private copies of `escapeHtml`** (corrected from "three, subsumed" above) —
-  `directives/tooltip.ts`, `icons/lucide.ts`.
-- **39 `LEGACY_ALIASES`** in the registry (confirmed: exactly 39 today), commented "scheduled for
-  removal in LaughTale v4". You are building v4.
-- **The 1.26 MB all-in-one IIFE** as documented default — keep as escape hatch, stop advertising it
-  (its own gzip budget was corrected to a realistic 420 KB this session — see Part J).
-- **`CompoundTagHelpers.cs`** — confirmed still 986 lines. Split to match `TagHelpers/Aura/{Data,Form,Misc}`.
-- **`public string? Class { get; set; }` declared 33 times** (confirmed exact count) when
-  `IslandTagHelperBase` exists to hold it.
+- **Two private copies of `escapeHtml`** — **[CLOSED]** `directives/tooltip.ts` and `icons/lucide.ts`
+  both now import `escapeHtml` from `runtime/html.ts` (LT-902's canonical, already-tested
+  implementation) instead of hand-rolling their own copy. `runtime/html.ts`'s version is a strict
+  superset (escapes the same characters plus `'`), so this is a behavior-preserving dedup, not a
+  behavior change — both call sites only ever feed the result into a double-quoted HTML attribute.
+- **39 `LEGACY_ALIASES`** — **[CLOSED]** removed outright (this is v4; `resolveIslandName` is now an
+  identity function). Re-verifying every one of the 39 mappings before deleting the table surfaced two
+  **real, live bugs** it had been silently papering over: `ComponentModels.cs`'s `CompareProps` was
+  declared `[Island("compare")]` and `TooltipProps` `[Island("tooltip")]`, while the client only ever
+  registers these components under their true canonical names, `image-compare` and `tooltip-component`
+  (`LaughTale.Client/src/index.ts`). Both names are used live today - `Components.cshtml` renders
+  `<island-compare>` four times, `LaughTale.Docs`'s tooltip doc page shows `<island-tooltip>` - and
+  only kept working because `resolveIslandName` fell through to the deprecated alias table on every
+  single render, logging a console warning nobody was looking at. Fixed at the source: the two
+  `[Island(...)]` attributes now use the real canonical names, and every consuming `.cshtml`/`.md` was
+  updated to the new generated tag names (`<island-image-compare>`, `<island-tooltip-component>`).
+  Full `dotnet build`/`dotnet test` (478/478) and `npm test` (634/634) verified green after the change.
+- **The 1.26 MB all-in-one IIFE** as documented default — **[CLOSED, see Part B "Optimizer"]**. Already
+  fixed this session, just not cross-referenced here yet: `package.json`'s `main`/`exports["."].default`
+  no longer resolve to the IIFE bundle - they point at the real split ESM build
+  (`dist/index.mjs`), with the IIFE demoted to an explicit opt-in subpath (`laughtale/iife`) for
+  script-tag/no-bundler use. The "1.26 MB" figure itself was also stale (real number: 373 KB gzip,
+  under a 420 KB CI budget).
+- **`CompoundTagHelpers.cs`** — **[CLOSED]** the 986-line, 27-class file is split into
+  `TagHelpers/Aura/{Form,Card,Button,Dialog,Accordion}/*TagHelpers.cs` (6/8/2/7/4 classes
+  respectively), one file per compound-component family. All 27 `[HtmlTargetElement]` tag names
+  verified byte-for-byte unchanged - this was a pure code-motion split, not a rename.
+- **`public string? Class { get; set; }` declared 33 times** — **[CLOSED] partially stale as
+  originally framed**: `IslandTagHelperBase` was the wrong reuse target (it's a heavyweight template
+  method for real hydrating islands - auth, hydration attributes, props serialization - not a place to
+  stash a CSS passthrough for plain structural TagHelpers like card/dialog/accordion parts). Of the 33:
+  one (`LaughTale.Core/TagHelpers/IslandTagHelper.cs`) lives in a different project than
+  `IslandTagHelperBase` and is genuinely irreducible without inverting a project dependency; one
+  (`StepperTagHelper`'s island root) already correctly inherits `IslandTagHelperBase`. The remaining
+  31 were plain structural TagHelpers with no island semantics at all - consolidated into a new,
+  minimal `AuraTagHelperBase` (`Class` passthrough + a `MergeClass()` helper): the 26 (of 27) split
+  classes that declared `Class` (`IslandInputIconTagHelper` never declared it), `StepperTagHelper.cs`'s
+  5 structural sub-parts (StepList/Step/StepPanels/StepPanel/StepItem), and `IconTagHelper`. Verified:
+  `dotnet build`/`dotnet test` (478/478) unchanged from baseline.
 
 ### Decouple
 
@@ -1043,19 +1073,41 @@ survives internal changes — which is what makes `eject` a good idea rather tha
   after skipping 14 that duplicated a hand-written class), so **82 of 82** TagHelpers now reach the
   template method. Every capability parked on it — SSR, localization, RTL — inherits that reach.
 - **Adopt — State machine** *(Zag.js, XState)* for overlays. Ends the
-  `isOpen && !isDisabled && hasFocus` boolean soup.
-- **Adopt — Observer/signals** so state changes patch rather than rebuild.
-- **Adopt — Facade** over `directives/security.ts`: one `safe.*` entry point.
-- **Adopt — Middleware pipeline** server-side for the plugin lifecycle; ASP.NET devs already think
-  that way.
+  `isOpen && !isDisabled && hasFocus` boolean soup. **Still genuinely open** - re-checked, not stale:
+  no state-machine library or hand-rolled equivalent exists anywhere in `src/`. Deliberately not
+  attempted this pass: this is a cross-cutting rewrite of every overlay component's internal state
+  handling (dialog, dropdown, tooltip, popover, drawer, ...), not a bounded, independently-mergeable
+  unit like the other bullets here - closer in shape to Part E's out-of-order streaming or Part B's
+  handler-level splitting (both required their own dedicated pass) than to a same-session debloat item.
+  Surfaced rather than attempted piecemeal against one component in isolation.
+- **Adopt — Observer/signals** — **[CLOSED, already adopted before this session — stale]**.
+  `runtime/signals.ts` already ships a real, dependency-free `signal`/`computed`/`effect`/`batch`
+  implementation (Preact Signals/SolidJS family), retrofitted into `multiselect.ts`, `datatable.ts`,
+  `autocomplete.ts`, and `select.ts` (Part I). This bullet described work already done, just never
+  cross-referenced here.
+- **Adopt — Facade** over `directives/security.ts`: one `safe.*` entry point. — **[CLOSED]** Added
+  `export const safe = { html, url, property, attribute, sandboxState }` bundling all five existing
+  primitives (`sanitizeHtml`, `sanitizeUrl`, `isSafeProperty`, `isSafeAttribute`, `createSandboxState`)
+  behind one object - an additive alias onto the same functions (existing named-export call sites
+  untouched), not a reimplementation. Tested directly (`safe.html === sanitizeHtml`, etc., plus
+  behavioral parity checks).
+- **Adopt — Middleware pipeline** server-side for the plugin lifecycle — **[CLOSED, already adopted
+  before this session — stale]**. `LaughTale.Core/Plugins/LaughTalePluginMiddleware.cs` already fans
+  `OnResponseStartingAsync` out to every registered `LaughTalePlugin` via ASP.NET Core's own
+  `HttpResponse.OnStarting`, exactly the "ASP.NET devs already think that way" middleware shape this
+  bullet asked for.
 - **Adopt — Builder** for `IslandDataRequest` so the field allowlist is a required constructor
-  argument. *Make the unsafe call impossible to write, instead of documenting that it's unsafe.*
+  argument. — **[CLOSED, already true — stale]**. Every `QueryableExtensions` method that touches an
+  `IslandDataRequest` (`ToIslandDataResult`, `ToIslandDataResultAsync`, `ApplyIslandCriteria`, ...)
+  already takes `IslandFieldPolicy fieldPolicy` as a required, non-nullable, non-optional parameter -
+  the unsafe call (no allowlist) is already impossible to write, not just documented as unsafe. This
+  predates the current session (Part K/H's field-policy hardening).
 - **Avoid — inheritance for TS components.** Compose from composables; that's what those 21 files
-  were built for.
+  were built for. *(Principle, not a task - no action needed.)*
 
 ---
 
-## 10. Part I — Directives (your best-kept secret)
+## 10. Part I — Directives (your best-kept secret) — **[CLOSED, all items including docs/fuzzing]**
 
 19 directives plus a hand-written **1,408-line** lexer, parser, AST and evaluator for sandboxed
 expressions. **Not mentioned once in the README.**

@@ -889,7 +889,7 @@ public record CarouselProps(
 );
 
 [IslandAllowAnonymous]
-[LaughTale.Core.Attributes.Island("compare")]
+[LaughTale.Core.Attributes.Island("image-compare")]
 public record CompareProps(
     string? LeftImage = null, string? RightImage = null, string? BeforeImage = null, string? AfterImage = null,
     double Position = 50, double? Value = 50, double? ModelValue = 50,
@@ -981,7 +981,7 @@ public record ToastProps(
 );
 
 [IslandAllowAnonymous]
-[LaughTale.Core.Attributes.Island("tooltip")]
+[LaughTale.Core.Attributes.Island("tooltip-component")]
 public record TooltipProps(
     string? Value = null, string? Text = null, string? Target = null,
     string? Position = "top", int? ShowDelay = null, int? HideDelay = null,

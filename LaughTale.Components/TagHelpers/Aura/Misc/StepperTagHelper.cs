@@ -51,11 +51,8 @@ public class StepperTagHelper : IslandTagHelperBase
 /// </summary>
 [HtmlTargetElement("p-steplist")]
 [HtmlTargetElement("island-steplist")]
-public class StepListTagHelper : TagHelper
+public class StepListTagHelper : AuraTagHelperBase
 {
-    [HtmlAttributeName("class")]
-    public string? Class { get; set; }
-
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
         output.TagName = "ul";
@@ -72,7 +69,7 @@ public class StepListTagHelper : TagHelper
 /// </summary>
 [HtmlTargetElement("p-step")]
 [HtmlTargetElement("island-step")]
-public class StepTagHelper : TagHelper
+public class StepTagHelper : AuraTagHelperBase
 {
     [HtmlAttributeName("value")]
     public string? Value { get; set; }
@@ -83,18 +80,15 @@ public class StepTagHelper : TagHelper
     [HtmlAttributeName("disabled")]
     public bool Disabled { get; set; }
 
-    [HtmlAttributeName("class")]
-    public string? Class { get; set; }
-
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
         output.TagName = "li";
         output.Attributes.SetAttribute("role", "presentation");
         output.Attributes.SetAttribute("data-value", Value ?? "1");
         output.Attributes.SetAttribute("value", Value ?? "1");
-        
+
         var baseClass = "p-step";
-        output.Attributes.SetAttribute("class", string.IsNullOrWhiteSpace(Class) ? baseClass : $"{baseClass} {Class}");
+        output.Attributes.SetAttribute("class", MergeClass(baseClass));
 
         var childContent = await output.GetChildContentAsync();
         var rawInner = childContent.GetContent();
@@ -120,11 +114,8 @@ public class StepTagHelper : TagHelper
 /// </summary>
 [HtmlTargetElement("p-steppanels")]
 [HtmlTargetElement("island-steppanels")]
-public class StepPanelsTagHelper : TagHelper
+public class StepPanelsTagHelper : AuraTagHelperBase
 {
-    [HtmlAttributeName("class")]
-    public string? Class { get; set; }
-
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
         output.TagName = "div";
@@ -140,13 +131,10 @@ public class StepPanelsTagHelper : TagHelper
 /// </summary>
 [HtmlTargetElement("p-steppanel")]
 [HtmlTargetElement("island-steppanel")]
-public class StepPanelTagHelper : TagHelper
+public class StepPanelTagHelper : AuraTagHelperBase
 {
     [HtmlAttributeName("value")]
     public string? Value { get; set; }
-
-    [HtmlAttributeName("class")]
-    public string? Class { get; set; }
 
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
@@ -154,9 +142,9 @@ public class StepPanelTagHelper : TagHelper
         output.Attributes.SetAttribute("role", "tabpanel");
         output.Attributes.SetAttribute("data-value", Value ?? "1");
         output.Attributes.SetAttribute("value", Value ?? "1");
-        
+
         var baseClass = "p-steppanel";
-        output.Attributes.SetAttribute("class", string.IsNullOrWhiteSpace(Class) ? baseClass : $"{baseClass} {Class}");
+        output.Attributes.SetAttribute("class", MergeClass(baseClass));
 
         var childContent = await output.GetChildContentAsync();
         output.Content.SetHtmlContent(childContent);
@@ -168,13 +156,10 @@ public class StepPanelTagHelper : TagHelper
 /// </summary>
 [HtmlTargetElement("p-stepitem")]
 [HtmlTargetElement("island-stepitem")]
-public class StepItemTagHelper : TagHelper
+public class StepItemTagHelper : AuraTagHelperBase
 {
     [HtmlAttributeName("value")]
     public string? Value { get; set; }
-
-    [HtmlAttributeName("class")]
-    public string? Class { get; set; }
 
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
@@ -183,7 +168,7 @@ public class StepItemTagHelper : TagHelper
         output.Attributes.SetAttribute("value", Value ?? "1");
 
         var baseClass = "p-stepitem";
-        output.Attributes.SetAttribute("class", string.IsNullOrWhiteSpace(Class) ? baseClass : $"{baseClass} {Class}");
+        output.Attributes.SetAttribute("class", MergeClass(baseClass));
 
         var childContent = await output.GetChildContentAsync();
         output.Content.SetHtmlContent(childContent);

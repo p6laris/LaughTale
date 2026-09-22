@@ -10,7 +10,8 @@ import {
     sanitizeUrl,
     isSafeAttribute,
     isSafeProperty,
-    sanitizeHtml
+    sanitizeHtml,
+    safe
 } from '../src/directives/security.ts';
 import { evaluateExpression, createReactiveScope } from '../src/directives/reactivity.ts';
 
@@ -182,6 +183,22 @@ describe('LaughTale Directive Security & Sandboxing Suite', () => {
             });
         }
 
+    });
+
+    describe('safe facade (ROADMAP.v5.md Part M)', () => {
+        it('exposes every primitive as the same function it aliases, not a reimplementation', () => {
+            assert.equal(safe.html, sanitizeHtml);
+            assert.equal(safe.url, sanitizeUrl);
+            assert.equal(safe.property, isSafeProperty);
+            assert.equal(safe.attribute, isSafeAttribute);
+        });
+
+        it('behaves identically to the named exports it wraps', () => {
+            assert.equal(safe.url('javascript:alert(1)'), 'about:blank');
+            assert.equal(safe.html('<script>alert(1)</script><b>ok</b>'), '<b>ok</b>');
+            assert.equal(safe.property('__proto__'), false);
+            assert.equal(safe.attribute('onclick'), false);
+        });
     });
 
 });

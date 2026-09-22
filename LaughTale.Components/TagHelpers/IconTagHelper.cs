@@ -11,7 +11,7 @@ namespace LaughTale.Components.TagHelpers;
 [HtmlTargetElement("lt-icon", TagStructure = TagStructure.NormalOrSelfClosing)]
 [HtmlTargetElement("aura-icon", TagStructure = TagStructure.NormalOrSelfClosing)]
 [HtmlTargetElement("island-icon", TagStructure = TagStructure.NormalOrSelfClosing)]
-public class IconTagHelper : TagHelper
+public class IconTagHelper : AuraTagHelperBase
 {
     /// <summary>
     /// Name or alias of the Lucide icon (e.g., "check", "chevron-down", "settings", "zap").
@@ -53,12 +53,6 @@ public class IconTagHelper : TagHelper
     public string? Title { get; set; }
 
     /// <summary>
-    /// Additional CSS classes to attach to the SVG element.
-    /// </summary>
-    [HtmlAttributeName("class")]
-    public string? Class { get; set; }
-
-    /// <summary>
     /// Inline CSS styles for the SVG element.
     /// </summary>
     [HtmlAttributeName("style")]
@@ -68,7 +62,7 @@ public class IconTagHelper : TagHelper
     {
         var iconId = LucideIcons.NormalizeId(Name);
         var baseClass = $"lt-icon lt-icon-{iconId}";
-        var finalClass = string.IsNullOrWhiteSpace(Class) ? baseClass : $"{baseClass} {Class}";
+        var finalClass = MergeClass(baseClass);
         var stroke = string.IsNullOrWhiteSpace(Color) ? "currentColor" : Color;
 
         output.TagName = "svg";

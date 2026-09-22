@@ -11,7 +11,6 @@ export {
     getIslandLoader,
     resolveIslandName,
     listIslands,
-    LEGACY_ALIASES,
     type IslandModule,
     type IslandFactory,
     type IslandTeardown,
