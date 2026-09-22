@@ -209,7 +209,8 @@ public class IslandTagHelper : TagHelper
             Hydrate,
             Media,
             !string.IsNullOrWhiteSpace(Persist),
-            output);
+            output,
+            childContent.IsEmptyOrWhiteSpace);
     }
 
     private void EnforceCachePrivacy()

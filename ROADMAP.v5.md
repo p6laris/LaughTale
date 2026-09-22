@@ -473,7 +473,7 @@ behaviour, and the fixes are sitting unused in `src/composables/`.
 
 ---
 
-## 6. Part D — Adapters — **[CLOSED except Angular, explicitly deferred - real esbuild/zone.js toolchain blocker, see "New adapters" row]**
+## 6. Part D — Adapters — **[CLOSED except Angular and the Framework SSR sidecar's Node-process work, both explicitly deferred as their own multi-week items - see "New adapters" and "Framework SSR sidecar" rows]**
 
 All five adapters *were* one-shot mount functions (324 lines total, confirmed by `wc -l`: 314
 across the five adapter files — `react.ts` 71, `vue.ts` 69, `preact.ts` 64, `svelte.ts` 94,
@@ -654,7 +654,7 @@ store, left unfixed here since it's unrelated to the actual ask; new adapters; a
 preservation for a nested island inside a framework adapter's destructive mount when the parent
 doesn't forward it as a slot (an author-error case, not a framework gap).
 
-| **Framework SSR sidecar** — Node render host over a local socket. The right *first plugin* to prove the Part L API, not core work. Until then, rename the strategy `client-only` and require a fallback | Astro, Nuxt | XL · 8+ wks |
+| **Framework SSR sidecar — [DEFERRED, real Node-sidecar work explicitly not attempted; interim "require a fallback" half CLOSED - see Part G/L "Validation: Framework SSR sidecar"]** Node render host over a local socket. The right *first plugin* to prove the Part L API, not core work. Until then, rename the strategy `client-only` and require a fallback | Astro, Nuxt | XL · 8+ wks |
 
 ---
 
@@ -1831,7 +1831,7 @@ how much of the enterprise story stops at that one policy string.
 
 ---
 
-## 14. Part G/L — DX & plugin architecture — **[CLOSED (mechanism + 1 of 3 validation plugins), this pass]**
+## 14. Part G/L — DX & plugin architecture — **[CLOSED except the Framework SSR sidecar's own Node-process implementation, explicitly deferred - mechanism + all 3 validation-plugin layers otherwise closed]**
 
 Build the plugin API **before** Parts E and F, so streaming, actions and cache tags are written as
 first-party plugins against your own interface. Nothing proves an extension point like being forced
@@ -1872,8 +1872,49 @@ Increment, a real antiforgery-protected POST fires, the server increments state 
 it: the generic plugin API above is not load-bearing for Server Actions at all.** An already-shipped
 mechanism (`directives/htmx.ts`'s `bindServerAction()`, the `l-get`/`l-post`/`l-put`/`l-delete`
 fragment-action engine) already did the entire intercept-fetch-swap job — exactly the finding "write
-the first three yourself" exists to produce. Cache tags and the SSR sidecar remain open, per the
-original plan's own honest effort estimates (deferred, not attempted this pass).
+the first three yourself" exists to produce.
+
+**Validation: Cache tags (Layer 2) — [CLOSED].** `IslandCacheTagsPlugin`
+(`LaughTale.Core/Plugins/IslandCacheTagsPlugin.cs`) proves the plugin API is expressive enough to build
+real automatic per-island cache tagging using ONLY the public `LaughTalePlugin` surface - zero changes
+to `IslandTagHelperBase` or Part F's `LaughTaleOutputCacheExtensions` were needed. Without it, an app
+tags its own cached response by hand (`HttpContext.Tag($"post:{id}")`, Part F); this plugin instead
+accumulates every island's name into `OnIslandRenderingAsync` (the same splice every `IslandTagHelperBase`
+subclass already reaches) and applies `island:<name>` tags for all of them in `OnResponseStartingAsync`,
+right before the response is cached - evicting `IslandCacheTagsPlugin.TagFor("datatable")` now
+invalidates every cached page that happened to render a datatable island, with no per-page code at all.
+**A real, previously-unexercised gap found building this, not assumed**: `UseLaughTalePlugins()` (the
+middleware that fans `OnResponseStartingAsync` out to every registered plugin) had never actually been
+wired into `LaughTale.Showcase/Program.cs` - `OnResponseStartingAsync` had never run outside a unit test
+until this pass added it. Live demo: `/PluginCacheTagsDemo` (real `<island name="interactive-counter">`,
+zero `HttpContext.Tag(...)` calls anywhere on the page) + `/PluginCacheTagsDemoInvalidate`, live-browser
+verified end to end - cache → auto-tag → evict → regenerate, confirmed via the render nonce changing
+immediately after the confirm-invalidate POST. 4 new TestServer-based tests, following
+`LaughTaleOutputCacheTests`'s own precedent.
+
+**Validation: Framework SSR sidecar (Layer 3) — deliberately NOT attempted, real toolchain reasons, not
+a time-box.** The actual ask (a Node render host doing genuine `renderToString()`-equivalent SSR for
+React/Vue/Svelte/Preact/Solid components, over a local socket, as the plugin validating the Part L
+server-lifecycle API against something core code doesn't already do) carries the roadmap's own XL · 8+
+wks estimate - real protocol design, process lifecycle/health management, per-framework render glue, and
+a new security boundary (arbitrary component code now executing in a sibling process), closer in shape
+to Part D's deferred Angular adapter or Part M's Zag.js state-machine item than to a same-pass plugin.
+**What genuinely was actionable this pass, and got done**: the interim half the roadmap explicitly asks
+for ("until then... require a fallback") - Development-mode diagnostics now catch exactly the gap a
+sidecar would eventually close. `IslandDiagnostics.ValidateIsland` (both the generic `<island>` TagHelper
+and `IslandTagHelperBase`, so every island shape reaches it) stamps `data-laughtale-warning-no-fallback`
+when a `hydrate="Load"` island - the ONE strategy that promises critical, above-the-fold content -
+rendered zero server-side markup, meaning a real, silent blank-flash until its JS chunk mounts.
+Deliberately scoped to `Load` only: `Idle`/`Visible`/`Media`/`Interaction` legitimately expect nothing to
+show until later (`Visible`'s whole pitch is "0 KB until scrolled into view"), so warning there would be
+noise, not signal - verified live (14 islands on `/polyglot`, 0 false positives on any non-`Load`
+strategy). Also documented honestly, not left implicit: `02-hydration-strategies.md` gained a new "What
+Actually Renders Server-Side" section stating plainly that React/Vue/Svelte/Preact/Solid islands have no
+true SSR in LaughTale today - only Razor/Vanilla/Web-Components/Alpine content is real without a sidecar.
+**Immediately found real, useful signal on this repo's own Showcase, not just a synthetic test**:
+`/polyglot` alone has 12 islands using `hydrate="Load"` with no fallback content today (`theme-studio`,
+`sidebar`, `persistent-telemetry`, and 9 more) - a real, pre-existing backlog this diagnostic now makes
+visible, left as-is rather than retrofitting 12 unrelated demo pages as a side effect of this item.
 
 **Two significant, previously-undiscovered bugs found and fixed while getting Server Actions to a real
 live-browser proof — both pre-existing, unrelated to the plugin API itself, neither ever caught because

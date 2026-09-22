@@ -103,6 +103,34 @@ This generates 100% semantic HTML and CSS with **zero JavaScript attachment**.
 
 ---
 
+## ⚠️ What Actually Renders Server-Side (Read Before Using `Load`)
+
+`hydrate` controls **when client JS takes over** - it says nothing about what's visible *before* that
+happens. Be honest with yourself about the difference:
+
+- **Razor markup, `Vanilla`, Web Components, and Alpine islands** can have real server-rendered
+  content: override `BuildSsrHtml()` (or nest markup inside `<island>...</island>`) with genuine HTML,
+  and that's what a visitor sees immediately, JS or not.
+- **React, Vue, Svelte, Preact, and Solid islands have no true server-side rendering in LaughTale
+  today.** There is no Node render host - `BuildSsrHtml()` for these is either left `null` (the
+  default) or hand-written HTML that approximates what the component would render, maintained by you,
+  by hand, forever. A framework-mounted island with no `BuildSsrHtml()` override and no child content
+  renders a genuinely **empty wrapper `<div>`** until its client JS chunk loads and mounts.
+
+For `Idle`/`Visible`/`Media`/`Interaction`, an empty island until then is often exactly what you want -
+`Visible`'s whole pitch is "0 KB until scrolled into view." **`hydrate="Load"` is different**: it
+promises critical, above-the-fold content, so a blank gap there is a real bug, not a trade-off. In
+Development, LaughTale detects this for you - an island using `hydrate="Load"` that rendered no
+server-side content at all gets a `data-laughtale-warning-no-fallback` attribute you can spot in the
+DOM inspector. Fix it by giving it real `BuildSsrHtml()` markup, nesting fallback content inside the
+`<island>` tag, or switching to a deferred strategy if a brief blank gap is genuinely fine.
+
+A **Node-based SSR sidecar** (real `renderToString()`-equivalent output for framework components, over
+a local socket) would close this gap for good - it's on the roadmap, sized honestly at 8+ weeks of its
+own, and deliberately not something this framework fakes with a partial implementation in the meantime.
+
+---
+
 ## 📈 Real-World Strategy Matrix
 
 | Component Type | Recommended Strategy | Reason |

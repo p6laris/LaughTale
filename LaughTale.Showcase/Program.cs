@@ -6,6 +6,7 @@ using LaughTale.Core.Configuration;
 using LaughTale.Core.Endpoints;
 using LaughTale.Core.Extensions;
 using LaughTale.Core.Performance;
+using LaughTale.Core.Plugins;
 using LaughTale.Core.Streaming;
 using LaughTale.Showcase.Configuration;
 
@@ -40,6 +41,12 @@ builder.Services.AddLaughTaleOutputCache(options =>
         .Expire(TimeSpan.FromSeconds(15))
         .AddPolicy(typeof(RespectNoStorePolicy)));
 });
+
+// ROADMAP.v5.md Part G/L "Validation: Cache tags" - the second of the two deferred validation
+// plugins. Auto-tags a cached response with island:<name> for every island it rendered, using only
+// the public LaughTalePlugin API. See /PluginCacheTagsDemo for the live proof (no HttpContext.Tag(...)
+// call anywhere on that page, unlike /CacheTagsDemo's own hand-written Part F version).
+builder.Services.AddLaughTalePlugin(new IslandCacheTagsPlugin());
 
 // ROADMAP.v5.md Part B "Asset pipeline" (integrity manifest): enables lt-integrity on <script>/<link>.
 builder.Services.AddLaughTaleAssetIntegrity();
@@ -78,6 +85,11 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+// ROADMAP.v5.md Part G/L: fans OnResponseStartingAsync out to every registered LaughTalePlugin
+// (IslandCacheTagsPlugin above). Registered early, before UseRouting(), per the middleware's own
+// doc comment - a real gap this pass found: nothing had ever actually wired this into an app's
+// pipeline before, so OnResponseStartingAsync had never run outside a unit test.
+app.UseLaughTalePlugins();
 app.UseResponseCompression();
 app.UseLaughTaleStaticAssetsCaching();
 app.UseLaughTaleRouteRules();

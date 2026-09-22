@@ -1,0 +1,23 @@
+@page "/PluginCacheTagsDemoInvalidate"
+@model LaughTale.Showcase.Pages.PluginCacheTagsDemoInvalidateModel
+@{
+    ViewData["Title"] = "Invalidate Cache Tag (Plugin)";
+}
+
+<div class="app-container" style="max-width: 600px; display: flex; flex-direction: column; gap: 1.5rem; padding-bottom: 3rem;">
+
+    <div style="background: var(--p-surface-0); border: 1px solid var(--p-border-color); border-radius: 1rem; padding: 1.75rem;">
+        <h1 style="font-size: 1.25rem; font-weight: 800; color: var(--p-text-color); margin: 0 0 0.5rem;">Invalidate Cache Tag (Plugin)</h1>
+        <p style="color: var(--p-text-muted); font-size: 0.8125rem; margin: 0 0 1.25rem;">
+            Confirming evicts <code>island:interactive-counter</code> from the output cache - the SAME
+            tag <code>IslandCacheTagsPlugin</code> applied automatically when
+            <a href="/PluginCacheTagsDemo">/PluginCacheTagsDemo</a> last rendered - then redirects back
+            there. The timestamp will be fresh immediately, no need to wait out the 15s duration.
+        </p>
+        <form method="post">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="p-button p-button-primary">Confirm invalidate</button>
+        </form>
+    </div>
+
+</div>

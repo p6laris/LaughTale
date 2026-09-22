@@ -274,6 +274,7 @@ public abstract class IslandTagHelperBase : TagHelper
             Hydrate,
             Media,
             Persist,
-            output);
+            output,
+            output.Content.IsEmptyOrWhiteSpace);
     }
 }
