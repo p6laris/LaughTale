@@ -32,6 +32,10 @@ const win = new Window({
 // ROADMAP.v5.md Part D "New adapters" (Web Components): happy-dom implements the real Custom
 // Elements API on its own Window, just not exposed as a bare global by this file until now.
 (globalThis as any).customElements = win.customElements;
+// ROADMAP.v5.md Part D "New adapters" (Alpine): Alpine's own `findClosest` walks up `parentNode`
+// checking `instanceof ShadowRoot` unconditionally (not feature-detected) - needed the moment
+// `Alpine.initTree`/`destroyTree` runs at all, not just for a Shadow-DOM-specific scenario.
+(globalThis as any).ShadowRoot = win.ShadowRoot;
 (globalThis as any).requestAnimationFrame = (cb: () => void) => setTimeout(cb, 16);
 
 // `navigator` is only a built-in Node global since Node 21+ - on Node 20 (what CI's

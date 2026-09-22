@@ -37,6 +37,8 @@ export { createVueIsland } from './adapters/vue';
 export { createSvelteIsland } from './adapters/svelte';
 export { createPreactIsland } from './adapters/preact';
 export { createWebComponentIsland, type WebComponentAdapterOptions } from './adapters/web-components';
+export { createSolidIsland, type SolidAdapterOptions } from './adapters/solid';
+export { createAlpineIsland, type AlpineAdapterOptions, type AlpineDataFactory } from './adapters/alpine';
 export { initDirectives } from './directives/index';
 export { LucideIcons, getLucideIcon } from './icons/lucide';
 export { registerCommand, unregisterCommand, getCommand, executeCommand, clearCommands, listCommands, type CommandHandler } from './runtime/commands';

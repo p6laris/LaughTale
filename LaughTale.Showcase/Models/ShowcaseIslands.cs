@@ -105,3 +105,25 @@ public record PolyglotWebComponentProps(
     string Label,
     int InitialCount
 );
+
+/// <summary>
+/// ROADMAP.v5.md Part D "New adapters" live demo - a real SolidJS component mounted via
+/// <c>createSolidIsland</c>'s signal-backed reactive props.
+/// </summary>
+[IslandAllowAnonymous]
+[Island("polyglot-solid", DefaultStrategy = HydrateStrategy.Load)]
+public record PolyglotSolidProps(
+    string Label,
+    int InitialCount
+);
+
+/// <summary>
+/// ROADMAP.v5.md Part D "New adapters" live demo - real Alpine.js <c>x-*</c> directives bound via
+/// <c>createAlpineIsland</c>.
+/// </summary>
+[IslandAllowAnonymous]
+[Island("polyglot-alpine", DefaultStrategy = HydrateStrategy.Load)]
+public record PolyglotAlpineProps(
+    string Label,
+    int InitialCount
+);

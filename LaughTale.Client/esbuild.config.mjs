@@ -105,7 +105,9 @@ await esbuild.build({
         'adapters/svelte': 'src/adapters/svelte.ts',
         'adapters/preact': 'src/adapters/preact.ts',
         'adapters/vanilla': 'src/adapters/vanilla.ts',
-        'adapters/web-components': 'src/adapters/web-components.ts'
+        'adapters/web-components': 'src/adapters/web-components.ts',
+        'adapters/solid': 'src/adapters/solid.ts',
+        'adapters/alpine': 'src/adapters/alpine.ts'
     },
     bundle: true,
     outdir: 'dist',

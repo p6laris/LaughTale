@@ -10,12 +10,12 @@
         <div>
             <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
                 <span class="aura-tag tag-indigo">Polyglot Architecture</span>
-                <span class="aura-tag tag-emerald">6 Frameworks Live</span>
+                <span class="aura-tag tag-emerald">8 Frameworks Live</span>
                 <span class="aura-tag tag-slate">Inter-Island Event Bus</span>
             </div>
             <h1 style="font-size: 2rem; font-weight: 800; color: var(--p-text-color); margin: 0 0 0.5rem 0;">Polyglot Multi-Framework Lab</h1>
             <p style="font-size: 1rem; color: var(--p-text-muted); margin: 0; max-width: 800px;">
-                Demonstrating <strong>React 19</strong>, <strong>Vue 3</strong>, <strong>Svelte 5</strong>, <strong>Preact</strong>, <strong>Vanilla TypeScript</strong>, and a real <strong>Web Component</strong> (ROADMAP.v5.md Part D - no framework, no runtime download) running concurrently on this single ASP.NET Core Razor page with real-time cross-island event communication.
+                Demonstrating <strong>React 19</strong>, <strong>Vue 3</strong>, <strong>Svelte 5</strong>, <strong>Preact</strong>, <strong>Vanilla TypeScript</strong>, a real <strong>Web Component</strong>, <strong>SolidJS</strong>, and <strong>Alpine.js</strong> (ROADMAP.v5.md Part D - no framework, no runtime download for the Web Component) running concurrently on this single ASP.NET Core Razor page with real-time cross-island event communication.
             </p>
         </div>
         <div>
@@ -66,6 +66,23 @@
     <island name="polyglot-web-component"
             framework="WebComponents"
             props="@(new PolyglotWebComponentProps("Real Custom Element", 0))"
+            hydrate="Load" />
+
+</div>
+
+<!-- ROADMAP.v5.md Part D "New adapters": Solid + Alpine -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.5rem; margin-top: 1.5rem;">
+
+    <!-- 7. SOLID ISLAND -->
+    <island name="polyglot-solid"
+            framework="Solid"
+            props="@(new PolyglotSolidProps("Solid Counter", 0))"
+            hydrate="Load" />
+
+    <!-- 8. ALPINE ISLAND -->
+    <island name="polyglot-alpine"
+            framework="Alpine"
+            props="@(new PolyglotAlpineProps("Alpine Counter", 0))"
             hydrate="Load" />
 
 </div>

@@ -9,7 +9,9 @@
   "dependencies": {
     "laughtale": "file:../LaughTale.Client",
     "react": "^19.3.0",
-    "react-dom": "^19.3.0"
+    "react-dom": "^19.3.0",
+    "solid-js": "^1.9.15",
+    "alpinejs": "^3.17.4"
   },
   "devDependencies": {
     "esbuild": "^0.25.0",

@@ -41,7 +41,14 @@ try {
 
 console.log('🚀 Running Node.js Native Test Runner...');
 const distTestFiles = testFiles.map(f => path.join('dist', f.replace(/\.ts$/, '.js')));
-const result = spawnSync('node', ['--test', ...distTestFiles], {
+// --conditions=browser: solid-js (adapters/solid.ts, ROADMAP.v5.md Part D) publishes a
+// package.json "exports" map that selects a CLIENT-ONLY-API-throwing SSR stub under Node's
+// default resolution condition set - real end-user apps never hit this (their own bundler
+// resolves "browser" conditions for a client build), but this Node-based test runner otherwise
+// would. Confirmed harmless to every other dependency already exercised here (react/vue/preact/
+// happy-dom) - none of them branch on the "browser" condition, so this flag only changes solid-js's
+// resolution, not theirs.
+const result = spawnSync('node', ['--conditions=browser', '--test', ...distTestFiles], {
     stdio: 'inherit',
     shell: true
 });
