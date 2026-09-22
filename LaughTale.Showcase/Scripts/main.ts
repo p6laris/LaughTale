@@ -4,6 +4,13 @@
 
 import { defineIsland, initIslands, initDirectives, enableViewTransitions, hydrateIsland, teardownIsland, rehydrateIsland, refreshIsland } from '../../LaughTale.Client/src/index';
 import { isDevMode } from '../../LaughTale.Client/src/runtime/error-boundary';
+import { wireLaughTaleTelemetryReporting } from '../../LaughTale.Client/src/runtime/telemetry';
+
+// ROADMAP.v5.md Part H "instrumentation hook": beacons every island's real hydration duration to
+// MapLaughTaleIslandTelemetry's endpoint, closing the loop with the server's own island.render spans
+// under one ActivitySource. Opt-in by design (see telemetry.ts's own doc comment) - the Showcase opts
+// in so this is exercised by a real page, not just unit tests.
+wireLaughTaleTelemetryReporting();
 
 // Expose runtime API on window for showcase demos, diagnostics, and E2E testing
 (window as any).LaughTale = {

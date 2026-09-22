@@ -96,11 +96,24 @@ public abstract class IslandTagHelperBase : TagHelper
 
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
+        // ROADMAP.v5.md Part H "instrumentation hook": wraps the ENTIRE render (auth check through
+        // final markup) in one span per island, tagged before any early-return path so a
+        // suppressed/unauthorized render still produces a (cheap, tagged) span rather than silently
+        // vanishing from a trace. Null when nothing is listening (see LaughTaleActivitySource's own
+        // doc comment) - every access below is null-conditional, so this costs nothing unless an app
+        // actually configured OpenTelemetry to listen for it.
+        using var activity = LaughTale.Core.Diagnostics.LaughTaleActivitySource.Source.StartActivity(
+            "island.render", System.Diagnostics.ActivityKind.Internal);
+        activity?.SetTag("island.name", IslandName);
+        activity?.SetTag("island.hydrate", Hydrate.ToString());
+        activity?.SetTag("island.framework", Framework.ToString());
+
         // LT-2203 / LT-2204: Initial Island Render Authorization Check
         var httpContext = ViewContext?.HttpContext;
         var requestServices = httpContext?.RequestServices;
         if (httpContext is null || requestServices is null)
         {
+            activity?.SetTag("island.suppressed", true);
             output.SuppressOutput();
             return;
         }
@@ -108,6 +121,7 @@ public abstract class IslandTagHelperBase : TagHelper
         var evaluator = requestServices.GetService<LaughTale.Core.Security.IIslandAccessEvaluator>();
         if (evaluator is null)
         {
+            activity?.SetTag("island.suppressed", true);
             output.SuppressOutput();
             return;
         }
@@ -141,6 +155,8 @@ public abstract class IslandTagHelperBase : TagHelper
 
         if (!decision.IsAllowed)
         {
+            activity?.SetTag("island.suppressed", true);
+            activity?.SetTag("island.authorized", false);
             output.SuppressOutput();
             return;
         }

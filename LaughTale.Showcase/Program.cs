@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Localization;
 using LaughTale.Core.Assets;
 using LaughTale.Core.Caching;
 using LaughTale.Core.Configuration;
+using LaughTale.Core.Endpoints;
 using LaughTale.Core.Extensions;
 using LaughTale.Core.Performance;
 using LaughTale.Core.Streaming;
@@ -96,6 +97,10 @@ app.UseRouting();
 app.UseLaughTaleOutputCache();
 
 app.MapHealthChecks("/healthz");
+// ROADMAP.v5.md Part H "instrumentation hook": accepts client-reported hydration timing and turns it
+// into an island.hydrate Activity under LaughTaleActivitySource, alongside every island.render span
+// IslandTagHelperBase already creates server-side.
+app.MapLaughTaleIslandTelemetry();
 app.MapRazorPages();
 
 app.Run();
