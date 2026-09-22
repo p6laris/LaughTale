@@ -1,0 +1,32 @@
+[
+  {
+    "name": "LaughTale",
+    "ttfbMs": 5,
+    "domContentLoadedMs": 30,
+    "loadEventMs": 33,
+    "transferredBytesAtLoad": 380390,
+    "transferredBytesUntilInteractive": 761160,
+    "ttiMs": 100,
+    "memoryAfter50NavBytes": 10000000
+  },
+  {
+    "name": "Blazor Server",
+    "ttfbMs": 3,
+    "domContentLoadedMs": 52,
+    "loadEventMs": 52,
+    "transferredBytesAtLoad": 74926,
+    "transferredBytesUntilInteractive": 149583,
+    "ttiMs": 114,
+    "memoryAfter50NavBytes": 10000000
+  },
+  {
+    "name": "Blazor WASM",
+    "ttfbMs": 4,
+    "domContentLoadedMs": 73,
+    "loadEventMs": 75,
+    "transferredBytesAtLoad": 1807364,
+    "transferredBytesUntilInteractive": 31330798,
+    "ttiMs": 1197,
+    "memoryAfter50NavBytes": 10000000
+  }
+]

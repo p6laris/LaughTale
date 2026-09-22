@@ -1,0 +1,9 @@
+@page "/Counter"
+@model LaughTaleBenchmarkApp.Pages.CounterModel
+@{
+    ViewData["Title"] = "Counter";
+}
+
+<h1>Counter</h1>
+
+<island name="counter" props="@(new CounterProps(0))" hydrate="Load" />

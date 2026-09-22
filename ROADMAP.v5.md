@@ -1345,7 +1345,7 @@ element reference throughout resolved it correctly. `autocomplete.ts`/`multisele
 
 ---
 
-## 11. Part J — Performance
+## 11. Part J — Performance — **[CLOSED except 1 documented-but-not-actioned item: no compression story for the `data-props` attribute payload — see below]**
 
 - **Stop leaking listeners (§1.3) — [CLOSED; stale duplicate reference, this pass]** This bullet was a leftover pointer to §1.3, which the roadmap's own "URGENT — three shipped bugs" section (top of this file) already records as **closed in Spec 040** (`040-teardown-lifecycle`) — nobody removed the duplicate line from Part J after that closure landed. Verified live, not just trusted: `npm run lint:metrics` (an enforced CI gate, part of `npm run verify`) reports `listenersUnmanaged: 0` out of `listenersTotal: 474` today, against the original audit's `374` unmanaged — and that `0` is a baseline the gate actively regresses against, not a one-time measurement.
 - **Replace `innerHTML` rebuilds with targeted updates — [CLOSED (four components), this pass].** Real
@@ -1421,8 +1421,38 @@ element reference throughout resolved it correctly. `autocomplete.ts`/`multisele
   several times since, is not the same as it ever having actually run green. Nothing in this session
   had checked the real GitHub Actions run history until asked to trigger a downstream workflow
   surfaced the failure by accident.
-- **Publish honest numbers** — a reproducible benchmark against Blazor Server and WASM: TTFB, TTI,
-  transferred bytes, memory after 50 navigations. Worth more than every adjective in the README.
+- **Publish honest numbers — [CLOSED, this pass]** a reproducible benchmark against Blazor Server and
+  WASM: TTFB, TTI, transferred bytes, memory after 50 navigations. Built three deliberately minimal,
+  structurally identical apps (Home/Counter/Weather, same markup, same "Click me" behavior) - one
+  LaughTale (Razor Pages + one island), one `dotnet new blazor -int Server`, one `dotnet new
+  blazorwasm` - published in Release/Production and measured with a real Playwright/Chromium harness
+  (`benchmark/harness/run-benchmark.cjs`), not synthetic estimates. Full methodology, honest caveats,
+  and a reproduction recipe: [`benchmark/RESULTS.md`](../benchmark/RESULTS.md).
+
+  **Mean of 3 runs**: TTFB ~6/4/7 ms (LaughTale/Server/WASM); TTI (real click-to-response, not a
+  synthetic heuristic - see methodology) ~113/118/**1,409** ms; transferred bytes until interactive
+  761 KB / 150 KB / **31.2 MB**; memory after 50 navigations inconclusive (Chromium coarsens
+  `performance.memory` for fingerprinting-privacy reasons - all three apps report the same bucketed
+  value, a real platform limitation, not a harness bug).
+
+  **Two real findings this pass's own methodology surfaced, corrected rather than reported wrong**:
+  (1) a first draft measured transferred bytes only up to the `load` event and got a materially
+  misleading result - Blazor WASM's own runtime (~200 additional requests: interpreter, BCL
+  assemblies, ICU data) keeps downloading for 1-2 seconds AFTER `load` fires, so a `load`-scoped byte
+  count made WASM look 90x cheaper than it actually is to become interactive; fixed by counting bytes
+  continuously through confirmed interactivity instead, and reporting BOTH numbers so the gap itself is
+  visible. (2) Blazor Server's status text renders server-side and is visible immediately, but
+  `@onclick` does nothing until its SignalR circuit connects - an immediate single click can silently
+  race that gap; fixed with a click-and-retry-until-it-registers loop applied identically to all three
+  apps, which is also the more correct definition of TTI ("time until clicking actually works").
+
+  **Stated plainly, not glossed over**: Blazor WASM was published without the `wasm-tools` workload
+  (not installed in this environment - `dotnet publish` printed its own warning recommending it), so
+  its 31.2 MB / 1.4s numbers are a worst-case, untrimmed build - real production Blazor WASM
+  deployments with IL trimming measure dramatically smaller. LaughTale's own 761 KB also isn't
+  minimal: importing `runtime-core.ts` as-is pulls in this session's newly-added prefetch/telemetry/
+  web-vitals modules alongside hydration/routing - a real, separate right-sizing opportunity this
+  benchmark surfaced but did not fix.
 - **Report Core Web Vitals — [CLOSED, this pass]** back through the instrumentation hook (Part H),
   which is now real (`LaughTaleActivitySource`/`runtime/telemetry.ts`, closed last pass) - this closes
   the collection half. `runtime/web-vitals.ts` (new) observes LCP, CLS, and INP via the browser's own
