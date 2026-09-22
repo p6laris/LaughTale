@@ -1123,8 +1123,42 @@ For government, finance and healthcare buyers — exactly the accounts an "enter
 chases — **"declarative directives under a strict CSP with nonces"** is a procurement-clearing
 sentence. You built it and you're not saying it.
 
-**Still needed**: document it and put it on the front page; fuzz the parser with property tests and a
-documented grammar; promote `htmx.ts` — the htmx audience *is* your audience.
+**Still needed — [CLOSED, this pass]**: document it and put it on the front page; fuzz the parser with
+property tests and a documented grammar; promote `htmx.ts` — the htmx audience *is* your audience.
+- **Front page**: `README.md` gained the specific "Alpine requires `unsafe-eval`, LaughTale doesn't"
+  procurement-framing line as its own Key Features bullet (previously buried as one clause inside a
+  generic "Defense-in-Depth Security" bullet), plus a separate bullet for the htmx-style server actions
+  below. Also corrected a stale test-count claim found in passing (`200 .NET / 268 JS` → the real,
+  currently-verified `478 .NET / 634 JS`).
+- **Documented grammar**: `LaughTale.Client/src/directives/expression/GRAMMAR.md` (new) — a full EBNF
+  grammar derived directly from `lexer.ts`/`parser.ts` (not guessed from behavior), operator precedence
+  table, and all three independent security blocklists (parser structural-name blocklist, evaluator
+  global-escape blocklist, lexer forbidden-keyword blocklist) with the exact name lists and which file
+  enforces each. Documents real, verified quirks along the way: template-literal interpolation
+  (`` `${x}` ``) is lexed but never parsed (a real `ParseError`, not silently wrong output); deeply
+  nested grouping is a known, accepted resource bound (a catchable `RangeError`, not a hang).
+- **Fuzz suite**: `tests/expression-fuzz.test.ts` (new, 6 tests) — a seeded PRNG (`mulberry32`,
+  deliberately zero new dependency, consistent with this framework's own "no dependency for something
+  this small" posture) generates random expressions directly against the documented grammar and checks
+  invariants rather than fixed outputs: (1) the parser never throws a non-`Error` or hangs across 500
+  random syntactically-intended expressions; (2) no randomly-nested expression ever resolves a forbidden
+  identifier/property to its real value — verified against a scope that deliberately binds the REAL
+  `globalThis`/`eval`/`Function`/a secret object directly under their forbidden names, so a blocklist gap
+  would actually leak them, not just fail to be exercised; (3) parsing the same string twice is
+  deterministic (structurally identical ASTs); (4) 50,000-deep nested parens throws a catchable
+  `RangeError`, never hangs; (5) 500 random single/multi-character mutations of valid expressions never
+  throw a non-`Error`; (6) `ParseError` is a real `Error` subclass carrying a position. Complements
+  (doesn't replace) the existing `expression-sandbox.test.ts`'s ~40 hand-picked known attack payloads -
+  generated, not curated, so it can catch a blocklist gap neither this session nor the original author
+  thought to hand-write a payload for. All seeds tried (1, 42, 1337, 2026, 999999) pass.
+- **Promoted `htmx.ts`**: was completely undocumented anywhere (grepped `LaughTale.Docs` and `README.md`
+  for `l-get`/`l-post`/`htmx` before writing anything - zero matches) despite being a real, working,
+  tested feature. Added a full "Server Actions (HTMX-Style AJAX)" section to
+  `LaughTale.Docs/content/docs/06-declarative-directives.md` documenting all 4 HTTP-method attributes
+  plus `l-target`/`l-swap`/`l-trigger`/`l-confirm`/`l-indicator`, the form/single-input body-encoding
+  rules, the `X-LaughTale-Request` header, and the submit-control disable/`data-lt-submitting` behavior
+  - plus a `README.md` Key Features bullet. Verified against the real `htmx.ts` source, not written from
+  memory of what htmx does.
 
 **Signals, `l-if`/`l-for`, and the teardown leak — [CLOSED (real signals + l-for/l-if + teardown), this
 pass].** Two items in this list were already stale: `l-model` already existed and worked

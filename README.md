@@ -10,6 +10,8 @@ An enterprise-grade, high-performance **Islands Architecture framework for ASP.N
 - 💤 **6 Hydration Strategies**: `Load`, `Idle`, `Visible` (IntersectionObserver), `Media`, `Interaction`, `Never`.
 - 🔌 **Multi-Framework Adapters**: Zero-friction mount adapters for **React 18/19**, **Vue 3**, **Svelte 4/5**, **Preact**, and **Vanilla TS**.
 - 🛡️ **Defense-in-Depth Security**: Output cache privacy guards (`[IslandPrivate]`), automated CSP nonces, AST expression sandboxing, and OWASP URL sanitization.
+- 🔐 **Directives run under a strict CSP — no `unsafe-eval`, ever**: the `l-*` directive engine's expression language (`l-model`, `l-if`, `l-bind`, ...) is a hand-written recursive-descent parser and tree-walking evaluator with a documented, fuzz-tested grammar (see [`expression/GRAMMAR.md`](LaughTale.Client/src/directives/expression/GRAMMAR.md)) — no `eval`, no `new Function`, ever. Alpine.js and most of its peers require `unsafe-eval` in your CSP; LaughTale doesn't. That's a procurement-clearing sentence for government, finance, and healthcare buyers.
+- ⚡ **HTMX-style server actions**: `l-get`/`l-post`/`l-put`/`l-delete` fetch a partial Razor fragment and swap it into the DOM (`l-target`, `l-swap`, `l-trigger`, `l-confirm`, `l-indicator`) — no client-side framework required. See [Declarative Directives](LaughTale.Docs/content/docs/06-declarative-directives.md).
 - 🎨 **Enterprise Aura Design System**: 76 components with dark mode, OKLCH palette generation, 100% token purity (0 hardcoded hex), and WCAG AA/AAA compliance.
 - 🔄 **Server-Driven Island Refresh**: `island.refresh()` re-renders a single island on the server and morphs the DOM in-place, preserving scroll and focus.
 - 📊 **Server-Side Data Contract**: `IslandDataRequest` → `IslandDataResult<T>` with safe LINQ/EF Core translation for 100,000+ row grids.
@@ -32,7 +34,7 @@ An enterprise-grade, high-performance **Islands Architecture framework for ASP.N
 | **`LaughTale.Client`** | Recommended path: the split ESM build (`dist/index.mjs`, ~8 KB gz entry - each of the 76 components is its own lazily-loaded chunk, downloaded only when actually used), router, adapters, and Tailwind preset. A monolithic IIFE bundle with everything inlined (`dist/index.js`, ~373 KB gz, published at the `laughtale/iife` subpath) is also available as a script-tag-droppable escape hatch for pages with no bundler - not the default. | `laughtale` (NPM) |
 | **`LaughTale.Showcase`** | Enterprise showcase demonstrating all components, theming, and hydration modes. | `net10.0` Web App |
 | **`LaughTale.Docs`** | Interactive documentation portal with runnable live examples. | `net10.0` Web App |
-| **`LaughTale.Tests`** | Comprehensive automated test suite (**200 .NET tests, 268 JS tests, 0 failures**). | `net10.0` |
+| **`LaughTale.Tests`** | Comprehensive automated test suite (**478 .NET tests, 634 JS tests, 0 failures**). | `net10.0` |
 
 ---
 

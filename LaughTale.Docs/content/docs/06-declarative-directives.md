@@ -25,6 +25,7 @@ LaughTale includes a lightweight, ultra-fast declarative directive engine (inspi
 | **`l-html`** | Injects sanitized HTML | `l-html="safeRichContent"` |
 | **`l-ref`** | Exposes direct DOM reference | `l-ref="inputField"` |
 | **`l-transition`**| Animated entry and exit effects | `l-transition.fade` |
+| **`l-get`/`l-post`/`l-put`/`l-delete`** | HTMX-style server fragment actions | `l-post="/cart/add" l-target="#cart"` |
 
 ---
 
@@ -131,8 +132,55 @@ Apply CSS transitions automatically when elements enter or leave via `l-show` or
 
 ---
 
-## 6. Security Sandbox (Zero `eval()`)
+## 6. Server Actions (`l-get`/`l-post`/`l-put`/`l-delete`) — HTMX-Style AJAX
+
+If you know [htmx](https://htmx.org), you already know this. Any element can request a server-rendered
+HTML fragment and swap it directly into the page — no client-side framework, no JSON API, no manual
+`fetch()` wiring:
+
+```html
+<button l-post="/cart/add?id=42" l-target="#cart-summary" l-swap="outerHTML">
+    Add to Cart
+</button>
+
+<div id="cart-summary">
+    <!-- Razor Page handler's response HTML lands here -->
+</div>
+```
+
+| Attribute | Purpose | Default |
+| :--- | :--- | :--- |
+| `l-get` / `l-post` / `l-put` / `l-delete` | HTTP method + URL to request | — (required, pick one) |
+| `l-target` | CSS selector for the element to swap | the triggering element itself |
+| `l-swap` | `innerHTML` \| `outerHTML` \| `beforeend` \| `afterbegin` \| `beforebegin` \| `afterend` \| `none` | `innerHTML` |
+| `l-trigger` | DOM event that fires the request, plus `delay:<ms>` | `submit` for `<form>`, `input` for `<input>`, else `click` |
+| `l-confirm` | `window.confirm()` message shown before the request fires | — (skipped if absent) |
+| `l-indicator` | CSS selector for an element to show (`display: block`) while the request is in flight | — |
+
+```html
+<!-- Debounced live search: waits 300ms after the user stops typing -->
+<input type="text" name="query" l-get="/search" l-target="#results" l-trigger="input delay:300ms" />
+<div id="results"></div>
+
+<!-- Confirm before a destructive action, with a loading spinner -->
+<button l-delete="/items/42" l-target="#row-42" l-swap="outerHTML"
+        l-confirm="Delete this item?" l-indicator="#spinner">
+    Delete
+</button>
+<span id="spinner" style="display:none">Deleting…</span>
+```
+
+A `<form>` submits its own `FormData` as the request body (`GET` forms encode it into the query string
+instead, matching native HTML form semantics); a single `<input>`/`<select>`/`<textarea>` sends its own
+`name=value`. Every request carries an `X-LaughTale-Request: true` header so a Razor Page handler can
+tell a fragment request apart from a full-page navigation and return just the partial. While a request
+is in flight, every submit control in scope (`button[type="submit"]`, `input[type="submit"]`, a bare
+`<button>`) is disabled to prevent a double-submit, and both the form and the triggering element get a
+`data-lt-submitting="true"` attribute you can target in CSS for a busy/dimmed state — both are cleared
+automatically when the request settles, success or failure.
+
+## 7. Security Sandbox (Zero `eval()`)
 
 Unlike other template directive engines that rely on dangerous `new Function()` or `eval()` execution, LaughTale compiles all directive expressions through a **Strict AST Tokenizer Sandbox**:
-- **100% CSP Compliant**: Runs flawlessly under strict Content Security Policies with `unsafe-eval` disabled.
-- **Zero Prototype Pollution**: Prevents malicious access to `window`, `document.cookie`, `__proto__`, or constructor scopes.
+- **100% CSP Compliant**: Runs flawlessly under strict Content Security Policies with `unsafe-eval` disabled. Alpine.js and most of its peers require `unsafe-eval` in your CSP — LaughTale never does, at the parser level (there is no `eval`/`new Function` call anywhere in this engine's source, not just a policy that happens not to use one).
+- **Zero Prototype Pollution**: Prevents malicious access to `window`, `document.cookie`, `__proto__`, or constructor scopes, enforced independently at parse time (structural name blocklist) AND at evaluation time (global-escape name blocklist) — see `LaughTale.Client/src/directives/expression/GRAMMAR.md` in the source tree for the complete, fuzz-tested list of every blocked name and construct.
