@@ -2,6 +2,7 @@ import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts
 import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
 import { useFocusTrap } from '../composables/useFocusTrap';
+import { useDisclosure } from '../composables/useDisclosure';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import { getLucideIcon } from '../icons/lucide';
 import type { PatternDeclaration } from '../accessibility/patterns';
@@ -279,10 +280,20 @@ function initGlobalDialogDelegation(signal?: AbortSignal) {
     if (globalDelegationBound || typeof document === 'undefined') return;
     globalDelegationBound = true;
 
+    // ROADMAP.v5.md Part M "Adopt - State machine": this delegated handler used to duplicate the
+    // ENTIRE open/close DOM sequence (mask display, reflow, active class, body overflow) by hand, in
+    // three separate places, none of which called `trap.activate()`/`trap.deactivate()` - a REAL
+    // accessibility bug found retrofitting this, not a style issue: a dialog opened via a
+    // `data-dialog-target`/`data-dialog-open` trigger (or closed via the backdrop/close button) never
+    // had focus trapped inside it and never had focus restored to the trigger on close, unlike a
+    // dialog driven through the imperative `.open()/.close()/.toggle()` handle API, which always did.
+    // Routing every path here through the SAME per-instance `DIALOG_INSTANCE_KEY` handle
+    // (`doOpen`/`doClose`, now backed by `useDisclosure` below) closes that gap for every dialog on
+    // the page at once, not just newly-authored ones.
     document.addEventListener('click', (e) => {
         const target = e.target as HTMLElement;
         const trigger = target.closest<HTMLElement>('[data-dialog-target], [data-dialog-open]');
-        
+
         if (trigger) {
             e.preventDefault();
             const dialogId = trigger.getAttribute('data-dialog-target') || trigger.getAttribute('data-dialog-open');
@@ -290,20 +301,12 @@ function initGlobalDialogDelegation(signal?: AbortSignal) {
             if (dialogId) {
                 const dialogContainer = document.getElementById(dialogId);
                 const maskEl = dialogContainer?.querySelector<HTMLElement>('.p-dialog-mask');
-                if (maskEl) {
-                    if (pos) {
-                        const cleanPos = pos.toLowerCase().replace(/[^a-z]/g, '');
-                        maskEl.className = maskEl.className.replace(/p-dialog-pos-[a-z]+/g, '');
-                        maskEl.classList.add(`p-dialog-pos-${cleanPos}`);
-                    }
-                    maskEl.style.display = 'flex';
-                    // Force reflow for smooth scale/opacity animation
-                    void maskEl.offsetWidth;
-                    maskEl.classList.add('p-dialog-mask-active');
-                    if (maskEl.classList.contains('p-dialog-mask-modal')) {
-                        document.body.style.overflow = 'hidden';
-                    }
+                if (pos && maskEl) {
+                    const cleanPos = pos.toLowerCase().replace(/[^a-z]/g, '');
+                    maskEl.className = maskEl.className.replace(/p-dialog-pos-[a-z]+/g, '');
+                    maskEl.classList.add(`p-dialog-pos-${cleanPos}`);
                 }
+                (dialogContainer as any)?.[DIALOG_INSTANCE_KEY]?.open();
             }
             return;
         }
@@ -312,41 +315,25 @@ function initGlobalDialogDelegation(signal?: AbortSignal) {
         const closeBtn = target.closest<HTMLElement>('.p-dialog-close-button, [data-dialog-close]');
         if (closeBtn) {
             e.preventDefault();
-            const maskEl = closeBtn.closest<HTMLElement>('.p-dialog-mask');
-            if (maskEl) {
-                maskEl.classList.remove('p-dialog-mask-active');
-                const tClose = setTimeout(() => {
-                    if (!maskEl.classList.contains('p-dialog-mask-active')) {
-                        maskEl.style.display = 'none';
-                    }
-                }, 200);
-                signal?.addEventListener('abort', () => clearTimeout(tClose), { signal });
-                document.body.style.overflow = '';
-            }
+            const dialogContainer = closeBtn.closest<HTMLElement>('[data-island="dialog"]');
+            (dialogContainer as any)?.[DIALOG_INSTANCE_KEY]?.close();
             return;
         }
 
         // Dismissable mask backdrop click
         if (target.classList.contains('p-dialog-mask')) {
-            const container = target.closest<HTMLElement>('[data-island="dialog"]');
+            const dialogContainer = target.closest<HTMLElement>('[data-island="dialog"]');
             let dismissable = true;
-            if (container) {
+            if (dialogContainer) {
                 try {
-                    const props = JSON.parse(container.getAttribute('data-props') || '{}');
+                    const props = JSON.parse(dialogContainer.getAttribute('data-props') || '{}');
                     if (props.dismissableMask === false && props.modal === true) {
                         dismissable = false;
                     }
                 } catch {}
             }
             if (dismissable) {
-                target.classList.remove('p-dialog-mask-active');
-                const tMask = setTimeout(() => {
-                    if (!target.classList.contains('p-dialog-mask-active')) {
-                        target.style.display = 'none';
-                    }
-                }, 200);
-                signal?.addEventListener('abort', () => clearTimeout(tMask), { signal });
-                document.body.style.overflow = '';
+                (dialogContainer as any)?.[DIALOG_INSTANCE_KEY]?.close();
             }
         }
     }, { signal });
@@ -406,37 +393,44 @@ export default function DialogIsland(container: HTMLElement, props: DialogProps,
         signal: ctx?.signal
     });
 
-    // Single source of truth for open/close, reused by the initial `visible` prop, the Escape
-    // handler below, and the createHandle instance API above - previously each duplicated its own
-    // partial copy of this logic (the Escape handler alone had the full show/hide sequence).
-    function doOpen(): void {
-        maskEl!.style.display = 'flex';
-        void maskEl!.offsetWidth; // force reflow so the enter transition actually animates
-        maskEl!.classList.add('p-dialog-mask-active');
-        if (maskEl!.classList.contains('p-dialog-mask-modal')) {
-            document.body.style.overflow = 'hidden';
+    // ROADMAP.v5.md Part M "Adopt - State machine": single source of truth for open/close, now
+    // backed by the same `useDisclosure` guard every other retrofitted overlay uses (matching
+    // select.ts/tieredmenu.ts/context-menu.ts/popover.ts) instead of a bare `classList.contains(...)`
+    // check repeated at every call site - reused by the initial `visible` prop, the Escape handler
+    // below, the global delegation above, and the createHandle instance API.
+    const dialogDisclosure = useDisclosure({
+        onOpen: () => {
+            maskEl!.style.display = 'flex';
+            void maskEl!.offsetWidth; // force reflow so the enter transition actually animates
+            maskEl!.classList.add('p-dialog-mask-active');
+            if (maskEl!.classList.contains('p-dialog-mask-modal')) {
+                document.body.style.overflow = 'hidden';
+            }
+            trap.activate();
+        },
+        onClose: () => {
+            trap.deactivate();
+            maskEl!.classList.remove('p-dialog-mask-active');
+            const t = setTimeout(() => {
+                if (!maskEl!.classList.contains('p-dialog-mask-active')) {
+                    maskEl!.style.display = 'none';
+                }
+            }, 200);
+            ctx?.onCleanup?.(() => clearTimeout(t));
+            document.body.style.overflow = '';
         }
-        trap.activate();
+    });
+
+    function doOpen(): void {
+        dialogDisclosure.open();
     }
 
     function doClose(): void {
-        trap.deactivate();
-        maskEl!.classList.remove('p-dialog-mask-active');
-        const t = setTimeout(() => {
-            if (!maskEl!.classList.contains('p-dialog-mask-active')) {
-                maskEl!.style.display = 'none';
-            }
-        }, 200);
-        ctx?.onCleanup?.(() => clearTimeout(t));
-        document.body.style.overflow = '';
+        dialogDisclosure.close();
     }
 
     function doToggle(): void {
-        if (maskEl!.classList.contains('p-dialog-mask-active')) {
-            doClose();
-        } else {
-            doOpen();
-        }
+        dialogDisclosure.toggle();
     }
 
     const instance: DialogInstance = { open: doOpen, close: doClose, toggle: doToggle };
@@ -460,7 +454,7 @@ export default function DialogIsland(container: HTMLElement, props: DialogProps,
 
     // Per-island Escape Key Handler
     window.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && maskEl!.classList.contains('p-dialog-mask-active')) {
+        if (e.key === 'Escape' && dialogDisclosure.isOpen) {
             doClose();
         }
     }, { signal: ctx?.signal });

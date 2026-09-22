@@ -10,6 +10,7 @@ import { useFloatingPosition } from '../composables/useFloatingPosition';
 
 import { injectIslandStyle } from '../runtime/styles';
 import { useLocale } from '../composables/useLocale';
+import { useDisclosure } from '../composables/useDisclosure';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
@@ -104,6 +105,51 @@ export interface PopoverProps {
 let globalPopoverDelegationBound = false;
 let activePopoverCtrl: { update(): void; computePosition(): any; destroy(): void } | null = null;
 
+// ROADMAP.v5.md Part M "Adopt - State machine": popover.ts is architecturally a page-wide SINGLETON
+// (only one popover can ever be positioned/active at a time, tracked via the module-scoped
+// `activePopoverCtrl` above), unlike select.ts/tieredmenu.ts/context-menu.ts's per-instance state -
+// so this retrofit models "is the ONE global popover slot currently open" rather than per-island
+// state. Before this, open/close logic was duplicated across 5 separate call sites (delegated
+// trigger click, delegated close-button click, delegated outside-click, delegated Escape, and the
+// per-instance target-click listener in PopoverIsland below), each independently destroying
+// `activePopoverCtrl` and toggling the `.p-popover-active` class by hand - `openPopover`/
+// `closePopover`/`togglePopover` centralize that into one real implementation every call site now
+// shares, guarded by the same `useDisclosure` machine every other retrofitted overlay uses.
+let activePopoverEl: HTMLElement | null = null;
+
+const popoverDisclosure = useDisclosure({
+    onOpen: () => {
+        activePopoverEl?.classList.add('p-popover-active');
+    },
+    onClose: () => {
+        activePopoverCtrl?.destroy();
+        activePopoverCtrl = null;
+        activePopoverEl?.classList.remove('p-popover-active');
+        activePopoverEl = null;
+    }
+});
+
+function openPopover(popoverEl: HTMLElement, anchorEl: HTMLElement, placement: string = 'bottom', signal?: AbortSignal, isRtl?: boolean) {
+    if (popoverDisclosure.isOpen) {
+        popoverDisclosure.close(); // close whatever else was open first - only one popover slot exists
+    }
+    activePopoverEl = popoverEl;
+    positionPopover(popoverEl, anchorEl, placement, signal, isRtl);
+    popoverDisclosure.open();
+}
+
+function closePopover() {
+    popoverDisclosure.close();
+}
+
+function togglePopover(popoverEl: HTMLElement, anchorEl: HTMLElement, placement: string = 'bottom', signal?: AbortSignal, isRtl?: boolean) {
+    if (popoverDisclosure.isOpen && activePopoverEl === popoverEl) {
+        closePopover();
+    } else {
+        openPopover(popoverEl, anchorEl, placement, signal, isRtl);
+    }
+}
+
 function positionPopover(popoverEl: HTMLElement, targetEl: HTMLElement, preferredPlacement: string = 'bottom', signal?: AbortSignal, isRtl?: boolean) {
     if (activePopoverCtrl) {
         activePopoverCtrl.destroy();
@@ -168,25 +214,9 @@ function initGlobalPopoverDelegation(signal?: AbortSignal) {
             if (popoverId && targetAnchor) {
                 const popoverContainer = document.getElementById(popoverId);
                 const popoverEl = popoverContainer?.querySelector<HTMLElement>('.p-popover') || popoverContainer;
-                
-                if (popoverEl) {
-                    const isActive = popoverEl.classList.contains('p-popover-active');
-                    
-                    // Close any other open popovers
-                    document.querySelectorAll<HTMLElement>('.p-popover.p-popover-active').forEach(p => {
-                        if (p !== popoverEl) p.classList.remove('p-popover-active');
-                    });
 
-                    if (!isActive) {
-                        positionPopover(popoverEl, targetAnchor, 'bottom', signal);
-                        popoverEl.classList.add('p-popover-active');
-                    } else {
-                        if (activePopoverCtrl) {
-                            activePopoverCtrl.destroy();
-                            activePopoverCtrl = null;
-                        }
-                        popoverEl.classList.remove('p-popover-active');
-                    }
+                if (popoverEl) {
+                    togglePopover(popoverEl, targetAnchor, 'bottom', signal);
                 }
             }
             return;
@@ -196,39 +226,20 @@ function initGlobalPopoverDelegation(signal?: AbortSignal) {
         const closeBtn = target.closest<HTMLElement>('[data-popover-close], [data-popover-hide]');
         if (closeBtn) {
             e.preventDefault();
-            const popoverEl = closeBtn.closest<HTMLElement>('.p-popover');
-            if (popoverEl) {
-                if (activePopoverCtrl) {
-                    activePopoverCtrl.destroy();
-                    activePopoverCtrl = null;
-                }
-                popoverEl.classList.remove('p-popover-active');
-            }
+            closePopover();
             return;
         }
 
         // Outside click dismiss
         if (!target.closest('.p-popover')) {
-            document.querySelectorAll<HTMLElement>('.p-popover.p-popover-active').forEach(p => {
-                p.classList.remove('p-popover-active');
-            });
-            if (activePopoverCtrl) {
-                activePopoverCtrl.destroy();
-                activePopoverCtrl = null;
-            }
+            closePopover();
         }
     }, { signal });
 
     // Escape Key Handler
     window.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
-            document.querySelectorAll<HTMLElement>('.p-popover.p-popover-active').forEach(p => {
-                p.classList.remove('p-popover-active');
-            });
-            if (activePopoverCtrl) {
-                activePopoverCtrl.destroy();
-                activePopoverCtrl = null;
-            }
+            closePopover();
         }
     }, { signal });
 }
@@ -256,17 +267,7 @@ export default function PopoverIsland(container: HTMLElement, props: PopoverProp
         targetEl.addEventListener('click', (e: MouseEvent) => {
             e.preventDefault();
             e.stopPropagation();
-            const isActive = container.classList.contains('p-popover-active');
-            if (!isActive) {
-                positionPopover(container, targetEl, (props.placement as any) || 'bottom', ctx?.signal, locale.isRtl);
-                container.classList.add('p-popover-active');
-            } else {
-                if (activePopoverCtrl) {
-                    activePopoverCtrl.destroy();
-                    activePopoverCtrl = null;
-                }
-                container.classList.remove('p-popover-active');
-            }
+            togglePopover(container, targetEl, (props.placement as any) || 'bottom', ctx?.signal, locale.isRtl);
         }, { signal: ctx?.signal });
     }
 

@@ -1077,11 +1077,11 @@ survives internal changes — which is what makes `eject` a good idea rather tha
   after skipping 14 that duplicated a hand-written class), so **82 of 82** TagHelpers now reach the
   template method. Every capability parked on it — SSR, localization, RTL — inherits that reach.
 - **Adopt — State machine** *(Zag.js, XState)* for overlays. Ends the
-  `isOpen && !isDisabled && hasFocus` boolean soup. **[CLOSED (real infrastructure + 3 of ~18
+  `isOpen && !isDisabled && hasFocus` boolean soup. **[CLOSED (real infrastructure + 5 of ~18
   components fully migrated), this pass]** - the primitive itself is genuinely done and tested;
-  retrofitting the remaining ~15 overlay components (dialog, dropdown, tooltip, popover, drawer, ...)
-  is explicitly left as ongoing/opportunistic work, the same posture Part C's own "headless core" item
-  already takes, not silently claimed as finished.
+  retrofitting the remaining ~13 overlay components (dropdown, tooltip, drawer, ...) is explicitly
+  left as ongoing/opportunistic work, the same posture Part C's own "headless core" item already
+  takes, not silently claimed as finished.
   `runtime/state-machine.ts` (new) is a real, hand-written finite state machine - deliberately not the
   actual Zag.js/XState packages (both cited as prior art, not a literal dependency requirement; this
   repo's own `runtime/signals.ts` set the exact same "write the dependency-free equivalent" precedent
@@ -1136,7 +1136,43 @@ survives internal changes — which is what makes `eject` a good idea rather tha
   Page-Visibility tooling limitation already documented for Part J's Core Web Vitals work, not a new
   gap in this feature. The jsdom test suite (where `requestAnimationFrame` is correctly mocked, see
   `tests/setup.ts`) is the authoritative proof for that half instead, and passes cleanly.
-  Verified: `npm run typecheck`/`build` (bundle budgets unaffected), `npm test` (681/681).
+  **Two more components migrated in a follow-up pass, `popover.ts` and `dialog.ts`, each with its own
+  architecture and its own real bug found along the way:**
+  `popover.ts` is architecturally a page-wide singleton - only one popover can ever be open at a time,
+  tracked via a module-scoped controller - unlike the per-instance state every other retrofitted
+  component has. Before this, open/close/destroy logic was independently duplicated across 5 separate
+  call sites (delegated trigger click, delegated close-button, delegated outside-click, delegated
+  Escape, and the per-instance target-click listener), each hand-rolling its own
+  `activePopoverCtrl?.destroy()` + class-toggle sequence. Centralized behind one `useDisclosure`
+  instance and three shared helpers (`openPopover`/`closePopover`/`togglePopover`) that all 5 call
+  sites now share - a deduplication fix, not a new-bug fix, since the singleton design had no
+  "disabled" concept to guard. 8 new tests, including one proving the singleton invariant directly
+  (opening a second popover closes the first).
+  `dialog.ts` surfaced a real, pre-existing accessibility bug: it had two independent, previously
+  unrelated open/close code paths - the per-instance `doOpen`/`doClose`/`doToggle` handle (used by
+  `createHandle` and the imperative API), and a module-scoped global delegation handler for
+  `data-dialog-target`/`data-dialog-open`/`data-dialog-close`/backdrop-click. The second path
+  duplicated the entire mask/reflow/body-overflow DOM sequence by hand and **never called
+  `trap.activate()`/`trap.deactivate()`** - a dialog opened via a data-attribute trigger (the common
+  case in real markup, including this same Showcase's own demos) never had focus trapped inside it or
+  restored to the trigger on close, unlike one opened through the imperative handle API. Routing both
+  paths through the same per-instance handle, now backed by `useDisclosure`, closes that gap for every
+  dialog on the page at once. 8 new tests. Live-verified in a real browser against this project's own
+  Showcase (`/Components#sec-dialog`, the "Basic" demo's `data-dialog-target` trigger): clicking the
+  delegated trigger now moves focus inside the dialog (`document.activeElement` lands on the header
+  close button, confirmed via direct DOM inspection, not just a class check), and Escape both closes
+  the dialog and restores focus to the original trigger button.
+  A genuine test-infrastructure trap was found and fixed along the way, not a production bug: a test
+  asserting `document.activeElement` via `assert.equal`/`assert.strictEqual` that then *fails* causes
+  `node:test`'s failure-message formatting to run `util.inspect` over both operands - and happy-dom
+  elements carry deep circular references (`parentNode`/`ownerDocument`/`defaultView`/...) that make
+  that inspection hang and exhaust memory (`RangeError: Array buffer allocation failed`) after several
+  minutes, instead of failing cleanly in milliseconds like every other assertion in the suite. Fixed by
+  asserting DOM-identity comparisons with `assert.ok(a === b, message)` instead, which has no
+  actual/expected diff to format. Confirmed via a bundled, non-`tsx` reproduction
+  (`node --test dist/tests/components/dialog.test.js`) that this was not a `tsx`/test-runner-integration
+  artifact - it hangs identically under the project's real `npm test` pipeline.
+  Verified: `npm run typecheck`/`build` (bundle budgets unaffected), `npm test` (697/697).
 - **Adopt — Observer/signals** — **[CLOSED, already adopted before this session — stale]**.
   `runtime/signals.ts` already ships a real, dependency-free `signal`/`computed`/`effect`/`batch`
   implementation (Preact Signals/SolidJS family), retrofitted into `multiselect.ts`, `datatable.ts`,
