@@ -10,11 +10,9 @@
     <page-head suffix=" - LaughTale" />
     <link rel="icon" type="image/svg+xml" href="~/favicon.svg?v=3" />
     <link rel="shortcut icon" href="~/favicon.ico?v=3" />
-    <!-- Google Fonts: Geist & Inter (Preloaded non-blocking) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap"></noscript>
+    <!-- ROADMAP.v5.md Part H "font optimization": self-hosted via scripts/gen-fonts.mjs - no
+         request to fonts.googleapis.com/fonts.gstatic.com on any page load. -->
+    <link rel="stylesheet" href="~/css/fonts.generated.css" asp-append-version="true" />
     <!-- Aura-Inspired Stylesheet -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" lt-integrity="true" />
     <script>

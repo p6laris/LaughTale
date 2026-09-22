@@ -51,6 +51,10 @@ builder.Services.AddLaughTalePlugin(new IslandCacheTagsPlugin());
 // ROADMAP.v5.md Part B "Asset pipeline" (integrity manifest): enables lt-integrity on <script>/<link>.
 builder.Services.AddLaughTaleAssetIntegrity();
 
+// ROADMAP.v5.md Part H "image optimization": enables lt-optimize on <img> (auto width/height,
+// default lazy loading). See /ImageOptimizationDemo.
+builder.Services.AddLaughTaleImageOptimization();
+
 // ROADMAP.v5.md Part H "Deployment presets": a real health endpoint, not a stub - every target this
 // preset covers (Azure App Service, a container orchestrator, an IIS/ARR front end) wants one to
 // probe. Deliberately unauthenticated/uncached (no antiforgery, no [IslandPrivate] on the path) so an

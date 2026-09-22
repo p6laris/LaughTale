@@ -28,4 +28,11 @@
     <ProjectReference Include="..\LaughTale.Generators\LaughTale.Generators.csproj" />
   </ItemGroup>
 
+  <!-- ROADMAP.v5.md Part H "image optimization": real, tiny, valid image files (known exact
+       dimensions) for ImageDimensionReaderTests - not hand-crafted byte arrays, so the parser is
+       proven against files a real encoder actually produced. -->
+  <ItemGroup>
+    <None Include="TestAssets\**" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>
