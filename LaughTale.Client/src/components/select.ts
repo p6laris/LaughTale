@@ -15,6 +15,7 @@ import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtim
 import { signal, effect } from '../runtime/signals';
 import { patchList } from '../runtime/list-patch';
 import { useDebounce } from '../composables/useDebounce';
+import { useDisclosure } from '../composables/useDisclosure';
 import { useVirtualizer, type Virtualizer } from '../composables/useVirtualizer';
 import { useFloatingPosition } from '../composables/useFloatingPosition';
 import { useFormField } from '../composables/useFormField';
@@ -606,14 +607,19 @@ export default function SelectIsland(container: HTMLElement, props: SelectProps,
     // State (ROADMAP.v5.md Part I/J signals retrofit - see multiselect.ts/datatable.ts/autocomplete.ts
     // for the established pattern this mirrors). `selectedValues` and `filterQuery` are signals, written
     // immutably at every former mutation site; the effects registered at the bottom of this file replace
-    // every one of the old manual `render()` calls. `isOpen` stays a plain variable exactly as it was:
-    // `toggleOverlay()` already does its own targeted DOM updates (classList/aria-expanded/floating
-    // position) and never called `render()`, so it isn't part of the problem this retrofit fixes -
-    // matching autocomplete.ts's own decision to leave `highlightedIndex` alone.
+    // every one of the old manual `render()` calls.
     const selectedValues = signal<any[]>(initialSelectedValues);
     const filterQuery = signal('');
 
-    let isOpen = false;
+    // ROADMAP.v5.md Part M "Adopt - State machine for overlays": `isOpen` used to be a raw variable,
+    // with every mutation site duplicating its own `if (isDisabled || isReadonly) return;` guard by
+    // hand (this component's own former version of the "isOpen && !isDisabled" boolean soup the
+    // roadmap names). `useDisclosure`'s `disabled` option makes that guard intrinsic to the
+    // CLOSED -> OPEN transition itself - real behavior fix found migrating this, not just a
+    // refactor: the old early-return blocked toggleOverlay(false) too, meaning a select that became
+    // disabled while its overlay was already open could never be closed through this path again;
+    // `useDisclosure` never guards close(), so that's no longer possible.
+    const disclosure = useDisclosure({ disabled: () => isDisabled || isReadonly });
 
     function isSelected(val: any): boolean {
         return selectedValues().some(v => String(v) === String(val) || (typeof v === 'object' && v?.value === val));
@@ -902,12 +908,15 @@ export default function SelectIsland(container: HTMLElement, props: SelectProps,
     let floatingHandle: { update: () => void } | null = null;
 
     function toggleOverlay(open?: boolean) {
-        if (isDisabled || isReadonly) return;
-        isOpen = open !== undefined ? open : !isOpen;
+        if (open === undefined) {
+            disclosure.toggle();
+        } else {
+            disclosure.setOpen(open);
+        }
         const overlay = container.querySelector<HTMLElement>('.p-select-overlay');
         const chevron = container.querySelector('.p-select-dropdown');
 
-        if (isOpen) {
+        if (disclosure.isOpen) {
             container.classList.add('is-open');
             overlay?.classList.add('is-visible');
             container.setAttribute('aria-expanded', 'true');
@@ -954,18 +963,18 @@ export default function SelectIsland(container: HTMLElement, props: SelectProps,
             size !== 'normal' ? `size-${size}` : '',
             isInvalid ? 'is-invalid' : '',
             isDisabled ? 'is-disabled' : '',
-            isOpen ? 'is-open' : ''
+            disclosure.isOpen ? 'is-open' : ''
         ].filter(Boolean).join(' ');
 
         applyPart(container, 'root', rootClasses, props.pt, props.studioOverrides);
         container.setAttribute('tabindex', isDisabled ? '-1' : '0');
         container.setAttribute('role', 'combobox');
-        container.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        container.setAttribute('aria-expanded', disclosure.isOpen ? 'true' : 'false');
         container.setAttribute('aria-haspopup', 'listbox');
         container.setAttribute('aria-controls', 'p-select-overlay');
 
         const triggerPart = resolvePart('trigger', 'p-select-trigger-wrap', props.pt, props.studioOverrides);
-        const panelPart = resolvePart('panel', `p-select-overlay ${isOpen ? 'is-visible' : ''}`, props.pt, props.studioOverrides);
+        const panelPart = resolvePart('panel', `p-select-overlay ${disclosure.isOpen ? 'is-visible' : ''}`, props.pt, props.studioOverrides);
         const listPart = resolvePart('list', 'p-select-list', props.pt, props.studioOverrides);
 
         formField.detach();
@@ -1117,12 +1126,12 @@ export default function SelectIsland(container: HTMLElement, props: SelectProps,
         // Keyboard navigation on container
         container.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown') {
-                if (!isOpen) {
+                if (!disclosure.isOpen) {
                     e.preventDefault();
                     toggleOverlay(true);
                 }
             } else if (e.key === 'Escape') {
-                if (isOpen) {
+                if (disclosure.isOpen) {
                     e.preventDefault();
                     toggleOverlay(false);
                 }
@@ -1134,7 +1143,7 @@ export default function SelectIsland(container: HTMLElement, props: SelectProps,
         if (typeof document !== 'undefined') {
             document.addEventListener('click', (e) => {
                 if (!container.contains(e.target as Node)) {
-                    if (isOpen) toggleOverlay(false);
+                    if (disclosure.isOpen) toggleOverlay(false);
                 }
             }, { signal: ctx?.signal });
         }

@@ -50,6 +50,27 @@ describe('Select Signals + patchList Retrofit Suite (ROADMAP.v5.md Part I/J)', (
         document.body.appendChild(container);
     });
 
+    describe('Disabled guard (ROADMAP.v5.md Part M "Adopt - State machine")', () => {
+        it('a disabled select cannot be opened by clicking the trigger', () => {
+            SelectIsland(container, { options: flatOptions, disabled: true });
+
+            container.click();
+
+            const overlay = container.querySelector<HTMLElement>('.p-select-overlay')!;
+            assert.equal(overlay.classList.contains('is-visible'), false, 'toggleOverlay must be a no-op while disabled - the guard is now intrinsic to the open transition, not a per-call-site check');
+            assert.equal(container.getAttribute('aria-expanded'), 'false');
+        });
+
+        it('an enabled select opens normally, proving the guard only blocks the disabled case', () => {
+            SelectIsland(container, { options: flatOptions, disabled: false });
+
+            container.click();
+
+            const overlay = container.querySelector<HTMLElement>('.p-select-overlay')!;
+            assert.equal(overlay.classList.contains('is-visible'), true);
+        });
+    });
+
     describe('Single-select', () => {
         it('picking an option updates the trigger label and closes the overlay', () => {
             SelectIsland(container, { options: flatOptions });

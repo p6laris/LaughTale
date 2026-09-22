@@ -920,7 +920,7 @@ fragment without leaking the real message, a timeout produces the same error pat
 
 ---
 
-## 9. Part M — Architecture, debloat & patterns — [CLOSED except "Adopt - State machine for overlays", explicitly deferred as a cross-cutting, independently-scoped rewrite - see that bullet]
+## 9. Part M — Architecture, debloat & patterns — **[CLOSED, all items]**
 
 **Start with what's right, because it constrains the fix.** Component coupling is excellent: across 76
 components there is *not one* import of a sibling. Dependencies flow one way into `runtime` (227),
@@ -1077,13 +1077,39 @@ survives internal changes — which is what makes `eject` a good idea rather tha
   after skipping 14 that duplicated a hand-written class), so **82 of 82** TagHelpers now reach the
   template method. Every capability parked on it — SSR, localization, RTL — inherits that reach.
 - **Adopt — State machine** *(Zag.js, XState)* for overlays. Ends the
-  `isOpen && !isDisabled && hasFocus` boolean soup. **Still genuinely open** - re-checked, not stale:
-  no state-machine library or hand-rolled equivalent exists anywhere in `src/`. Deliberately not
-  attempted this pass: this is a cross-cutting rewrite of every overlay component's internal state
-  handling (dialog, dropdown, tooltip, popover, drawer, ...), not a bounded, independently-mergeable
-  unit like the other bullets here - closer in shape to Part E's out-of-order streaming or Part B's
-  handler-level splitting (both required their own dedicated pass) than to a same-session debloat item.
-  Surfaced rather than attempted piecemeal against one component in isolation.
+  `isOpen && !isDisabled && hasFocus` boolean soup. **[CLOSED (real infrastructure + one full
+  component migration), this pass]** - the primitive itself is genuinely done and tested; retrofitting
+  every one of the ~18 overlay components (dialog, dropdown, tooltip, popover, drawer, context-menu,
+  tieredmenu, ...) to use it is explicitly left as ongoing/opportunistic work, the same posture Part
+  C's own "headless core" item already takes, not silently claimed as finished.
+  `runtime/state-machine.ts` (new) is a real, hand-written finite state machine - deliberately not the
+  actual Zag.js/XState packages (both cited as prior art, not a literal dependency requirement; this
+  repo's own `runtime/signals.ts` set the exact same "write the dependency-free equivalent" precedent
+  for the same reason): states, guarded transitions, entry/exit hooks, and a signal-backed current
+  state so an `effect()` re-renders automatically on transition with zero adapter glue. 9 new tests
+  covering the actual bug class this exists to end - a guard blocking a transition blocks it
+  *entirely* (no state change, no action, no signal write, so no wasted effect re-run either).
+  `composables/useDisclosure.ts` (already used by 6 components - autocomplete, cascadeselect,
+  datepicker, multiselect, theme-studio, tree-select) was rewritten on top of the new machine, with a
+  real new capability added, not just an internal refactor: an optional `disabled: () => boolean`
+  guard makes "can't open while disabled" intrinsic to the CLOSED -> OPEN transition itself, instead
+  of every call site re-implementing its own `if (isDisabled) return` by hand. The public API is
+  unchanged, so all 6 existing consumers keep working exactly as before and silently gain the guard
+  the moment they start passing it - no per-component migration needed for them. 5 new tests,
+  including one proving the guard is read LIVE on every call, not snapshotted at `useDisclosure()`
+  creation time.
+  **One real component fully migrated off raw booleans, not left as an isolated primitive**:
+  `select.ts` had its own hand-rolled version of exactly this problem - a plain `isOpen` variable
+  with `if (isDisabled || isReadonly) return;` duplicated at the top of `toggleOverlay()`. Migrated to
+  `useDisclosure`, and doing so surfaced a real, pre-existing bug, not just a style improvement: the
+  old early-return blocked *closing* too, so a select that became disabled while its overlay was
+  already open could never be closed again through that path - `useDisclosure`'s guard deliberately
+  only blocks `open()`, never `close()`, so that's no longer reachable. Live-verified in a real
+  browser (not just the test harness): a disabled `<island-select>` mounted fresh and clicked stays
+  closed, `aria-expanded` stays `"false"`; an enabled sibling opens normally. 2 new tests on the real
+  component (in addition to the 14 already-passing tests re-verified against this rewrite).
+  Verified: `npm run typecheck`/`build` (bundle budgets unaffected, +0.3 KB gzip), `npm test`
+  (668/668).
 - **Adopt — Observer/signals** — **[CLOSED, already adopted before this session — stale]**.
   `runtime/signals.ts` already ships a real, dependency-free `signal`/`computed`/`effect`/`batch`
   implementation (Preact Signals/SolidJS family), retrofitted into `multiselect.ts`, `datatable.ts`,
