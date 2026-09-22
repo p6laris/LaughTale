@@ -50,6 +50,7 @@ export { measureHydration, measureThroughput, recordHydrationMetric, getHydratio
 export { PrefetchManager, prefetchManager, type CachedResponse, type PrefetchOptions } from './router/prefetch';
 export { prefetchIslandChunk, prefetchIslandChunksInHtml } from './router/chunk-prefetch';
 export { reportHydrationTelemetry, wireLaughTaleTelemetryReporting, type HydrationDiagnosticDetail } from './runtime/telemetry';
+export { observeCoreWebVitals, wireLaughTaleWebVitalsReporting, type WebVitalMetric } from './runtime/web-vitals';
 export { extractIconSymbols, generateSubsetSprite, computeSpriteHash } from './icons/subset-generator';
 export { announce, clearAnnouncements, getAnnouncerElement, type AnnouncePriority } from './accessibility/announcer';
 export { applyAriaAttributes, setRovingTabindex, handleRovingKeydown } from './accessibility/aria';

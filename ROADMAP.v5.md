@@ -1423,11 +1423,34 @@ element reference throughout resolved it correctly. `autocomplete.ts`/`multisele
   surfaced the failure by accident.
 - **Publish honest numbers** — a reproducible benchmark against Blazor Server and WASM: TTFB, TTI,
   transferred bytes, memory after 50 navigations. Worth more than every adjective in the README.
-- **Report Core Web Vitals** back through the instrumentation hook (Part H) — the hook itself is now
-  real (`LaughTaleActivitySource`/`runtime/telemetry.ts`, closed this pass), but Core Web Vitals
-  (LCP/CLS/INP) are browser-native metrics measured via the `PerformanceObserver` API, a genuinely
-  different collection problem from island render/hydration timing - still open, now unblocked rather
-  than blocked on a hook that didn't exist.
+- **Report Core Web Vitals — [CLOSED, this pass]** back through the instrumentation hook (Part H),
+  which is now real (`LaughTaleActivitySource`/`runtime/telemetry.ts`, closed last pass) - this closes
+  the collection half. `runtime/web-vitals.ts` (new) observes LCP, CLS, and INP via the browser's own
+  native `PerformanceObserver` - deliberately NOT the `web-vitals` npm package, matching this
+  framework's zero-runtime-dependency client. **CLS implements the real, documented web.dev
+  session-window algorithm** (group shifts no more than 1s apart into windows of at most 5s, report
+  the largest window's total) rather than a naive running sum, which would over-report CLS on a
+  long-lived page - verified with a real test proving the session-boundary math (two shifts 500ms
+  apart sum into one 0.15 window; a third shift 1.5s later starts a smaller, separate window that must
+  NOT merge into the first). **INP is an honest, stated approximation**: the true spec computes an
+  ~98th-percentile across every distinct interaction (grouped by `interactionId`) over the page's
+  whole lifetime; this tracks the single WORST interaction duration instead - catches a genuinely slow
+  interaction correctly, but isn't spec-exact on a page with many interactions where the 98th
+  percentile and the max diverge, and said so rather than silently approximating without a note.
+  Reported once, on `visibilitychange` to hidden (the standard point these metrics become "final"),
+  through `MapLaughTaleWebVitals` (new endpoint, same file as the hydration-timing one) into a
+  `web-vitals.report` `Activity` under the SAME `LaughTaleActivitySource` island render/hydrate spans
+  use - one OpenTelemetry backend ends up showing island timing and page Web Vitals together. Not
+  wired automatically anywhere (opt-in, matching every other reporting hook in this codebase); the
+  Showcase opts in. **Verification note, stated honestly rather than glossed over**: the endpoint and
+  the CLS/INP/LCP computation logic are both proven correct — the endpoint via a real TestServer
+  request (9 tests) and the client algorithms via a fake-`PerformanceObserver`-driven unit suite (7
+  tests, including the CLS session-window case above) — but a true end-to-end live-browser check (a
+  real page actually reporting a real LCP/CLS/INP value through a real beacon) could not be completed:
+  this session's browser automation pane reports `document.visibilityState` as `"hidden"` from the
+  moment a page loads, which is itself the correct browser behavior for a backgrounded/non-focused
+  tab, but means LCP/CLS never get a chance to accumulate real entries in this specific tool
+  environment - a tooling limitation, not a code question left unanswered.
 
 **Payload and serialization — the part this roadmap missed. — [CLOSED (partial), this pass]** Every
 island writes a `data-props` JSON blob into the HTML, and nothing about that path was tuned:

@@ -29,7 +29,11 @@ public class IslandTelemetryEndpointTests
             .Configure(app =>
             {
                 app.UseRouting();
-                app.UseEndpoints(endpoints => endpoints.MapLaughTaleIslandTelemetry());
+                app.UseEndpoints(endpoints =>
+                {
+                    endpoints.MapLaughTaleIslandTelemetry();
+                    endpoints.MapLaughTaleWebVitals();
+                });
             });
 
         var server = new TestServer(builder);
@@ -139,5 +143,105 @@ public class IslandTelemetryEndpointTests
         {
             listener.Dispose();
         }
+    }
+
+    [Fact]
+    public async Task PostWebVitals_ValidLcp_CreatesTaggedActivity()
+    {
+        var (_, client) = BuildServer();
+
+        var recorded = new List<Activity>();
+        var listener = new ActivityListener
+        {
+            ShouldListenTo = source => source.Name == LaughTaleActivitySource.Name,
+            Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllData,
+            ActivityStopped = activity => { if (activity.OperationName == "web-vitals.report") recorded.Add(activity); }
+        };
+        ActivitySource.AddActivityListener(listener);
+
+        try
+        {
+            var body = new StringContent("{\"name\":\"LCP\",\"value\":2350.75}", Encoding.UTF8, "application/json");
+            var response = await client.PostAsync("/_laughtale/telemetry/web-vitals", body);
+
+            response.EnsureSuccessStatusCode();
+            var activity = Assert.Single(recorded);
+            Assert.Equal("LCP", activity.GetTagItem("web_vitals.metric"));
+            Assert.Equal(2350.75, activity.GetTagItem("web_vitals.value"));
+        }
+        finally
+        {
+            listener.Dispose();
+        }
+    }
+
+    [Theory]
+    [InlineData("CLS")]
+    [InlineData("INP")]
+    public async Task PostWebVitals_ValidClsOrInp_CreatesTaggedActivity(string metricName)
+    {
+        var (_, client) = BuildServer();
+
+        var recorded = new List<Activity>();
+        var listener = new ActivityListener
+        {
+            ShouldListenTo = source => source.Name == LaughTaleActivitySource.Name,
+            Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllData,
+            ActivityStopped = activity => { if (activity.OperationName == "web-vitals.report") recorded.Add(activity); }
+        };
+        ActivitySource.AddActivityListener(listener);
+
+        try
+        {
+            var body = new StringContent($"{{\"name\":\"{metricName}\",\"value\":10}}", Encoding.UTF8, "application/json");
+            var response = await client.PostAsync("/_laughtale/telemetry/web-vitals", body);
+
+            response.EnsureSuccessStatusCode();
+            var activity = Assert.Single(recorded);
+            Assert.Equal(metricName, activity.GetTagItem("web_vitals.metric"));
+        }
+        finally
+        {
+            listener.Dispose();
+        }
+    }
+
+    [Fact]
+    public async Task PostWebVitals_UnrecognizedMetricName_ReturnsNoContent_CreatesNoActivity()
+    {
+        var (_, client) = BuildServer();
+
+        var recorded = new List<Activity>();
+        var listener = new ActivityListener
+        {
+            ShouldListenTo = source => source.Name == LaughTaleActivitySource.Name,
+            Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllData,
+            ActivityStopped = activity => { if (activity.OperationName == "web-vitals.report") recorded.Add(activity); }
+        };
+        ActivitySource.AddActivityListener(listener);
+
+        try
+        {
+            var body = new StringContent("{\"name\":\"NOT_A_REAL_METRIC\",\"value\":10}", Encoding.UTF8, "application/json");
+            var response = await client.PostAsync("/_laughtale/telemetry/web-vitals", body);
+
+            Assert.Equal(System.Net.HttpStatusCode.NoContent, response.StatusCode);
+            Assert.Empty(recorded);
+        }
+        finally
+        {
+            listener.Dispose();
+        }
+    }
+
+    [Fact]
+    public async Task PostWebVitals_MalformedJson_ReturnsNoContent_DoesNotThrow()
+    {
+        var (_, client) = BuildServer();
+
+        var body = new StringContent("not json", Encoding.UTF8, "application/json");
+        var response = await client.PostAsync("/_laughtale/telemetry/web-vitals", body);
+
+        Assert.Equal(System.Net.HttpStatusCode.NoContent, response.StatusCode);
     }
 }

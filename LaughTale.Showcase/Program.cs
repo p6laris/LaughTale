@@ -101,6 +101,9 @@ app.MapHealthChecks("/healthz");
 // into an island.hydrate Activity under LaughTaleActivitySource, alongside every island.render span
 // IslandTagHelperBase already creates server-side.
 app.MapLaughTaleIslandTelemetry();
+// ROADMAP.v5.md Part J "Report Core Web Vitals": accepts client-reported LCP/CLS/INP, unblocked now
+// that the instrumentation hook above is real.
+app.MapLaughTaleWebVitals();
 app.MapRazorPages();
 
 app.Run();

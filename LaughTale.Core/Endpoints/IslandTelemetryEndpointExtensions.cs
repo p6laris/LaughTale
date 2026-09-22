@@ -22,6 +22,10 @@ public static class IslandTelemetryEndpointExtensions
 {
     private sealed record HydrationTelemetryPayload(string Name, double DurationMs, string? Strategy);
 
+    private sealed record WebVitalPayload(string Name, double Value);
+
+    private static readonly string[] KnownWebVitalNames = ["LCP", "CLS", "INP"];
+
     /// <summary>
     /// Maps a POST endpoint accepting a small <c>{ name, durationMs, strategy }</c> JSON body
     /// (matching <c>navigator.sendBeacon</c>'s fire-and-forget shape - no antiforgery token is
@@ -71,6 +75,52 @@ public static class IslandTelemetryEndpointExtensions
                 activity?.SetTag("island.hydrate.strategy", payload.Strategy);
             }
             activity?.SetEndTime(now.UtcDateTime);
+
+            return Results.NoContent();
+        });
+
+        return endpoints;
+    }
+
+    /// <summary>
+    /// Maps a POST endpoint accepting a small <c>{ name, value }</c> JSON body (from
+    /// <c>web-vitals.ts</c>'s <c>wireLaughTaleWebVitalsReporting</c>) and turns it into a
+    /// <c>web-vitals.report</c> <see cref="Activity"/> under the same <see cref="LaughTaleActivitySource"/>
+    /// island render/hydrate spans use - one OpenTelemetry backend ends up showing island timing and
+    /// page-level Core Web Vitals together. <c>name</c> must be one of <c>LCP</c>/<c>CLS</c>/<c>INP</c>;
+    /// anything else is silently dropped rather than polluting a trace with an unrecognized metric
+    /// name a client could send.
+    /// </summary>
+    public static IEndpointRouteBuilder MapLaughTaleWebVitals(
+        this IEndpointRouteBuilder endpoints,
+        string pattern = "/_laughtale/telemetry/web-vitals")
+    {
+        ArgumentNullException.ThrowIfNull(endpoints);
+        ArgumentNullException.ThrowIfNull(pattern);
+
+        endpoints.MapPost(pattern, async (HttpContext context) =>
+        {
+            WebVitalPayload? payload;
+            try
+            {
+                payload = await JsonSerializer.DeserializeAsync<WebVitalPayload>(
+                    context.Request.Body,
+                    new JsonSerializerOptions(JsonSerializerDefaults.Web),
+                    context.RequestAborted);
+            }
+            catch (JsonException)
+            {
+                return Results.NoContent();
+            }
+
+            if (payload is null || Array.IndexOf(KnownWebVitalNames, payload.Name) < 0 || payload.Value < 0)
+            {
+                return Results.NoContent();
+            }
+
+            using var activity = LaughTaleActivitySource.Source.StartActivity("web-vitals.report", ActivityKind.Client);
+            activity?.SetTag("web_vitals.metric", payload.Name);
+            activity?.SetTag("web_vitals.value", payload.Value);
 
             return Results.NoContent();
         });
