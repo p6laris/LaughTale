@@ -17,6 +17,7 @@ import { LucideIcons, getLucideIcon } from '../icons/lucide';
 import { getBrandMarkSvg } from '../icons/decorative-svgs';
 import { injectIslandStyle } from '../runtime/styles';
 import { useFocusTrap } from '../composables/useFocusTrap';
+import { useDisclosure } from '../composables/useDisclosure';
 import { useLocale } from '../composables/useLocale';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
@@ -1684,7 +1685,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps, ctx?
         const sidebarWidth = isOpen ? width : (collapsible === 'icon' ? '3.5rem' : '0rem');
 
         const sidebarHtml = `
-            <aside class="${sidebarClasses}" style="width: ${sidebarWidth};" data-sidebar-root role="dialog" aria-modal="true">
+            <aside class="${sidebarClasses}" style="width: ${sidebarWidth};" data-sidebar-root role="${overlay && isOpen ? 'dialog' : 'navigation'}" ${overlay && isOpen ? 'aria-modal="true"' : ''}>
                 <div class="p-sidebar-aside">
                     <div class="p-sidebar-panel">
                         <div class="p-sidebar-header">
@@ -1757,16 +1758,14 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps, ctx?
         container.querySelectorAll('[data-sidebar-toggle]').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                isOpen = !isOpen;
-                updateSidebarClasses();
+                sidebarDisclosure.toggle();
             }, { signal: ctx?.signal });
         });
 
         // Global Event Hook for App Shell Trigger Button
         if (isAppMode) {
             const onAppToggle = () => {
-                isOpen = !isOpen;
-                updateSidebarClasses();
+                sidebarDisclosure.toggle();
             };
             document.removeEventListener('app-sidebar:toggle', (window as any).__appSidebarUnifiedHandler);
             (window as any).__appSidebarUnifiedHandler = onAppToggle;
@@ -1789,8 +1788,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps, ctx?
         // Backdrop click dismisses smoothly
         container.querySelectorAll('[data-sidebar-backdrop]').forEach(bd => {
             bd.addEventListener('click', () => {
-                isOpen = false;
-                updateSidebarClasses();
+                sidebarDisclosure.close();
             }, { signal: ctx?.signal });
         });
 
@@ -1799,8 +1797,7 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps, ctx?
         if (mainEl) {
             mainEl.addEventListener('click', (e) => {
                 if (overlay && isOpen && !(e.target as HTMLElement).closest('[data-sidebar-toggle]')) {
-                    isOpen = false;
-                    updateSidebarClasses();
+                    sidebarDisclosure.close();
                 }
             }, { signal: ctx?.signal });
         }
@@ -1909,16 +1906,10 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps, ctx?
             const aside = container.querySelector('[data-sidebar-root]');
             if (aside) {
                 aside.addEventListener('mouseenter', () => {
-                    if (!isOpen) {
-                        isOpen = true;
-                        updateSidebarClasses();
-                    }
+                    sidebarDisclosure.open();
                 }, { signal: ctx?.signal });
                 aside.addEventListener('mouseleave', () => {
-                    if (isOpen) {
-                        isOpen = false;
-                        updateSidebarClasses();
-                    }
+                    sidebarDisclosure.close();
                 }, { signal: ctx?.signal });
             }
         }
@@ -2034,26 +2025,68 @@ function renderCompoundSidebar(container: HTMLElement, props: SidebarProps, ctx?
     }
 
     function render() {
-        container.setAttribute('role', 'dialog');
-        container.setAttribute('aria-modal', 'true');
         container.setAttribute('aria-labelledby', (props as any).ariaLabelledby || 'Sidebar');
         setHtml(container, unsafe(renderComponent()));
         wireEvents();
         restoreScrollAndActiveItem();
+        syncModalSemantics();
     }
-
-    render();
 
     const trap = useFocusTrap(container, {
         autoFocus: false,
         restoreFocus: true,
         signal: ctx?.signal
     });
-    trap.activate();
+
+    // ROADMAP.v5.md Part M "Adopt - State machine": `trap.activate()` used to run unconditionally at
+    // mount, regardless of `overlay`/`isOpen` - a real, site-wide bug, not a style issue. This same
+    // component renders the app's own persistent left-navigation sidebar (`isAppMode`, see the file
+    // header), which is a permanently-docked landmark (`overlay: false` by default), not a modal - yet
+    // it was unconditionally given `role="dialog"`/`aria-modal="true"` and a focus trap, meaning Tab
+    // could never leave the nav sidebar to reach the rest of the page on ANY page of the site. Per
+    // WAI-ARIA and this codebase's own Invariant I3 (already documented for non-modal overlays like
+    // popover/menu/context-menu), only a genuinely modal OVERLAY sidebar - a mobile offcanvas drawer
+    // with a backdrop, while open - should trap focus or claim dialog semantics. Centralizing "is this
+    // sidebar currently acting as a modal overlay" behind `useDisclosure` and re-deriving
+    // role/aria-modal/trap state from it on every open/close and every re-render closes that gap.
+    function syncModalSemantics() {
+        const modal = overlay && isOpen;
+        const aside = container.querySelector<HTMLElement>('[data-sidebar-root]');
+        for (const el of [container, aside]) {
+            if (!el) continue;
+            el.setAttribute('role', modal ? 'dialog' : 'navigation');
+            if (modal) {
+                el.setAttribute('aria-modal', 'true');
+            } else {
+                el.removeAttribute('aria-modal');
+            }
+        }
+        if (modal) {
+            trap.activate();
+        } else {
+            trap.deactivate();
+        }
+    }
+
+    const sidebarDisclosure = useDisclosure({
+        defaultIsOpen: isOpen,
+        onOpen: () => {
+            isOpen = true;
+            updateSidebarClasses();
+            syncModalSemantics();
+        },
+        onClose: () => {
+            isOpen = false;
+            updateSidebarClasses();
+            syncModalSemantics();
+        }
+    });
+
+    render();
 
     window.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            trap.deactivate();
+        if (e.key === 'Escape' && overlay && isOpen) {
+            sidebarDisclosure.close();
         }
     }, { signal: ctx?.signal });
 }

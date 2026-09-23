@@ -124,9 +124,15 @@ describe('Focus Containment Suite (T033–T037 / US3)', () => {
         const container = document.createElement('div');
         document.body.appendChild(container);
 
+        // ROADMAP.v5.md Part M: `overlay: true` is required to actually put the sidebar into modal
+        // mode - a docked (non-overlay) sidebar, the default, is a persistent navigation landmark and
+        // must NOT trap focus (see sidebar.test.ts). This test's own name promises "modal mode", so it
+        // must ask for it explicitly rather than relying on the trap firing unconditionally.
         SidebarIsland(container, {
             variant: 'sidebar',
-            position: 'left'
+            position: 'left',
+            overlay: true,
+            open: true
         } as any);
 
         const focusable = container.querySelector<HTMLElement>('button, a[href]');

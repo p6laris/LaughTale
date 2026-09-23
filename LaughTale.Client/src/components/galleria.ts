@@ -3,6 +3,7 @@ import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
 import { LucideIcons } from '../icons/lucide';
 import { useFocusTrap } from '../composables/useFocusTrap';
+import { useDisclosure } from '../composables/useDisclosure';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
@@ -344,8 +345,10 @@ export default function GalleriaIsland(container: HTMLElement, props: GalleriaPr
             </div>
         ` : '';
 
+        const isModal = galleriaDisclosure.isOpen;
+
         setHtml(container, html`
-            <div class="p-galleria p-component ${props.class || ''}" role="dialog" aria-modal="true" aria-labelledby="galleria-caption" style="${props.style || ''}">
+            <div class="p-galleria p-component ${props.class || ''}" ${attr('role', isModal ? 'dialog' : undefined)} ${attr('aria-modal', isModal ? 'true' : undefined)} aria-labelledby="galleria-caption" style="${props.style || ''}">
                 <div class="p-galleria-item-wrapper">
                     <div class="p-galleria-item-container">
                         <div class="p-galleria-item">
@@ -434,21 +437,55 @@ export default function GalleriaIsland(container: HTMLElement, props: GalleriaPr
         startAutoplay();
     }
 
-    render();
-    startAutoplay();
-
     const trap = useFocusTrap(container, {
         autoFocus: false,
         restoreFocus: true,
         signal: ctx?.signal
     });
-    if (props.fullScreen || (props as any).FullScreen || props.visible || (props as any).Visible) {
-        trap.activate();
+
+    // ROADMAP.v5.md Part M "Adopt - State machine": the rendered markup used to hardcode
+    // `role="dialog" aria-modal="true"` unconditionally, regardless of `fullScreen`/`visible` - a real
+    // inconsistency with the focus trap right below it, which DID correctly gate `trap.activate()` on
+    // that same condition. A plain inline galleria (the common case: a carousel embedded in a page,
+    // not a fullscreen lightbox) claimed modal dialog semantics to assistive tech while never actually
+    // trapping focus. Separately, the Escape handler called `trap.deactivate()` directly without
+    // touching the role/aria-modal state at all, so even a genuine fullscreen galleria kept announcing
+    // itself as an active modal dialog after Escape had already released its focus trap. Centralizing
+    // "is this currently acting as a modal lightbox" behind `useDisclosure` fixes both: role/aria-modal
+    // and the trap now always agree, in the initial render and after Escape alike.
+    function syncModalAttrs() {
+        const root = container.querySelector<HTMLElement>('.p-galleria');
+        if (!root) return;
+        if (galleriaDisclosure.isOpen) {
+            root.setAttribute('role', 'dialog');
+            root.setAttribute('aria-modal', 'true');
+        } else {
+            root.removeAttribute('role');
+            root.removeAttribute('aria-modal');
+        }
     }
+
+    const galleriaDisclosure = useDisclosure({
+        defaultIsOpen: !!(props.fullScreen || (props as any).FullScreen || props.visible || (props as any).Visible),
+        onOpen: () => {
+            trap.activate();
+            syncModalAttrs();
+        },
+        onClose: () => {
+            trap.deactivate();
+            syncModalAttrs();
+        }
+    });
+    // `defaultIsOpen` sets the machine's initial state directly, without running the OPEN transition's
+    // own `onOpen` action - so a galleria that starts in modal mode needs its trap activated explicitly.
+    if (galleriaDisclosure.isOpen) trap.activate();
+
+    render();
+    startAutoplay();
 
     window.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
-            trap.deactivate();
+            galleriaDisclosure.close();
         }
     }, { signal: ctx?.signal });
 

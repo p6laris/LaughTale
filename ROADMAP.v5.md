@@ -1077,11 +1077,11 @@ survives internal changes — which is what makes `eject` a good idea rather tha
   after skipping 14 that duplicated a hand-written class), so **82 of 82** TagHelpers now reach the
   template method. Every capability parked on it — SSR, localization, RTL — inherits that reach.
 - **Adopt — State machine** *(Zag.js, XState)* for overlays. Ends the
-  `isOpen && !isDisabled && hasFocus` boolean soup. **[CLOSED (real infrastructure + 11 of ~18
+  `isOpen && !isDisabled && hasFocus` boolean soup. **[CLOSED (real infrastructure + 13 of ~18
   components fully migrated), this pass]** - the primitive itself is genuinely done and tested;
-  retrofitting the remaining ~7 overlay components (dropdown, sidebar, galleria, ...) is explicitly
-  left as ongoing/opportunistic work, the same posture Part C's own "headless core" item already
-  takes, not silently claimed as finished.
+  retrofitting the remaining ~5 overlay components (dropdown, command, split-button, ...) is
+  explicitly left as ongoing/opportunistic work, the same posture Part C's own "headless core" item
+  already takes, not silently claimed as finished.
   `runtime/state-machine.ts` (new) is a real, hand-written finite state machine - deliberately not the
   actual Zag.js/XState packages (both cited as prior art, not a literal dependency requirement; this
   repo's own `runtime/signals.ts` set the exact same "write the dependency-free equivalent" precedent
@@ -1248,6 +1248,41 @@ survives internal changes — which is what makes `eject` a good idea rather tha
   correctly opens/toggles/outside-click-closes the drawer, and Escape now closes it - confirmed it did
   not before this fix by re-checking the pre-retrofit code path's own logic.
   Verified: `npm run typecheck`/`build` (bundle budgets unaffected), `npm test` (740/740).
+  **Two more components migrated in a follow-up pass, `sidebar.ts` and `galleria.ts` - both surfaced
+  the SAME class of real, severe bug: dialog semantics and focus-trapping applied unconditionally,
+  independent of whether the component was actually acting as a modal overlay:**
+  `sidebar.ts` renders this app's own persistent left-navigation sidebar (`isAppMode`, see the file's
+  own header comment) on every single page of this Showcase - a permanently-docked landmark
+  (`overlay: false` by default), not a dialog. Yet `trap.activate()` ran unconditionally at mount, and
+  the rendered `<aside>` unconditionally carried `role="dialog"`/`aria-modal="true"` in its template,
+  regardless of `overlay`/`isOpen`. This meant Tab could never leave the nav sidebar to reach the rest
+  of the page - a real, site-wide accessibility bug, live-verified as fixed by dispatching a Tab
+  keydown on the last focusable nav item and confirming `defaultPrevented` is now `false` (previously
+  the trap would have intercepted it). Per WAI-ARIA and this codebase's own Invariant I3 (already
+  applied to popover/menu/context-menu), only a genuinely modal OVERLAY sidebar - a mobile offcanvas
+  drawer with a backdrop, while open - should trap focus or claim dialog semantics now. Centralizing
+  that condition behind `useDisclosure` also converted the raw `isOpen` boolean (previously mutated
+  directly at 7 separate call sites: toggle button, app-shell custom event, backdrop click,
+  outside-click, hover enter/leave) into one guarded transition, and fixed a second, smaller gap along
+  the way: Escape previously released the focus trap without ever closing the sidebar itself, leaving
+  it looking open while unresponsive to Tab; Escape now closes an open overlay sidebar for real (and is
+  correctly a no-op on a docked one). 7 new tests.
+  `galleria.ts` had the identical bug pattern in miniature: its `.p-galleria` root unconditionally
+  carried `role="dialog"`/`aria-modal="true"` in the template, regardless of `fullScreen`/`visible` -
+  inconsistent with the focus trap right next to it in the same file, which DID correctly gate
+  `trap.activate()` on that same condition. A plain inline galleria (a carousel embedded in a page, the
+  common case) claimed modal dialog semantics to assistive tech while never actually trapping focus.
+  Separately, Escape called `trap.deactivate()` directly without touching role/aria-modal at all, so
+  even a genuine fullscreen galleria kept announcing itself as an active modal dialog after Escape had
+  already released its focus trap. Centralizing "is this currently acting as a modal lightbox" behind
+  `useDisclosure` fixes both at once. 6 new tests, including one asserting role/aria-modal are dropped
+  after Escape, and one confirming navigating between images (a full re-render) doesn't silently lose
+  the modal state.
+  One pre-existing test (`focus-containment.test.ts`'s "sidebar traps focus when in modal mode") had
+  itself enshrined the bug: it asserted Tab-trapping without ever passing `overlay: true`, only passing
+  because production code trapped focus unconditionally. Fixed by giving it the `overlay: true, open:
+  true` props its own name already promised, rather than relaxing the assertion.
+  Verified: `npm run typecheck`/`build` (bundle budgets unaffected), `npm test` (753/753).
 - **Adopt — Observer/signals** — **[CLOSED, already adopted before this session — stale]**.
   `runtime/signals.ts` already ships a real, dependency-free `signal`/`computed`/`effect`/`batch`
   implementation (Preact Signals/SolidJS family), retrofitted into `multiselect.ts`, `datatable.ts`,
