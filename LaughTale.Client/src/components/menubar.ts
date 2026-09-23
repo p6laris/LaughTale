@@ -13,6 +13,7 @@ import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtim
 import { setRovingTabindex, handleRovingKeydown } from '../accessibility/aria';
 import { useKeyboardNav } from '../composables/useKeyboardNav';
 import { useLocale } from '../composables/useLocale';
+import { useDisclosure } from '../composables/useDisclosure';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
@@ -389,7 +390,17 @@ export default function MenubarIsland(container: HTMLElement, props: MenubarProp
     const rawData = props.model || props.items || (props as any).Model || (props as any).Items || [];
     const itemsState: MenubarItem[] = normalizeItems(rawData);
 
-    let isMobileMenuOpen = false;
+    // ROADMAP.v5.md Part M "Adopt - State machine": the mobile hamburger drawer's `isMobileMenuOpen`
+    // was a raw boolean, written at 2 separate sites (the toggle button, the outside-click handler) -
+    // and the Escape handler, a THIRD site that closes cascading submenus, never touched it at all. A
+    // real, findable gap: pressing Escape with the mobile drawer open closed any open submenu inside
+    // it but left the drawer itself open. Centralizing behind `useDisclosure` fixes that - see the
+    // Escape branch in `wireEvents` below.
+    let rootListEl: HTMLElement | null = null;
+    const mobileMenuDisclosure = useDisclosure({
+        onOpen: () => rootListEl?.classList.add('p-mobile-open'),
+        onClose: () => rootListEl?.classList.remove('p-mobile-open')
+    });
 
     function getIconSvg(iconName?: string): string {
         if (!iconName) return '';
@@ -472,7 +483,7 @@ export default function MenubarIsland(container: HTMLElement, props: MenubarProp
                 <button type="button" class="p-menubar-button" aria-label="Toggle navigation">
                     ${hamburgerSvg}
                 </button>
-                <ul class="p-menubar-root-list ${isMobileMenuOpen ? 'p-mobile-open' : ''}" role="menubar">
+                <ul class="p-menubar-root-list" role="menubar">
                     ${rootItemsHtml}
                 </ul>
                 ${endHtml}
@@ -483,12 +494,12 @@ export default function MenubarIsland(container: HTMLElement, props: MenubarProp
     function wireEvents(menubarEl: HTMLElement) {
         const button = menubarEl.querySelector<HTMLButtonElement>('.p-menubar-button');
         const rootList = menubarEl.querySelector<HTMLElement>('.p-menubar-root-list');
+        rootListEl = rootList;
 
         if (button && rootList) {
             button.addEventListener('click', (e) => {
                 e.stopPropagation();
-                isMobileMenuOpen = !isMobileMenuOpen;
-                rootList.classList.toggle('p-mobile-open', isMobileMenuOpen);
+                mobileMenuDisclosure.toggle();
             }, { signal: ctx?.signal });
         }
 
@@ -579,10 +590,7 @@ export default function MenubarIsland(container: HTMLElement, props: MenubarProp
         document.addEventListener('click', (e) => {
             if (!menubarEl.contains(e.target as Node)) {
                 closeAllSubmenus();
-                if (isMobileMenuOpen && rootList) {
-                    isMobileMenuOpen = false;
-                    rootList.classList.remove('p-mobile-open');
-                }
+                mobileMenuDisclosure.close();
             }
         }, { signal: ctx?.signal });
 
@@ -606,6 +614,7 @@ export default function MenubarIsland(container: HTMLElement, props: MenubarProp
         menubarEl.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 closeAllSubmenus();
+                mobileMenuDisclosure.close();
                 return;
             }
             if (nav.handleKeyDown(e)) return;

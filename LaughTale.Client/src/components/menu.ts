@@ -14,6 +14,7 @@ import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtim
 import { setRovingTabindex, handleRovingKeydown } from '../accessibility/aria';
 import { useKeyboardNav } from '../composables/useKeyboardNav';
 import { useLocale } from '../composables/useLocale';
+import { useDisclosure } from '../composables/useDisclosure';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
@@ -382,7 +383,38 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps, ctx
     let itemsState: MenuItemData[] = normalizeItems(rawData);
 
     let popupEl: HTMLElement | null = null;
-    let isOpen = false;
+    let floatingCtrl: { update(): void; destroy(): void } | null = null;
+    let clickOutsideHandler: ((e: MouseEvent) => void) | null = null;
+    let outsideClickTimeoutId: ReturnType<typeof setTimeout> | null = null;
+
+    // ROADMAP.v5.md Part M "Adopt - State machine": `isOpen` was a raw boolean, and the popup's
+    // teardown (destroy the floating-position controller, remove the popup element, unbind the
+    // outside-click listener) only ever ran inside the outside-click handler ITSELF. Every other way
+    // the popup could close - selecting a menu item, pressing Escape - called `closePopup()` but that
+    // function did nothing beyond flipping the boolean, so the stale `clickOutsideHandler` stayed bound
+    // to `document` forever. Reopening the popup then bound a SECOND listener on top of it, and so on -
+    // a real, accumulating listener leak on every open/close cycle that didn't go through an actual
+    // outside click. Centralizing teardown into one guarded `onClose` fixes it for every path at once.
+    const menuDisclosure = useDisclosure({
+        onClose: () => {
+            if (outsideClickTimeoutId) {
+                clearTimeout(outsideClickTimeoutId);
+                outsideClickTimeoutId = null;
+            }
+            if (clickOutsideHandler) {
+                document.removeEventListener('click', clickOutsideHandler);
+                clickOutsideHandler = null;
+            }
+            if (floatingCtrl) {
+                floatingCtrl.destroy();
+                floatingCtrl = null;
+            }
+            if (popupEl) {
+                popupEl.remove();
+                popupEl = null;
+            }
+        }
+    });
 
     function getIconSvg(iconName?: string): string {
         if (!iconName) return '';
@@ -664,15 +696,12 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps, ctx
         }
     }
 
-    let floatingCtrl: { update(): void; destroy(): void } | null = null;
-
     function openPopup(trigger: HTMLElement) {
-        if (isOpen) {
+        if (menuDisclosure.isOpen) {
             closePopup();
             return;
         }
 
-        isOpen = true;
         popupEl = document.createElement('div');
         popupEl.className = 'p-menu-popup-wrapper';
         setHtml(popupEl, renderMenuHtml());
@@ -692,26 +721,23 @@ export default function MenuIsland(container: HTMLElement, props: MenuProps, ctx
         });
         floatingCtrl.update();
 
-        const clickOutsideHandler = (e: MouseEvent) => {
+        clickOutsideHandler = (e: MouseEvent) => {
             if (popupEl && !popupEl.contains(e.target as Node) && !trigger.contains(e.target as Node)) {
                 closePopup();
-                document.removeEventListener('click', clickOutsideHandler);
             }
         };
-        const tClick = setTimeout(() => document.addEventListener('click', clickOutsideHandler, { signal: ctx?.signal }), 0);
-        ctx?.onCleanup?.(() => clearTimeout(tClick));
+        outsideClickTimeoutId = setTimeout(() => {
+            outsideClickTimeoutId = null;
+            if (clickOutsideHandler) {
+                document.addEventListener('click', clickOutsideHandler, { signal: ctx?.signal });
+            }
+        }, 0);
+
+        menuDisclosure.open();
     }
 
     function closePopup() {
-        isOpen = false;
-        if (floatingCtrl) {
-            floatingCtrl.destroy();
-            floatingCtrl = null;
-        }
-        if (popupEl) {
-            popupEl.remove();
-            popupEl = null;
-        }
+        menuDisclosure.close();
     }
 
     if (isPopup) {

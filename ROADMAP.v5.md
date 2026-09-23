@@ -1077,9 +1077,9 @@ survives internal changes — which is what makes `eject` a good idea rather tha
   after skipping 14 that duplicated a hand-written class), so **82 of 82** TagHelpers now reach the
   template method. Every capability parked on it — SSR, localization, RTL — inherits that reach.
 - **Adopt — State machine** *(Zag.js, XState)* for overlays. Ends the
-  `isOpen && !isDisabled && hasFocus` boolean soup. **[CLOSED (real infrastructure + 9 of ~18
+  `isOpen && !isDisabled && hasFocus` boolean soup. **[CLOSED (real infrastructure + 11 of ~18
   components fully migrated), this pass]** - the primitive itself is genuinely done and tested;
-  retrofitting the remaining ~9 overlay components (dropdown, menu, menubar, ...) is explicitly
+  retrofitting the remaining ~7 overlay components (dropdown, sidebar, galleria, ...) is explicitly
   left as ongoing/opportunistic work, the same posture Part C's own "headless core" item already
   takes, not silently claimed as finished.
   `runtime/state-machine.ts` (new) is a real, hand-written finite state machine - deliberately not the
@@ -1225,6 +1225,29 @@ survives internal changes — which is what makes `eject` a good idea rather tha
   invokes the first's `reject()` before the second one renders, and focus lands inside the dialog via
   the existing (already-correct) focus trap.
   Verified: `npm run typecheck`/`build` (bundle budgets unaffected), `npm test` (727/727).
+  **Two more components migrated in a follow-up pass, `menu.ts` and `menubar.ts` - each surfacing its
+  own real, pre-existing bug, neither an accessibility gap this time but a genuine leak/dead-path
+  class:**
+  `menu.ts`'s popup mode had a raw `isOpen` boolean, and its teardown (destroy the floating-position
+  controller, remove the popup element, unbind the outside-click listener) only ever ran INSIDE the
+  outside-click handler itself - every other close path (selecting a menu item, Escape) called
+  `closePopup()`, but that function did nothing beyond flipping the boolean. The stale outside-click
+  listener stayed bound to `document` forever, and reopening the popup bound a SECOND listener on top
+  of it - a real, accumulating listener leak on every open/close cycle that didn't go through an actual
+  outside click. Fixed by centralizing all teardown into one guarded `useDisclosure` `onClose`, reached
+  from every close path alike. 6 new tests, including one that reproduces the exact leak scenario
+  (close via item-click, reopen, confirm a SINGLE outside click still closes it - proving no duplicated
+  listener survived). Live-verified against the Showcase's own `p-menu` popup demo.
+  `menubar.ts`'s mobile hamburger drawer used a raw `isMobileMenuOpen` boolean written at 2 separate
+  sites (the toggle button, the outside-click handler) - and the keyboard Escape handler, a THIRD site
+  that closes cascading submenus, never touched it at all. A real, findable gap: pressing Escape while
+  the mobile drawer was open closed any open submenu inside it but left the drawer itself open, an
+  accessibility miss for keyboard users on mobile viewports. Fixed by centralizing the drawer's state
+  behind `useDisclosure` and having the Escape handler close it too. 7 new tests. Live-verified at a
+  926px (sub-960px breakpoint) viewport against the Showcase's own menubar demo: the hamburger button
+  correctly opens/toggles/outside-click-closes the drawer, and Escape now closes it - confirmed it did
+  not before this fix by re-checking the pre-retrofit code path's own logic.
+  Verified: `npm run typecheck`/`build` (bundle budgets unaffected), `npm test` (740/740).
 - **Adopt — Observer/signals** — **[CLOSED, already adopted before this session — stale]**.
   `runtime/signals.ts` already ships a real, dependency-free `signal`/`computed`/`effect`/`batch`
   implementation (Preact Signals/SolidJS family), retrofitted into `multiselect.ts`, `datatable.ts`,
