@@ -1321,13 +1321,34 @@ survives internal changes — which is what makes `eject` a good idea rather tha
   Both fixes were mutation-checked (disabling each fails exactly its own test). Live-verified in the
   Showcase: zero live scroll listeners after three open/close cycles, Escape closes the palette, and
   Enter-then-Escape on the SpeedDial's main button opens and closes it.
-  **Separate bug found, not fixed here:** the color-picker's `DEFAULT_PRESETS` were mechanically
-  converted to CSS-variable strings by the hex-to-token migration (8333e82), so every swatch sets an
-  invalid color like `#VAR(--LT-PRIMARY-500, ...)` and the native color input falls back to
-  `#000000`. A palette needs literal colors, which conflicts with the repo's no-hardcoded-hex lint,
-  so that decision is tracked separately.
   Verified: `npm run typecheck`/`build` (bundle budgets unaffected), contract gate, `npm test`
   (781/781).
+  **Follow-up fix - the color-picker palette (found during the pass above):** every swatch set an
+  invalid color like `#VAR(--LT-PRIMARY-500, ...)`, the native `<input type="color">` fell back to
+  `#000000`, and only 11 of the 15 swatches were distinct. The palette was already partly broken
+  before the hex-to-token migration (8333e82) - 5 of its 15 entries were `var(--token, #hex)`
+  strings, which the old `applyColor` also mangled - and the migration converted the remaining ten
+  and collapsed several distinct colors onto the same token. The same bad value leaked into three
+  more places: the default color when no `value` is passed, the selected-swatch outline (which
+  compared a `var()` string against the current color, so it never matched), and each swatch's
+  `title`, which screen readers announced as its raw `var()` string. Each palette entry is now
+  `var(--token, #hex)`: themeable through the token, and counted by `audit-metrics.mjs` as a
+  legitimate var fallback rather than hardcoded hex. Colors with no design token get a
+  component-scoped `--p-colorpicker-swatch-*` hook. When the palette opens, each swatch is resolved
+  to the `#rrggbb` actually on screen via `getComputedStyle` (honoring theme overrides), falling back
+  to the literal hex; swatches get readable labels ("Select color #EF4444").
+  A first version re-resolved all 15 swatches inside `applyColor`, i.e. on every hex keystroke and
+  native-spectrum drag event - up to 15 forced style recalcs per event. It also measurably slowed the
+  test suite enough to make two unrelated wall-clock timing tests flaky (the committed code passed
+  4 of 4 full runs; that version failed 4 of 5). Resolution now happens only on open, cached on each
+  swatch, and a test asserts that 20 spectrum drags plus a hex edit trigger zero `getComputedStyle`
+  calls. Against the old code, exactly the 4 new bug tests fail. Live-verified in the Showcase: 15
+  distinct valid colors, native input matching each, one correct selection outline.
+  The two timing tests themselves (`useTransition` and `l-if` rapid-toggle) still flake occasionally
+  under heavy machine load - they wait a fixed 80ms of real time - and are tracked separately.
+  Verified: `npm run typecheck`/`build` (bundle budgets unaffected), contract gate, metrics audit,
+  `npm test` (786/786, clean in 4 of the last 5 runs; the one failure was a timing test during an
+  abnormally slow run).
 - **Adopt — Observer/signals** — **[CLOSED, already adopted before this session — stale]**.
   `runtime/signals.ts` already ships a real, dependency-free `signal`/`computed`/`effect`/`batch`
   implementation (Preact Signals/SolidJS family), retrofitted into `multiselect.ts`, `datatable.ts`,

@@ -25,11 +25,42 @@ export interface ColorPickerProps {
     studioOverrides?: Record<string, any>;
 }
 
+// Palette entries are user-pickable colors, so each one needs a literal #rrggbb behind it: the value
+// the picker emits must be a real color (<input type="color"> only accepts #rrggbb). The earlier
+// hex-to-token migration replaced them with bare `var(--token, var(--token))` strings, which
+// applyColor then turned into e.g. "#var(--lt-primary-500, ...)" - an invalid color - and collapsed
+// 15 distinct colors into 11. Each entry is now `var(--token, #hex)`: the token keeps it themeable,
+// the fallback keeps it resolvable. Colors with no design token get a component-scoped hook.
 const DEFAULT_PRESETS = [
-    'var(--lt-primary-500, var(--lt-primary-500))', 'var(--lt-primary-600, var(--lt-primary-600))', 'var(--lt-info-500, var(--lt-info-500))', 'var(--lt-info-600, var(--lt-info-600))', 'var(--lt-info-500, var(--lt-info-500))',
-    'var(--lt-primary-500, var(--lt-primary-500))', 'var(--lt-primary-500)', 'var(--lt-danger-500, var(--lt-danger-500))', 'var(--lt-danger-500, var(--lt-danger-500))', 'var(--lt-warn-500, var(--lt-warn-500))',
-    'var(--lt-primary-500)', 'var(--lt-info-500)', 'var(--lt-surface-500, var(--lt-surface-500))', 'var(--lt-surface-800, var(--lt-surface-800))', 'var(--lt-surface-950, var(--lt-surface-950))'
+    'var(--lt-primary-500, #10b981)', 'var(--lt-primary-600, #059669)', 'var(--lt-info-500, #3b82f6)', 'var(--lt-info-600, #2563eb)', 'var(--p-colorpicker-swatch-indigo, #6366f1)',
+    'var(--p-colorpicker-swatch-violet, #8b5cf6)', 'var(--p-colorpicker-swatch-pink, #ec4899)', 'var(--p-colorpicker-swatch-rose, #f43f5e)', 'var(--lt-danger-500, #ef4444)', 'var(--lt-warn-500, #f59e0b)',
+    'var(--p-colorpicker-swatch-teal, #14b8a6)', 'var(--p-colorpicker-swatch-cyan, #06b6d4)', 'var(--lt-surface-500, #64748b)', 'var(--lt-surface-800, #1e293b)', 'var(--p-colorpicker-swatch-black, #000000)'
 ];
+
+function rgbToHex(rgb: string): string | null {
+    const m = rgb.match(/^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
+    if (!m) return null;
+    return '#' + [m[1], m[2], m[3]].map(n => Number(n).toString(16).padStart(2, '0')).join('');
+}
+
+/**
+ * Resolves a palette entry to the concrete #rrggbb the user actually sees - through the cascade, so a
+ * theme override of the token is honored - falling back to the literal hex inside `var(--x, #hex)`
+ * when the browser can't resolve it (e.g. a detached element).
+ */
+function resolveColor(value: string): string {
+    if (value.startsWith('#')) return value.toLowerCase();
+    if (typeof document !== 'undefined' && document.body) {
+        const probe = document.createElement('span');
+        probe.style.color = value;
+        document.body.appendChild(probe);
+        const hex = rgbToHex(window.getComputedStyle(probe).color);
+        probe.remove();
+        if (hex) return hex;
+    }
+    const fallback = value.match(/#[0-9a-fA-F]{6}\b/);
+    return fallback ? fallback[0].toLowerCase() : value;
+}
 
 
 const CSS = `
@@ -65,19 +96,17 @@ export default function ColorPickerIsland(container: HTMLElement, props: ColorPi
         name: props.name || props.targetInputName || (props as any).targetInput
     });
 
-    let currentColor = props.value || formField.field?.value || 'var(--lt-primary-500, var(--lt-primary-500))';
+    let currentColor = resolveColor(props.value || formField.field?.value || DEFAULT_PRESETS[0]);
 
+    // Swatch hex values, labels and the selected outline are filled in by refreshSwatches() when the
+    // palette opens: resolving a color forces a style recalc, and the palette is hidden until then.
     const swatches = DEFAULT_PRESETS.map(c => {
-        const isMatch = c.toLowerCase() === currentColor.toLowerCase();
-        const borderStyle = isMatch ? '2px solid var(--lt-surface-0, var(--lt-surface-0))' : '1px solid rgba(0,0,0,0.15)';
-        const shadowStyle = isMatch ? '0 0 0 2px var(--lt-primary-600)' : 'none';
-        const styleVal = `width: 1.75rem; height: 1.75rem; border-radius: 4px; border: ${borderStyle}; background: ${c}; cursor: pointer; box-shadow: ${shadowStyle}; transition: transform 0.15s ease, box-shadow 0.15s ease;`;
+        const styleVal = `width: 1.75rem; height: 1.75rem; border-radius: 4px; border: 1px solid rgba(0,0,0,0.15); background: ${c}; cursor: pointer; box-shadow: none; transition: transform 0.15s ease, box-shadow 0.15s ease;`;
 
         return html`
-            <button type="button" 
-                    class="color-swatch-btn" data-part="root" 
-                    data-color="${c}" 
-                    title="${c}"
+            <button type="button"
+                    class="color-swatch-btn" data-part="root"
+                    data-color="${c}"
                     style="${styleVal}">
             </button>
         `;
@@ -146,15 +175,29 @@ export default function ColorPickerIsland(container: HTMLElement, props: ColorPi
             hexInput.value = currentColor.replace('#', '');
         }
 
-        // Update swatch selection outlines
+        highlightSelected();
+        syncValue();
+    }
+
+    function highlightSelected() {
         container.querySelectorAll<HTMLButtonElement>('.color-swatch-btn').forEach(btn => {
-            const btnColor = btn.getAttribute('data-color') || '';
-            const isMatch = btnColor.toLowerCase() === currentColor.toLowerCase();
+            const isMatch = btn.getAttribute('data-hex') === currentColor.toLowerCase();
             btn.style.border = isMatch ? '2px solid var(--lt-surface-0, var(--lt-surface-0))' : '1px solid rgba(0,0,0,0.15)';
             btn.style.boxShadow = isMatch ? '0 0 0 2px var(--lt-primary-600)' : 'none';
         });
+    }
 
-        syncValue();
+    // Resolving forces a style recalc, far too costly to do per applyColor() (which runs on every hex
+    // keystroke and native-spectrum drag event) or at mount (the palette is hidden). Running it on
+    // open also picks up a theme change that happened while the palette was closed.
+    function refreshSwatches() {
+        container.querySelectorAll<HTMLButtonElement>('.color-swatch-btn').forEach(btn => {
+            const hex = resolveColor(btn.getAttribute('data-color') || '');
+            btn.setAttribute('data-hex', hex);
+            btn.setAttribute('title', hex.toUpperCase());
+            btn.setAttribute('aria-label', `Select color ${hex.toUpperCase()}`);
+        });
+        highlightSelected();
     }
 
     // ROADMAP.v5.md Part M "Adopt - State machine": closing used to just null this reference without
@@ -167,6 +210,7 @@ export default function ColorPickerIsland(container: HTMLElement, props: ColorPi
     const overlayDisclosure = useDisclosure({
         disabled: () => !!props.disabled,
         onOpen: () => {
+            refreshSwatches();
             overlay.style.display = 'block';
             floatingHandle = useFloatingPosition(triggerBtn, overlay, {
                 placement: 'bottom-start',
@@ -197,8 +241,7 @@ export default function ColorPickerIsland(container: HTMLElement, props: ColorPi
         container.querySelectorAll<HTMLButtonElement>('.color-swatch-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                const color = btn.getAttribute('data-color')!;
-                applyColor(color);
+                applyColor(btn.getAttribute('data-hex')!);
                 toggleOverlay(false);
             }, { signal: ctx?.signal });
         });
