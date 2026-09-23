@@ -6,6 +6,7 @@ import { emitComponentEvent } from '../runtime/events';
 import { useFloatingPosition } from '../composables/useFloatingPosition';
 import { useFormField } from '../composables/useFormField';
 import { useLocale } from '../composables/useLocale';
+import { useDisclosure } from '../composables/useDisclosure';
 import { html, setHtml, attr, type Raw } from '../runtime/html';
 import { announce } from '../accessibility/announcer';
 import type { PatternDeclaration } from '../accessibility/patterns';
@@ -65,7 +66,6 @@ export default function ColorPickerIsland(container: HTMLElement, props: ColorPi
     });
 
     let currentColor = props.value || formField.field?.value || 'var(--lt-primary-500, var(--lt-primary-500))';
-    let isOpen = false;
 
     const swatches = DEFAULT_PRESETS.map(c => {
         const isMatch = c.toLowerCase() === currentColor.toLowerCase();
@@ -157,12 +157,17 @@ export default function ColorPickerIsland(container: HTMLElement, props: ColorPi
         syncValue();
     }
 
-    let floatingHandle: { update: () => void } | null = null;
+    // ROADMAP.v5.md Part M "Adopt - State machine": closing used to just null this reference without
+    // calling destroy(). With `reposition: 'follow'`, each controller binds window scroll/resize
+    // listeners plus a ResizeObserver, scoped to the island's own signal - so they outlived the close.
+    // Every open added another set, all repositioning the hidden overlay on every scroll for the
+    // island's whole lifetime. Now onClose destroys the controller.
+    let floatingHandle: { update: () => void; destroy: () => void } | null = null;
 
-    function toggleOverlay(show?: boolean) {
-        isOpen = show !== undefined ? show : !isOpen;
-        overlay.style.display = isOpen ? 'block' : 'none';
-        if (isOpen) {
+    const overlayDisclosure = useDisclosure({
+        disabled: () => !!props.disabled,
+        onOpen: () => {
+            overlay.style.display = 'block';
             floatingHandle = useFloatingPosition(triggerBtn, overlay, {
                 placement: 'bottom-start',
                 reposition: 'follow',
@@ -170,9 +175,17 @@ export default function ColorPickerIsland(container: HTMLElement, props: ColorPi
                 offset: 8,
                 isRtl: locale.isRtl
             });
-        } else {
+        },
+        onClose: () => {
+            overlay.style.display = 'none';
+            floatingHandle?.destroy();
             floatingHandle = null;
         }
+    });
+
+    function toggleOverlay(show?: boolean) {
+        if (show === undefined) overlayDisclosure.toggle();
+        else overlayDisclosure.setOpen(show);
     }
 
     if (!props.disabled) {
@@ -204,6 +217,15 @@ export default function ColorPickerIsland(container: HTMLElement, props: ColorPi
         document.addEventListener('click', (e) => {
             if (!container.contains(e.target as Node)) {
                 toggleOverlay(false);
+            }
+        }, { signal: ctx?.signal });
+
+        // The palette previously had no keyboard dismissal at all.
+        container.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && overlayDisclosure.isOpen) {
+                e.preventDefault();
+                toggleOverlay(false);
+                triggerBtn.focus();
             }
         }, { signal: ctx?.signal });
     }

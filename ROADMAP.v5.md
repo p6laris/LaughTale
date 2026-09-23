@@ -1077,11 +1077,12 @@ survives internal changes — which is what makes `eject` a good idea rather tha
   after skipping 14 that duplicated a hand-written class), so **82 of 82** TagHelpers now reach the
   template method. Every capability parked on it — SSR, localization, RTL — inherits that reach.
 - **Adopt — State machine** *(Zag.js, XState)* for overlays. Ends the
-  `isOpen && !isDisabled && hasFocus` boolean soup. **[CLOSED (real infrastructure + 15 of ~18
-  components fully migrated), this pass]** - the primitive itself is genuinely done and tested;
-  retrofitting the remaining ~3 overlay components (dropdown, ...) is
-  explicitly left as ongoing/opportunistic work, the same posture Part C's own "headless core" item
-  already takes, not silently claimed as finished.
+  `isOpen && !isDisabled && hasFocus` boolean soup. **[CLOSED, all overlays migrated]** - the
+  primitive is done and tested, and every overlay now uses it: 17 migrated across these passes
+  (16 components plus the tooltip directive) on top of the 6 `useDisclosure` consumers that already
+  existed, 23 in total. A source scan confirms no component keeps a raw `isOpen`-style boolean. The
+  earlier "~18" total was an estimate, and the "dropdown" once listed as remaining does not exist
+  as a separate component (`select.ts`, migrated first, covers that role).
   `runtime/state-machine.ts` (new) is a real, hand-written finite state machine - deliberately not the
   actual Zag.js/XState packages (both cited as prior art, not a literal dependency requirement; this
   repo's own `runtime/signals.ts` set the exact same "write the dependency-free equivalent" precedent
@@ -1306,6 +1307,27 @@ survives internal changes — which is what makes `eject` a good idea rather tha
   opening a second SplitButton closes the first across the page's 56 real instances.
   Verified: `npm run typecheck`/`build` (bundle budgets unaffected), contract gate, `npm test`
   (767/767).
+  **The final two, `color-picker.ts` and `speed-dial.ts`:**
+  `color-picker.ts` never destroyed its floating-position controller on close, it only nulled the
+  reference. With `reposition: 'follow'`, each controller binds window scroll/resize listeners and a
+  ResizeObserver scoped to the island's signal, so every open added another set that kept
+  repositioning the hidden palette on every scroll for the island's lifetime. `onClose` now calls
+  `destroy()`. The palette also had no Escape handling at all; Escape now closes it and returns focus
+  to the trigger. 7 new tests, including one that counts live window scroll listeners across
+  open/close cycles.
+  `speed-dial.ts` handled Escape only on the action items, so the most common keyboard path - Enter
+  or Space on the main button, which leaves focus there - had no Escape dismissal until you arrowed
+  into an item. The main button handles Escape now. 7 new tests.
+  Both fixes were mutation-checked (disabling each fails exactly its own test). Live-verified in the
+  Showcase: zero live scroll listeners after three open/close cycles, Escape closes the palette, and
+  Enter-then-Escape on the SpeedDial's main button opens and closes it.
+  **Separate bug found, not fixed here:** the color-picker's `DEFAULT_PRESETS` were mechanically
+  converted to CSS-variable strings by the hex-to-token migration (8333e82), so every swatch sets an
+  invalid color like `#VAR(--LT-PRIMARY-500, ...)` and the native color input falls back to
+  `#000000`. A palette needs literal colors, which conflicts with the repo's no-hardcoded-hex lint,
+  so that decision is tracked separately.
+  Verified: `npm run typecheck`/`build` (bundle budgets unaffected), contract gate, `npm test`
+  (781/781).
 - **Adopt — Observer/signals** — **[CLOSED, already adopted before this session — stale]**.
   `runtime/signals.ts` already ships a real, dependency-free `signal`/`computed`/`effect`/`batch`
   implementation (Preact Signals/SolidJS family), retrofitted into `multiselect.ts`, `datatable.ts`,

@@ -6,6 +6,7 @@ import { emitComponentEvent } from '../runtime/events';
 import { executeCommand } from '../runtime/commands';
 import { sanitizeUrl } from '../directives/security';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
+import { useDisclosure } from '../composables/useDisclosure';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
@@ -534,8 +535,6 @@ export default function SpeedDialIsland(container: HTMLElement, props: SpeedDial
     const hasTooltips = !!props.tooltipOptions;
     const tooltipPosition = props.tooltipOptions?.position || (direction === 'left' ? 'top' : (direction === 'right' ? 'top' : 'left'));
 
-    let isOpen = false;
-
     // Severity mapping (defaults to primary theme color)
     const btnSev = props.buttonSeverity || props.buttonProps?.severity || 'primary';
     const btnSevClass = `p-button-${btnSev.toLowerCase()}`;
@@ -741,7 +740,6 @@ export default function SpeedDialIsland(container: HTMLElement, props: SpeedDial
     const itemElements = Array.from(container.querySelectorAll<HTMLLIElement>('.p-speeddial-item'));
 
     function applyAnimation(opening: boolean) {
-        isOpen = opening;
         rootEl.classList.toggle('p-speeddial-opened', opening);
         mainBtn.setAttribute('aria-expanded', String(opening));
 
@@ -784,13 +782,22 @@ export default function SpeedDialIsland(container: HTMLElement, props: SpeedDial
         });
     }
 
+    // ROADMAP.v5.md Part M "Adopt - State machine": the raw `isOpen` boolean is replaced by one guarded
+    // disclosure. Found along the way: Escape was only handled on the action items, so the most common
+    // keyboard path - Enter/Space on the main button, which leaves focus there - had no way to dismiss
+    // the dial without first arrowing into an item. The main button now handles Escape too.
+    const dialDisclosure = useDisclosure({
+        onOpen: () => applyAnimation(true),
+        onClose: () => applyAnimation(false)
+    });
+
     function toggle() {
-        applyAnimation(!isOpen);
+        dialDisclosure.toggle();
     }
 
     function close() {
-        if (isOpen) {
-            applyAnimation(false);
+        if (dialDisclosure.isOpen) {
+            dialDisclosure.close();
             mainBtn.focus();
         }
     }
@@ -806,7 +813,7 @@ export default function SpeedDialIsland(container: HTMLElement, props: SpeedDial
     }, { signal: ctx?.signal });
 
     document.addEventListener('click', (e) => {
-        if (isOpen && !container.contains(e.target as Node)) {
+        if (dialDisclosure.isOpen && !container.contains(e.target as Node)) {
             close();
         }
     }, { signal: ctx?.signal });
@@ -815,17 +822,22 @@ export default function SpeedDialIsland(container: HTMLElement, props: SpeedDial
         if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
             toggle();
-        } else if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
-            if (!isOpen) {
+        } else if (e.key === 'Escape') {
+            if (dialDisclosure.isOpen) {
                 e.preventDefault();
-                applyAnimation(true);
+                close();
+            }
+        } else if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+            if (!dialDisclosure.isOpen) {
+                e.preventDefault();
+                dialDisclosure.open();
                 const first = container.querySelector<HTMLElement>('.p-speeddial-action, .p-speeddial-custom-icon');
                 first?.focus();
             }
         } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
-            if (!isOpen) {
+            if (!dialDisclosure.isOpen) {
                 e.preventDefault();
-                applyAnimation(true);
+                dialDisclosure.open();
                 const actions = container.querySelectorAll<HTMLElement>('.p-speeddial-action, .p-speeddial-custom-icon');
                 if (actions.length) actions[actions.length - 1].focus();
             }
