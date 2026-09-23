@@ -14,6 +14,7 @@ import { executeCommand } from '../runtime/commands';
 import { sanitizeUrl } from '../directives/security';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import { useLocale } from '../composables/useLocale';
+import { useDisclosure } from '../composables/useDisclosure';
 import type { PatternDeclaration } from '../accessibility/patterns';
 
 export const a11y: PatternDeclaration = {
@@ -512,7 +513,6 @@ export default function SplitButtonIsland(container: HTMLElement, props: SplitBu
     const disabled = !!props.disabled;
     const fluid = !!props.fluid;
 
-    let isOpen = false;
     const menuId = `sb_menu_${Math.random().toString(36).substring(2, 9)}`;
 
     // Build Modifier Classes
@@ -617,73 +617,97 @@ export default function SplitButtonIsland(container: HTMLElement, props: SplitBu
 
     let dropdownFloatingCtrl: { update(): void; computePosition(): any; destroy(): void } | null = null;
 
-    function closeMenu() {
-        if (!isOpen) return;
-        isOpen = false;
-        if (activeSplitButtonClose === closeMenu) {
-            activeSplitButtonClose = null;
-        }
-        if (dropdownFloatingCtrl) {
-            dropdownFloatingCtrl.destroy();
-            dropdownFloatingCtrl = null;
-        }
-        dropdownBtn.setAttribute('aria-expanded', 'false');
-        menuEl.style.opacity = '0';
-        menuEl.style.transform = 'scaleY(0.8)';
-        closeAllSubmenus();
-        const t = setTimeout(() => {
-            if (!isOpen) {
-                menuEl.style.display = 'none';
+    // ROADMAP.v5.md Part M "Adopt - State machine": open/close were already centralized in these two
+    // functions (no per-call-site duplication like menu.ts had), so this retrofit is mostly about
+    // consistency with the rest of the codebase - but it surfaced one real, genuine bug along the way.
+    // `activeSplitButtonClose` is a MODULE-level singleton reference (only one SplitButton menu may be
+    // open at a time, page-wide), and nothing ever released it if THIS island unmounted while its own
+    // menu happened to be the active one - e.g. a SPA route change removing this component. The stale
+    // closure then kept its entire DOM subtree (`rootEl`/`menuEl`/`dropdownBtn`) alive indefinitely via
+    // closure references, and would still be invoked (touching detached elements) the next time some
+    // OTHER SplitButton on the page opened. `disabled: () => disabled || items.length === 0` folds the
+    // old `openMenu()` guard into the machine itself, so a disabled or empty-menu SplitButton can never
+    // reach `onOpen`, matching every other retrofitted overlay in this codebase.
+    const splitButtonDisclosure = useDisclosure({
+        disabled: () => disabled || items.length === 0,
+        onOpen: () => {
+            // Close any other open SplitButton menu across the entire page!
+            if (activeSplitButtonClose && activeSplitButtonClose !== closeMenu) {
+                activeSplitButtonClose();
             }
-        }, 150);
-        ctx?.onCleanup?.(() => clearTimeout(t));
+            activeSplitButtonClose = closeMenu;
+
+            dropdownBtn.setAttribute('aria-expanded', 'true');
+            menuEl.style.display = 'block';
+
+            dropdownFloatingCtrl?.destroy();
+            const effectiveSignal = ctx?.signal || new AbortController().signal;
+            dropdownFloatingCtrl = useFloatingPosition(rootEl, menuEl, {
+                placement: 'bottom-end',
+                offset: 4,
+                strategy: 'absolute',
+                reposition: 'follow',
+                signal: effectiveSignal,
+                isRtl: locale.isRtl
+            });
+            const coords = dropdownFloatingCtrl.computePosition();
+            if (coords.actualPlacement.startsWith('top')) {
+                menuEl.classList.add('p-menu-flipped');
+            } else {
+                menuEl.classList.remove('p-menu-flipped');
+            }
+            dropdownFloatingCtrl.update();
+
+            requestAnimationFrame(() => {
+                menuEl.style.opacity = '1';
+                menuEl.style.transform = 'scaleY(1)';
+            });
+
+            // Focus first active menu item
+            const firstLink = menuEl.querySelector<HTMLAnchorElement>('.p-menu-item-link:not([aria-disabled="true"])');
+            firstLink?.focus();
+        },
+        onClose: () => {
+            if (activeSplitButtonClose === closeMenu) {
+                activeSplitButtonClose = null;
+            }
+            if (dropdownFloatingCtrl) {
+                dropdownFloatingCtrl.destroy();
+                dropdownFloatingCtrl = null;
+            }
+            dropdownBtn.setAttribute('aria-expanded', 'false');
+            menuEl.style.opacity = '0';
+            menuEl.style.transform = 'scaleY(0.8)';
+            closeAllSubmenus();
+            const t = setTimeout(() => {
+                if (!splitButtonDisclosure.isOpen) {
+                    menuEl.style.display = 'none';
+                }
+            }, 150);
+            ctx?.onCleanup?.(() => clearTimeout(t));
+        }
+    });
+
+    function closeMenu() {
+        splitButtonDisclosure.close();
     }
 
     function openMenu() {
-        if (disabled || items.length === 0 || isOpen) return;
-
-        // Close any other open SplitButton menu across the entire page!
-        if (activeSplitButtonClose && activeSplitButtonClose !== closeMenu) {
-            activeSplitButtonClose();
-        }
-        activeSplitButtonClose = closeMenu;
-
-        isOpen = true;
-        dropdownBtn.setAttribute('aria-expanded', 'true');
-        menuEl.style.display = 'block';
-
-        dropdownFloatingCtrl?.destroy();
-        const effectiveSignal = ctx?.signal || new AbortController().signal;
-        dropdownFloatingCtrl = useFloatingPosition(rootEl, menuEl, {
-            placement: 'bottom-end',
-            offset: 4,
-            strategy: 'absolute',
-            reposition: 'follow',
-            signal: effectiveSignal,
-            isRtl: locale.isRtl
-        });
-        const coords = dropdownFloatingCtrl.computePosition();
-        if (coords.actualPlacement.startsWith('top')) {
-            menuEl.classList.add('p-menu-flipped');
-        } else {
-            menuEl.classList.remove('p-menu-flipped');
-        }
-        dropdownFloatingCtrl.update();
-
-        requestAnimationFrame(() => {
-            menuEl.style.opacity = '1';
-            menuEl.style.transform = 'scaleY(1)';
-        });
-
-        // Focus first active menu item
-        const firstLink = menuEl.querySelector<HTMLAnchorElement>('.p-menu-item-link:not([aria-disabled="true"])');
-        firstLink?.focus();
+        splitButtonDisclosure.open();
     }
 
     function toggleMenu() {
-        if (isOpen) closeMenu();
-        else openMenu();
+        splitButtonDisclosure.toggle();
     }
+
+    // The real bug this retrofit fixes: release the page-wide singleton if THIS instance still holds
+    // it when the island unmounts, so a later SplitButton's openMenu() never invokes a stale closure
+    // over an already-detached DOM subtree.
+    ctx?.onCleanup?.(() => {
+        if (activeSplitButtonClose === closeMenu) {
+            activeSplitButtonClose = null;
+        }
+    });
 
     // Main Button Click
     mainBtn.addEventListener('click', () => {
@@ -702,7 +726,7 @@ export default function SplitButtonIsland(container: HTMLElement, props: SplitBu
 
     // Global Click Outside
     document.addEventListener('click', (e) => {
-        if (isOpen && !rootEl.contains(e.target as Node)) {
+        if (splitButtonDisclosure.isOpen && !rootEl.contains(e.target as Node)) {
             closeMenu();
         }
     }, { signal: ctx?.signal });

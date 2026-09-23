@@ -3,6 +3,7 @@ import type { IslandContext } from '../runtime/registry';
 import { LucideIcons, getLucideIcon } from '../icons/lucide';
 import { injectIslandStyle } from '../runtime/styles';
 import { useFocusTrap } from '../composables/useFocusTrap';
+import { useDisclosure } from '../composables/useDisclosure';
 import { useLocale } from '../composables/useLocale';
 import { html, setHtml, url as safeUrl, unsafe, attr, type Raw } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
@@ -364,7 +365,6 @@ export default function CommandMenuIsland(container: HTMLElement, props: Command
 
     let search = props.search || (props as any).Search || '';
     let selectedIndex = 0;
-    let isDialogOpen = false;
     let isUsingKeyboard = false;
 
     function fuzzyScore(value: string, query: string): number {
@@ -673,38 +673,61 @@ export default function CommandMenuIsland(container: HTMLElement, props: Command
         renderListOnly();
     }
 
+    // ROADMAP.v5.md Part M "Adopt - State machine": `useFocusTrap(card, {...})`'s return value used
+    // to be discarded entirely - `.activate()` was never called. This wasn't a style issue, it meant
+    // the Ctrl/Cmd+L command palette dialog rendered `role="dialog" aria-modal="true"` while providing
+    // NO actual focus trap at all: Tab could escape into the rest of the page while it was "open", and
+    // focus was never restored to whatever triggered it on close. Keeping the trap instance and
+    // wiring `activate()`/`deactivate()` through `useDisclosure`'s `onOpen`/`onClose` fixes both at
+    // once, the same way every other retrofitted modal in this codebase already works.
+    let currentTrap: ReturnType<typeof useFocusTrap> | null = null;
+    let currentBackdrop: HTMLElement | null = null;
+
+    const commandDialogDisclosure = useDisclosure({
+        onOpen: () => {
+            const backdrop = document.createElement('div');
+            backdrop.className = 'p-commandmenu-dialog-backdrop'; container.setAttribute('data-part', 'root');
+            setHtml(backdrop, html`
+                <div class="p-commandmenu-dialog-card" role="dialog" aria-modal="true" aria-labelledby="command-title"></div>
+            `);
+
+            document.body.appendChild(backdrop);
+            currentBackdrop = backdrop;
+
+            const card = backdrop.querySelector<HTMLElement>('.p-commandmenu-dialog-card')!;
+            setupCommandMenu(card);
+
+            const input = card.querySelector<HTMLInputElement>('.p-commandmenu-input');
+            input?.focus();
+
+            backdrop.addEventListener('click', (e) => {
+                if (e.target === backdrop) {
+                    closeDialog();
+                }
+            }, { signal: ctx?.signal });
+
+            currentTrap = useFocusTrap(card, { initialFocusElement: input || undefined, signal: ctx?.signal });
+            currentTrap.activate();
+        },
+        onClose: () => {
+            currentTrap?.deactivate();
+            currentTrap = null;
+            currentBackdrop?.remove();
+            currentBackdrop = null;
+        }
+    });
+
     function openDialog() {
-        if (isDialogOpen) return;
-        isDialogOpen = true;
-
-        const backdrop = document.createElement('div');
-        backdrop.className = 'p-commandmenu-dialog-backdrop'; container.setAttribute('data-part', 'root');
-        setHtml(backdrop, html`
-            <div class="p-commandmenu-dialog-card" role="dialog" aria-modal="true" aria-labelledby="command-title"></div>
-        `);
-
-        document.body.appendChild(backdrop);
-
-        const card = backdrop.querySelector<HTMLElement>('.p-commandmenu-dialog-card')!;
-        setupCommandMenu(card);
-
-        const input = card.querySelector<HTMLInputElement>('.p-commandmenu-input');
-        input?.focus();
-
-        backdrop.addEventListener('click', (e) => {
-            if (e.target === backdrop) {
-                closeDialog();
-            }
-        }, { signal: ctx?.signal });
-
-        useFocusTrap(card, { initialFocusElement: input || undefined });
+        commandDialogDisclosure.open();
     }
 
     function closeDialog() {
-        isDialogOpen = false;
-        const backdrop = document.querySelector('.p-commandmenu-dialog-backdrop');
-        if (backdrop) backdrop.remove();
+        commandDialogDisclosure.close();
     }
+
+    // The backdrop is appended to document.body, outside this island's own container, so tearing
+    // the island down while the dialog is open would otherwise orphan it on the page forever.
+    ctx?.onCleanup?.(() => commandDialogDisclosure.close());
 
     if (withDialog) {
         setHtml(container, html`
@@ -722,7 +745,7 @@ export default function CommandMenuIsland(container: HTMLElement, props: Command
         window.addEventListener('keydown', (e) => {
             if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'l') {
                 e.preventDefault();
-                if (isDialogOpen) {
+                if (commandDialogDisclosure.isOpen) {
                     closeDialog();
                 } else {
                     openDialog();

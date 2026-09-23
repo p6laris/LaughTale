@@ -1077,9 +1077,9 @@ survives internal changes — which is what makes `eject` a good idea rather tha
   after skipping 14 that duplicated a hand-written class), so **82 of 82** TagHelpers now reach the
   template method. Every capability parked on it — SSR, localization, RTL — inherits that reach.
 - **Adopt — State machine** *(Zag.js, XState)* for overlays. Ends the
-  `isOpen && !isDisabled && hasFocus` boolean soup. **[CLOSED (real infrastructure + 13 of ~18
+  `isOpen && !isDisabled && hasFocus` boolean soup. **[CLOSED (real infrastructure + 15 of ~18
   components fully migrated), this pass]** - the primitive itself is genuinely done and tested;
-  retrofitting the remaining ~5 overlay components (dropdown, command, split-button, ...) is
+  retrofitting the remaining ~3 overlay components (dropdown, ...) is
   explicitly left as ongoing/opportunistic work, the same posture Part C's own "headless core" item
   already takes, not silently claimed as finished.
   `runtime/state-machine.ts` (new) is a real, hand-written finite state machine - deliberately not the
@@ -1283,6 +1283,29 @@ survives internal changes — which is what makes `eject` a good idea rather tha
   because production code trapped focus unconditionally. Fixed by giving it the `overlay: true, open:
   true` props its own name already promised, rather than relaxing the assertion.
   Verified: `npm run typecheck`/`build` (bundle budgets unaffected), `npm test` (753/753).
+  **Two more components migrated in a follow-up pass, `command.ts` and `split-button.ts`:**
+  `command.ts`'s Ctrl/Cmd+L command-palette dialog called `useFocusTrap(card, {...})` and discarded
+  the return value - `.activate()` was never called. The dialog rendered `role="dialog"
+  aria-modal="true"` while providing no focus trap at all: Tab escaped into the page behind it, and
+  focus was never restored on close. The trap instance is now kept and driven by `useDisclosure`'s
+  `onOpen`/`onClose`, replacing the raw `isDialogOpen` boolean. A second, smaller gap: the backdrop is
+  appended to `document.body`, outside the island's container, so tearing the island down while the
+  dialog was open orphaned it on the page - now closed via `ctx.onCleanup`. 7 new tests.
+  `split-button.ts` already centralized open/close, so its retrofit was mostly for consistency (the old
+  `openMenu()` guard folds into `useDisclosure`'s `disabled` option) - but `activeSplitButtonClose`, a
+  page-wide singleton, was never released if an island unmounted while its menu was the active one.
+  The stale closure kept the detached DOM subtree alive and was still invoked the next time any other
+  SplitButton opened. Released via `ctx.onCleanup` now. 7 new tests.
+  Both unmount fixes were mutation-checked: disabling each fix makes exactly its own test fail, and a
+  first-draft `doesNotThrow` assertion was replaced after realizing it passed with or without the fix
+  (touching detached elements doesn't throw) - the final test asserts the detached button's
+  `aria-expanded` is left untouched instead. The first draft of both fixes used raw
+  `signal.addEventListener('abort', ...)`, which this repo's own `verify-contracts.mjs` gate rejects as
+  an unmanaged listener; `ctx.onCleanup`, which the hydrator runs on teardown, is the sanctioned
+  mechanism. Live-verified in the Showcase: Tab is now intercepted inside the open command palette, and
+  opening a second SplitButton closes the first across the page's 56 real instances.
+  Verified: `npm run typecheck`/`build` (bundle budgets unaffected), contract gate, `npm test`
+  (767/767).
 - **Adopt — Observer/signals** — **[CLOSED, already adopted before this session — stale]**.
   `runtime/signals.ts` already ships a real, dependency-free `signal`/`computed`/`effect`/`batch`
   implementation (Preact Signals/SolidJS family), retrofitted into `multiselect.ts`, `datatable.ts`,
