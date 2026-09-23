@@ -3,6 +3,7 @@ import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
 import { useFocusTrap, type UseFocusTrapReturn } from '../composables/useFocusTrap';
 import { useFloatingPosition } from '../composables/useFloatingPosition';
+import { useDisclosure } from '../composables/useDisclosure';
 import { html, setHtml, unsafe, type Raw } from '../runtime/html';
 import { getLucideIcon } from '../icons/lucide';
 import type { PatternDeclaration } from '../accessibility/patterns';
@@ -235,6 +236,30 @@ class ConfirmPopupManager {
     private trap: UseFocusTrapReturn | null = null;
     public floatingCtrl: { update(): void; computePosition(): any; destroy(): void } | null = null;
 
+    // ROADMAP.v5.md Part M "Adopt - State machine": same singleton-disclosure retrofit as
+    // confirm-dialog.ts. `require()` already handled the "clicking the SAME open target again closes
+    // it" toggle, but never handled requesting a confirmation for a DIFFERENT target while one was
+    // already open - `currentOptions` was silently overwritten, dropping the outgoing confirmation's
+    // `accept`/`reject` callback forever (the exact bug found and fixed in confirm-dialog.ts).
+    private disclosure = useDisclosure({
+        onOpen: () => {
+            this.popupEl?.classList.add('p-confirmpopup-active');
+        },
+        onClose: () => {
+            this.trap?.deactivate();
+            this.trap = null;
+            if (this.floatingCtrl) {
+                this.floatingCtrl.destroy();
+                this.floatingCtrl = null;
+            }
+            this.popupEl?.classList.remove('p-confirmpopup-active');
+            if (this.outsideClickListener) {
+                document.removeEventListener('click', this.outsideClickListener);
+                this.outsideClickListener = null;
+            }
+        }
+    });
+
     constructor() {
         if (typeof document !== 'undefined') {
             this.initDOM();
@@ -254,7 +279,7 @@ class ConfirmPopupManager {
         this.popupEl.setAttribute('aria-describedby', 'confirmpopup-message');
 
         window.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && this.popupEl?.classList.contains('p-confirmpopup-active')) {
+            if (e.key === 'Escape' && this.disclosure.isOpen) {
                 this.close(false);
             }
         }, { signal });
@@ -266,17 +291,21 @@ class ConfirmPopupManager {
         this.initDOM();
         if (!this.popupEl || !options.target) return;
 
-        // If clicking same target that is already open, toggle close
-        if (this.currentOptions && this.currentOptions.target === options.target && this.popupEl.classList.contains('p-confirmpopup-active')) {
+        if (this.disclosure.isOpen) {
+            // Clicking the SAME target that's already open toggles it closed.
+            if (this.currentOptions?.target === options.target) {
+                this.close(false);
+                return;
+            }
+            // A DIFFERENT target's confirmation is already open - reject it before replacing it, so
+            // its caller isn't left waiting on a callback that would otherwise never fire.
             this.close(false);
-            return;
         }
 
         this.currentOptions = options;
         this.renderContent(options);
         this.alignToTarget(options.target, options.signal);
 
-        this.trap?.deactivate();
         this.trap = useFocusTrap(this.popupEl, {
             autoFocus: true,
             restoreFocus: true,
@@ -284,7 +313,7 @@ class ConfirmPopupManager {
         });
         this.trap.activate();
 
-        this.popupEl.classList.add('p-confirmpopup-active');
+        this.disclosure.open();
 
         // Bind outside click
         const t = setTimeout(() => {
@@ -302,28 +331,18 @@ class ConfirmPopupManager {
     }
 
     public close(accepted: boolean = false) {
-        if (!this.popupEl) return;
-        this.trap?.deactivate();
-        this.trap = null;
-        if (this.floatingCtrl) {
-            this.floatingCtrl.destroy();
-            this.floatingCtrl = null;
-        }
-        this.popupEl.classList.remove('p-confirmpopup-active');
+        if (!this.disclosure.isOpen) return;
+        const opts = this.currentOptions;
+        this.currentOptions = null;
+        this.disclosure.close();
 
-        if (this.outsideClickListener) {
-            document.removeEventListener('click', this.outsideClickListener);
-            this.outsideClickListener = null;
-        }
-
-        if (this.currentOptions) {
-            if (accepted && this.currentOptions.accept) {
-                this.currentOptions.accept();
-            } else if (!accepted && this.currentOptions.reject) {
-                this.currentOptions.reject();
+        if (opts) {
+            if (accepted && opts.accept) {
+                opts.accept();
+            } else if (!accepted && opts.reject) {
+                opts.reject();
             }
         }
-        this.currentOptions = null;
     }
 
     private alignToTarget(target: HTMLElement, signal?: AbortSignal) {

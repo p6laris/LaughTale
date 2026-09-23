@@ -2,6 +2,7 @@ import { resolvePart, applyPart, type PassthroughRecord } from '../runtime/parts
 import type { IslandContext } from '../runtime/registry';
 import { injectIslandStyle } from '../runtime/styles';
 import { useFocusTrap, type UseFocusTrapReturn } from '../composables/useFocusTrap';
+import { useDisclosure } from '../composables/useDisclosure';
 import { html, setHtml, unsafe, type Raw } from '../runtime/html';
 import type { PatternDeclaration } from '../accessibility/patterns';
 import { getLucideIcon } from '../icons/lucide';
@@ -294,6 +295,25 @@ class ConfirmDialogManager {
     private currentOptions: ConfirmDialogOptions | null = null;
     private trap: UseFocusTrapReturn | null = null;
 
+    // ROADMAP.v5.md Part M "Adopt - State machine": "is a confirmation currently open" was only ever
+    // `maskEl.classList.contains('p-confirmdialog-mask-active')`, re-derived at each of its 3 call
+    // sites (the Escape handler, `close()`'s early-out, `require()`'s decision to eject a stale
+    // confirmation below) instead of one guarded place. Centralizing it surfaced a real bug: `require()`
+    // never checked whether a DIFFERENT confirmation was already open before overwriting
+    // `currentOptions` and re-rendering - the outgoing confirmation's `accept`/`reject` callback was
+    // silently dropped forever, never invoked, the same "opening a second X orphans the first" class of
+    // bug popover.ts's own retrofit already found and fixed for its singleton.
+    private disclosure = useDisclosure({
+        onOpen: () => {
+            this.maskEl?.classList.add('p-confirmdialog-mask-active');
+        },
+        onClose: () => {
+            this.trap?.deactivate();
+            this.trap = null;
+            this.maskEl?.classList.remove('p-confirmdialog-mask-active');
+        }
+    });
+
     constructor() {
         if (typeof document !== 'undefined') {
             this.initDOM();
@@ -317,7 +337,7 @@ class ConfirmDialogManager {
         }, { signal });
 
         window.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && this.maskEl?.classList.contains('p-confirmdialog-mask-active')) {
+            if (e.key === 'Escape' && this.disclosure.isOpen) {
                 this.close(false);
             }
         }, { signal });
@@ -327,15 +347,22 @@ class ConfirmDialogManager {
 
     public require(options: ConfirmDialogOptions) {
         this.initDOM(options.signal);
+
+        if (this.disclosure.isOpen) {
+            // A different confirmation is already showing - reject it before replacing it, so its
+            // caller isn't left waiting on a callback that would otherwise never fire.
+            this.close(false);
+        }
+
         this.currentOptions = options;
         const pos = (options.position || 'center').toLowerCase().replace(/[^a-z]/g, '');
-        
+
         if (this.maskEl) {
-            this.maskEl.className = `p-confirmdialog-mask p-confirmdialog-pos-${pos} p-confirmdialog-mask-active`;
+            this.maskEl.className = `p-confirmdialog-mask p-confirmdialog-pos-${pos}`;
             this.renderDialog(options);
+            this.disclosure.open();
             const dialogEl = this.maskEl.querySelector<HTMLElement>('.p-confirmdialog');
             if (dialogEl) {
-                this.trap?.deactivate();
                 this.trap = useFocusTrap(dialogEl, {
                     autoFocus: true,
                     restoreFocus: true,
@@ -347,19 +374,18 @@ class ConfirmDialogManager {
     }
 
     public close(accepted: boolean = false) {
-        if (!this.maskEl) return;
-        this.trap?.deactivate();
-        this.trap = null;
-        this.maskEl.classList.remove('p-confirmdialog-mask-active');
+        if (!this.disclosure.isOpen) return;
+        const opts = this.currentOptions;
+        this.currentOptions = null;
+        this.disclosure.close();
 
-        if (this.currentOptions) {
-            if (accepted && this.currentOptions.accept) {
-                this.currentOptions.accept();
-            } else if (!accepted && this.currentOptions.reject) {
-                this.currentOptions.reject();
+        if (opts) {
+            if (accepted && opts.accept) {
+                opts.accept();
+            } else if (!accepted && opts.reject) {
+                opts.reject();
             }
         }
-        this.currentOptions = null;
     }
 
     private getIconSVG(iconName?: string): Raw {

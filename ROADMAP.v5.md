@@ -1077,9 +1077,9 @@ survives internal changes — which is what makes `eject` a good idea rather tha
   after skipping 14 that duplicated a hand-written class), so **82 of 82** TagHelpers now reach the
   template method. Every capability parked on it — SSR, localization, RTL — inherits that reach.
 - **Adopt — State machine** *(Zag.js, XState)* for overlays. Ends the
-  `isOpen && !isDisabled && hasFocus` boolean soup. **[CLOSED (real infrastructure + 7 of ~18
+  `isOpen && !isDisabled && hasFocus` boolean soup. **[CLOSED (real infrastructure + 9 of ~18
   components fully migrated), this pass]** - the primitive itself is genuinely done and tested;
-  retrofitting the remaining ~11 overlay components (dropdown, menu, menubar, ...) is explicitly
+  retrofitting the remaining ~9 overlay components (dropdown, menu, menubar, ...) is explicitly
   left as ongoing/opportunistic work, the same posture Part C's own "headless core" item already
   takes, not silently claimed as finished.
   `runtime/state-machine.ts` (new) is a real, hand-written finite state machine - deliberately not the
@@ -1205,6 +1205,26 @@ survives internal changes — which is what makes `eject` a good idea rather tha
   real tooltip text; a hover-then-leave within the 300ms window now correctly shows nothing, even after
   waiting well past where the stale timer would have fired.
   Verified: `npm run typecheck`/`build` (bundle budgets unaffected), `npm test` (712/712).
+  **Two more components migrated in a follow-up pass, `confirm-dialog.ts` and `confirm-popup.ts` -
+  both page-wide singleton managers (the same shape as popover.ts/tooltip.ts), each with the SAME
+  real, pre-existing bug found and fixed:**
+  Both `ConfirmDialogManager.require()` and `ConfirmPopupManager.require()` already correctly called
+  `trap.activate()`/`trap.deactivate()` (no accessibility gap here, unlike dialog.ts/drawer.ts's
+  delegation bug) - but neither checked whether a confirmation was already open before overwriting
+  `currentOptions` and re-rendering in place. Requesting a second confirmation (a different message, or
+  for confirm-popup, a different target) while one was already showing silently dropped the outgoing
+  confirmation's `accept`/`reject` callback forever - it would never fire, leaking any promise or
+  state a caller was waiting on. This is the exact "opening a second X orphans the first" class of bug
+  popover.ts's own retrofit already found and fixed for its singleton, just not yet applied here.
+  Fixed by centralizing "is one currently open" behind `useDisclosure` and having `require()` call
+  `close(false)` - explicitly rejecting the outgoing confirmation - before replacing it.
+  `confirm-popup.ts` keeps its existing "clicking the SAME open target again toggles it closed"
+  behavior unchanged; the fix only covers the previously-unhandled DIFFERENT-target case. 15 new tests
+  across both components. Live-verified against the Showcase's own delete-confirmation triggers: a
+  second `$confirm.require(...)`/`$confirmPopup.require(...)` call while one is already open correctly
+  invokes the first's `reject()` before the second one renders, and focus lands inside the dialog via
+  the existing (already-correct) focus trap.
+  Verified: `npm run typecheck`/`build` (bundle budgets unaffected), `npm test` (727/727).
 - **Adopt — Observer/signals** — **[CLOSED, already adopted before this session — stale]**.
   `runtime/signals.ts` already ships a real, dependency-free `signal`/`computed`/`effect`/`batch`
   implementation (Preact Signals/SolidJS family), retrofitted into `multiselect.ts`, `datatable.ts`,
