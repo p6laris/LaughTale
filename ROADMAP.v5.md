@@ -1344,11 +1344,26 @@ survives internal changes — which is what makes `eject` a good idea rather tha
   swatch, and a test asserts that 20 spectrum drags plus a hex edit trigger zero `getComputedStyle`
   calls. Against the old code, exactly the 4 new bug tests fail. Live-verified in the Showcase: 15
   distinct valid colors, native input matching each, one correct selection outline.
-  The two timing tests themselves (`useTransition` and `l-if` rapid-toggle) still flake occasionally
-  under heavy machine load - they wait a fixed 80ms of real time - and are tracked separately.
   Verified: `npm run typecheck`/`build` (bundle budgets unaffected), contract gate, metrics audit,
   `npm test` (786/786, clean in 4 of the last 5 runs; the one failure was a timing test during an
-  abnormally slow run).
+  abnormally slow run - fixed in the follow-up below).
+  **Follow-up - the flaky timing tests:** `useTransition.test.ts` and the `l-transition` block of
+  `conditional.test.ts` asserted state after fixed real-time waits. The mechanism was specific:
+  `enter()` reaches its visible styles through a chain of two `requestAnimationFrame` hops (mocked as
+  16ms `setTimeout`s in `tests/setup.ts`), and each hop is scheduled from inside the previous one, so
+  under load the chain accumulates one stall per hop while the test's single wait absorbs only one -
+  and the chain can finish after the check. Both now use node:test mock timers (`mock.timers`,
+  advanced 1ms at a time so chained timers are reached), making the ordering exact; several
+  assertions also tightened from loose windows to exact boundaries (e.g. removal at exactly 30ms,
+  not "somewhere before 60ms"), and one was added (a superseded exit's callback never fires).
+  Reproduced on demand with a preload shim adding 0-60ms of jitter to every timer: the old tests
+  failed 6 of 8 runs, the new ones 0 of 8. Mutation-checked: disabling `useTransition`'s
+  stale-callback guard fails the `useTransition` test; the `l-if` test needs both that guard and
+  `conditional.ts`'s own `generation` guard removed to fail, since each alone protects the element.
+  The 9 other test files that still wait on real time were audited: every one waits on a single timer
+  that the code schedules synchronously, before the test's own wait, and Node fires due timers in
+  order - so a stall delays both without reordering them. Only chained timers were vulnerable.
+  Verified: full `npm test` 786/786 in 4 of 4 consecutive runs.
 - **Adopt — Observer/signals** — **[CLOSED, already adopted before this session — stale]**.
   `runtime/signals.ts` already ships a real, dependency-free `signal`/`computed`/`effect`/`batch`
   implementation (Preact Signals/SolidJS family), retrofitted into `multiselect.ts`, `datatable.ts`,

@@ -1,5 +1,5 @@
 import '../setup.ts';
-import { describe, it } from 'node:test';
+import { describe, it, beforeEach, afterEach, mock } from 'node:test';
 import assert from 'node:assert/strict';
 import { useTransition } from '../../src/composables/animation/useTransition.ts';
 
@@ -8,20 +8,30 @@ import { useTransition } from '../../src/composables/animation/useTransition.ts'
 // `l-if`'s l-transition support (directives/conditional.ts) now depends on its exact contract -
 // in particular that `enter()` is safe to call again mid-exit, and that `exit()`'s callback fires
 // exactly once - so that contract gets its own direct suite here.
+//
+// Time is mocked rather than waited on: enter() reaches its visible styles after two
+// requestAnimationFrame hops (mocked as 16ms setTimeouts in tests/setup.ts), and these tests assert
+// ordering against that chain and the `duration` timer. Real waits with fixed margins flaked on a
+// loaded machine; mocked time makes the ordering exact.
 
-function wait(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+// Advances mocked time 1ms at a time, because each rAF hop schedules the next timer from inside a
+// timer callback - a single large tick() would stop short of it.
+function advance(ms: number): void {
+    for (let i = 0; i < ms; i++) mock.timers.tick(1);
 }
 
 describe('useTransition Composable Suite (ROADMAP.v5.md Part I, l-if/l-for transitions)', () => {
-    it('enter() is safely callable again before a prior exit()\'s callback has fired, and ends up visible', async () => {
+    beforeEach(() => mock.timers.enable({ apis: ['setTimeout'] }));
+    afterEach(() => mock.timers.reset());
+
+    it('enter() is safely callable again before a prior exit()\'s callback has fired, and ends up visible', () => {
         const el = document.createElement('div');
         document.body.appendChild(el);
         const { enter, exit } = useTransition(el, { duration: 30 });
 
         enter();
-        await wait(80);
-        assert.equal(el.style.opacity, '1', 'must be visible after the initial enter settles');
+        advance(32); // two 16ms rAF hops
+        assert.equal(el.style.opacity, '1', 'must be visible once the enter rAF chain completes');
 
         let exitCbCalls = 0;
         exit(() => { exitCbCalls++; });
@@ -29,12 +39,13 @@ describe('useTransition Composable Suite (ROADMAP.v5.md Part I, l-if/l-for trans
         // Re-enter immediately, well before exit's setTimeout(duration) would fire.
         assert.doesNotThrow(() => enter());
 
-        await wait(80);
+        advance(200); // past exit's 30ms timer, the re-entry's rAF chain, and its duration timer
         assert.equal(el.style.opacity, '1', 'must end up visible after re-entering mid-exit');
         assert.equal(el.style.display, 'block', 'must not be left at exit\'s display:none');
+        assert.equal(exitCbCalls, 0, 'the superseded exit\'s callback must never fire');
     });
 
-    it('exit(cb) invokes its callback exactly once, duration ms after being called', async () => {
+    it('exit(cb) invokes its callback exactly once, duration ms after being called', () => {
         const el = document.createElement('div');
         document.body.appendChild(el);
         const { exit } = useTransition(el, { duration: 40 });
@@ -42,13 +53,13 @@ describe('useTransition Composable Suite (ROADMAP.v5.md Part I, l-if/l-for trans
         let calls = 0;
         exit(() => { calls++; });
 
-        await wait(10);
+        advance(39);
         assert.equal(calls, 0, 'must not fire before duration has elapsed');
 
-        await wait(70);
-        assert.equal(calls, 1, 'must fire exactly once once duration has elapsed');
+        advance(1);
+        assert.equal(calls, 1, 'must fire exactly when duration elapses');
 
-        await wait(50);
+        advance(200);
         assert.equal(calls, 1, 'must not fire again afterward');
     });
 

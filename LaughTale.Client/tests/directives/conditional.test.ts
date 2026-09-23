@@ -1,12 +1,15 @@
 import '../setup.ts';
-import { describe, it } from 'node:test';
+import { describe, it, beforeEach, afterEach, mock } from 'node:test';
 import assert from 'node:assert/strict';
 import { createReactiveScope } from '../../src/directives/reactivity.ts';
 import { bindConditionalDirectives } from '../../src/directives/conditional.ts';
 import { teardownDirectives } from '../../src/directives/lifecycle.ts';
 
-function wait(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+// Advances mocked time 1ms at a time: a timer scheduled from inside another timer's callback (the
+// rAF-as-setTimeout chain in useTransition) lands later than the current tick, so a single large
+// tick() would not reach it.
+function advance(ms: number): void {
+    for (let i = 0; i < ms; i++) mock.timers.tick(1);
 }
 
 describe('Conditional Rendering Directive Suite (l-if, ROADMAP.v5.md Part I)', () => {
@@ -84,7 +87,13 @@ describe('Conditional Rendering Directive Suite (l-if, ROADMAP.v5.md Part I)', (
     });
 
     describe('l-transition (ROADMAP.v5.md Part I, deferred transitions)', () => {
-        it('an animated toggle only actually removes the element once its exit duration elapses', async () => {
+        // Mocked timers, not real waits: these assert ordering against a 30ms exit timer and a
+        // requestAnimationFrame chain (mocked as 16ms setTimeouts in tests/setup.ts). With real
+        // time, a loaded machine could slip past the margins in either direction and flake.
+        beforeEach(() => mock.timers.enable({ apis: ['setTimeout'] }));
+        afterEach(() => mock.timers.reset());
+
+        it('an animated toggle only actually removes the element once its exit duration elapses', () => {
             const root = document.createElement('div');
             document.body.appendChild(root);
             const scope = createReactiveScope(root, { show: true });
@@ -100,14 +109,14 @@ describe('Conditional Rendering Directive Suite (l-if, ROADMAP.v5.md Part I)', (
             scope.state.show = false;
             assert.equal(root.contains(el), true, 'must not remove synchronously once a transition is active');
 
-            await wait(10);
+            advance(29);
             assert.equal(root.contains(el), true, 'must still be present before the exit duration elapses');
 
-            await wait(50);
-            assert.equal(root.contains(el), false, 'must be removed once the exit duration elapses');
+            advance(1);
+            assert.equal(root.contains(el), false, 'must be removed exactly when the exit duration elapses');
         });
 
-        it('rapid true -> false -> true toggling during a pending exit leaves the element visible and never calls remove()', async () => {
+        it('rapid true -> false -> true toggling during a pending exit leaves the element visible and never calls remove()', () => {
             const root = document.createElement('div');
             document.body.appendChild(root);
             const scope = createReactiveScope(root, { show: true });
@@ -129,7 +138,7 @@ describe('Conditional Rendering Directive Suite (l-if, ROADMAP.v5.md Part I)', (
             scope.state.show = false; // starts an exit animation
             scope.state.show = true; // flips back before that exit's callback fires
 
-            await wait(80); // well past the original exit's duration
+            advance(200); // well past the original exit's 30ms timer and the re-entry's rAF chain
 
             assert.equal(removeCalled, false, 'a stale exit callback must never remove a since-re-shown element');
             assert.equal(root.contains(el), true, 'element must remain in the DOM');
