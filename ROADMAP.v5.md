@@ -473,7 +473,7 @@ behaviour, and the fixes are sitting unused in `src/composables/`.
 
 ---
 
-## 6. Part D — Adapters — **[CLOSED except Angular (deferred) and the Framework SSR sidecar (IN PROGRESS - Phases 1-4, React, Preact, Vue and Svelte, done) - see "New adapters" and "Framework SSR sidecar" rows]**
+## 6. Part D — Adapters — **[CLOSED except Angular (deferred) - see "New adapters" row; the Framework SSR sidecar is DONE for all five frameworks]**
 
 All five adapters *were* one-shot mount functions (324 lines total, confirmed by `wc -l`: 314
 across the five adapter files — `react.ts` 71, `vue.ts` 69, `preact.ts` 64, `svelte.ts` 94,
@@ -654,7 +654,7 @@ store, left unfixed here since it's unrelated to the actual ask; new adapters; a
 preservation for a nested island inside a framework adapter's destructive mount when the parent
 doesn't forward it as a slot (an author-error case, not a framework gap).
 
-| **Framework SSR sidecar — [IN PROGRESS: Phase 1 (React, full pipeline), Phase 2 (Preact), Phase 3 (Vue) and Phase 4 (Svelte) DONE; Solid to follow - see Part G/L "Validation: Framework SSR sidecar"]** Node render host over a local socket. The right *first plugin* to prove the Part L API, not core work. Until then, rename the strategy `client-only` and require a fallback | Astro, Nuxt | XL · 8+ wks |
+| **Framework SSR sidecar — [DONE: React, Preact, Vue, Svelte and Solid, in five phases - see Part G/L "Validation: Framework SSR sidecar" for each phase and the known limits]** Node render host over a local socket. The right *first plugin* to prove the Part L API, not core work. Until then, rename the strategy `client-only` and require a fallback | Astro, Nuxt | XL · 8+ wks |
 
 ---
 
@@ -2112,7 +2112,7 @@ how much of the enterprise story stops at that one policy string.
 
 ---
 
-## 14. Part G/L — DX & plugin architecture — **[CLOSED except the Framework SSR sidecar, now IN PROGRESS - Phases 1-4 (React, Preact, Vue, Svelte) done; mechanism + other validation-plugin layers closed]**
+## 14. Part G/L — DX & plugin architecture — **[CLOSED - the Framework SSR sidecar (the last open validation plugin) is done for all five frameworks]**
 
 Build the plugin API **before** Parts E and F, so streaming, actions and cache tags are written as
 first-party plugins against your own interface. Nothing proves an extension point like being forced
@@ -2315,6 +2315,50 @@ pipeline carried over as-is.
   clean. Client 820/820 (twice), .NET 535/535, typecheck, contract gate and bundle budgets pass, and
   SSR e2e is 16/16 in Chromium and WebKit.
 - **Not yet:** Solid (Phase 5); slot forwarding and `update()` for Svelte islands.
+
+**Update - Framework SSR sidecar, Phase 5 (Solid) DONE - the item is closed.** No .NET changes.
+- **JS (`laughtale/ssr/solid`):** `solidSsrComponent(Component)` renders with Solid's
+  `renderToString`, using the same root shape the adapter hydrates, so both sides generate the same
+  `data-hk` hydration keys. Solid's JSX compiler emits different code per target, so the Showcase runs
+  `babel-preset-solid` (`hydratable: true`) through a small esbuild plugin in both builds -
+  `generate: 'ssr'` for the sidecar, `generate: 'dom'` for the browser - scoped to
+  `Scripts/islands/solid/` because the project's JSX default is React's.
+- **Two Solid assumptions that break islands, found by probing before building:**
+  - `hydrate()` throws unless a page-global `_$HY` exists, which Solid's hydration script
+    (`generateHydrationScript()`) normally defines. The adapter now creates the same empty object
+    itself when the page has none, so no inline script - and no CSP nonce - is needed. Nothing
+    replays clicks made before hydration, which matches every other LaughTale adapter.
+  - Solid assumes one hydration per page: the first delegated event after hydrating sets
+    `_$HY.done`, and every later `hydrate()` silently re-renders instead. With islands, a Solid
+    island hydrating late (`Visible`, `Idle`) after another was clicked would have had its server DOM
+    thrown away. The adapter clears the flag before each island hydrates.
+  - Hydration keys don't collide between islands: `hydrate()` gathers keys from its own container
+    only, so no per-island `renderId` is needed.
+- **Also fixed:** Solid's `render()` appends like Svelte's `mount()`, so the plain-render path left
+  server fallback markup beside the component. Both adapters now share `clearForAppendingMount`,
+  which keeps `<template data-slot="fallback">` (the error boundary reads it if the mount throws).
+  Found on the way: a `HTMLTemplateElement` reference threw in the test DOM and the adapter's
+  catch-all silently turned that into its "package not found" fallback; the check now uses
+  `nodeName`, and the test caught it.
+- **Tests:** the test runner's `--conditions=browser` selects Solid's browser build, whose
+  `renderToString` only throws, so the tests compile components with the real Solid compiler and
+  render server HTML in a child Node process (`tests/helpers/solid.ts`) - the same split the real
+  sidecar has. Covered: keyed output, stamped vs unstamped markup, the opt-out, the fallback template
+  surviving, markup with unmatched keys being rebuilt (which only node identity detects), and a
+  second island hydrating after the first was clicked. Mutation checks, one per fix: the old hydrate
+  rule, no `_$HY`, no `done` reset and no clearing each fail exactly their own tests.
+- **Showcase:** `/polyglot`'s Solid island was real Solid but built with DOM calls (Solid can't
+  hydrate those); it's now Solid JSX, server-rendered and hydrated. One Solid copy per bundle -
+  client builds in the browser, server builds in the sidecar.
+- **Verified:** the raw server HTML carries the keyed markup; the browser hydrates onto the same node
+  with no Solid script on the page, clicks update it, and the console is clean. Client 827/827
+  (twice), .NET 535/535, typecheck, contract gate and bundle budgets pass, and SSR e2e is 20/20 in
+  Chromium and WebKit - all five frameworks.
+- **Known limits of the whole sidecar:** islands with slotted child content and `<island-deferred>`
+  islands still render client-side; one Node process renders serially; `.vue` single-file components
+  are untested; a Solid island nested inside a server-rendered Solid island could have its keys
+  gathered by the outer one. The published standalone adapters (`dist/adapters/*.js`) inline their
+  frameworks - a pre-existing issue, being handled separately.
 
 **Two significant, previously-undiscovered bugs found and fixed while getting Server Actions to a real
 live-browser proof — both pre-existing, unrelated to the plugin API itself, neither ever caught because

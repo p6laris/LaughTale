@@ -5,6 +5,7 @@
  */
 
 import type { IslandContext } from '../runtime/registry';
+import { clearForAppendingMount } from './slot';
 
 export interface SvelteAdapterOptions {
     hydrate?: boolean;
@@ -50,7 +51,7 @@ export function createSvelteIsland<TProps = any>(
                 // replacing its content, so any server fallback markup would stay next to the live
                 // component. Clear it first so a plain mount behaves like the other adapters.
                 if (!hydrateMode) {
-                    container.replaceChildren();
+                    clearForAppendingMount(container);
                 }
 
                 const instance = mount(Component, {

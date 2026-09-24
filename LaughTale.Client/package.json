@@ -40,7 +40,8 @@
     "./ssr/react": "./dist/ssr/react.js",
     "./ssr/preact": "./dist/ssr/preact.js",
     "./ssr/vue": "./dist/ssr/vue.js",
-    "./ssr/svelte": "./dist/ssr/svelte.js"
+    "./ssr/svelte": "./dist/ssr/svelte.js",
+    "./ssr/solid": "./dist/ssr/solid.js"
   },
   "scripts": {
     "gen:icons": "node ../scripts/gen-icons.mjs",
@@ -71,9 +72,12 @@
     "typescript": "^5.7.3"
   },
   "devDependencies": {
+    "@babel/core": "^7.29.7",
+    "@babel/preset-typescript": "^7.29.7",
     "@playwright/test": "^1.62.1",
     "@types/alpinejs": "^3.13.11",
     "alpinejs": "^3.17.4",
+    "babel-preset-solid": "^1.9.15",
     "happy-dom": "^20.11.6",
     "lucide-static": "^1.33.0",
     "preact": "^10.29.8",

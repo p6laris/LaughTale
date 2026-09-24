@@ -99,11 +99,14 @@ describe('Svelte SSR hydration', () => {
         defineIsland('plain-svelte-counter', async () => ({ default: createSvelteIsland(ClientCounter) }));
         const container = await serverRenderedIsland('plain-svelte-counter', { start: 5 }, false);
         const serverButton = container.querySelector('button')!;
+        // The error boundary's fallback: inert, and read only if the mount throws - it must survive.
+        container.insertAdjacentHTML('beforeend', '<template data-slot="fallback"><p>Failed to load</p></template>');
 
         hydrateIsland(container);
         await waitFor(() => !!container.querySelector('button') && container.querySelector('button') !== serverButton);
 
         assert.equal(container.querySelectorAll('button').length, 1, 'the server markup must be replaced, not kept beside the component');
+        assert.ok(container.querySelector('template[data-slot="fallback"]'), 'the fallback template must be kept for the error boundary');
         const button = container.querySelector('button')!;
         assert.equal(button.textContent, 'Count: 5');
         assert.equal(container.hasAttribute('data-lt-ssr-hydrated'), false);

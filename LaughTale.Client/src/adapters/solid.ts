@@ -5,7 +5,7 @@
  */
 
 import type { IslandContext } from '../runtime/registry';
-import { extractIslandSlot, warnIfSlotUnused } from './slot';
+import { clearForAppendingMount, extractIslandSlot, warnIfSlotUnused } from './slot';
 
 export interface SolidAdapterOptions {
     hydrate?: boolean;
@@ -47,6 +47,27 @@ function createReactiveProps<TProps extends object>(
 }
 
 /**
+ * Solid's hydrate() reads a page-global `_$HY` object that its hydration script
+ * (`generateHydrationScript()`) normally defines, and throws without it. Islands don't need that
+ * script's early-event capture - no LaughTale adapter replays clicks made before hydration - so the
+ * adapter creates the same empty object itself when the page has none, which also keeps an inline
+ * script (and its CSP nonce) out of the picture.
+ *
+ * Solid also assumes one hydration per page: the first delegated event after hydrating sets
+ * `_$HY.done`, after which every hydrate() call silently re-renders instead. Islands hydrate at
+ * different times (a `Visible` island long after a `Load` one was clicked), so the flag is cleared
+ * before each island hydrates.
+ */
+function prepareSolidHydration(solidCore: any): void {
+    const g = globalThis as any;
+    g._$HY ??= { events: [], completed: new WeakSet(), r: {}, fe() {} };
+    g._$HY.done = false;
+    if (solidCore.sharedConfig) {
+        solidCore.sharedConfig.done = false;
+    }
+}
+
+/**
  * Creates an island mount function wrapping a Solid component.
  * @param Component The Solid component function.
  * @param options Adapter configuration options.
@@ -70,11 +91,25 @@ export function createSolidIsland<TProps = any>(
             const createSignal = solidCore.createSignal;
 
             if (render && createComponent && createSignal) {
-                const hydrateMode = options.hydrate && typeof hydrate === 'function' && (ctx?.hydrate || container.hasChildNodes());
+                // Same rule as the React adapter: hydrate markup the server stamped (ctx.hydrate, set
+                // from data-lt-ssr by the hydrator) with no opt-in needed; an explicit {hydrate:true}
+                // keeps its old meaning; {hydrate:false} always opts out.
+                const hydrateMode = typeof hydrate === 'function' && options.hydrate !== false
+                    && (ctx?.hydrate === true || (options.hydrate === true && container.hasChildNodes()));
+
+                if (hydrateMode) {
+                    prepareSolidHydration(solidCore);
+                }
 
                 // Extract `.island-slot` (ROADMAP.v5.md Part D, close adapter gaps) BEFORE the
                 // destructive render below wipes it out - identical rationale to react.ts/vue.ts.
                 const extractedSlot = hydrateMode ? null : extractIslandSlot(container);
+
+                // Solid's render() appends to the container like Svelte's mount() - see
+                // clearForAppendingMount. (Slot content was detached just above.)
+                if (!hydrateMode) {
+                    clearForAppendingMount(container);
+                }
 
                 const { props: reactiveProps, setProps } = createReactiveProps(props as any, createSignal);
 

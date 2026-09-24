@@ -150,7 +150,8 @@ await esbuild.build({
         'ssr/react': 'src/ssr/react.ts',
         'ssr/preact': 'src/ssr/preact.ts',
         'ssr/vue': 'src/ssr/vue.ts',
-        'ssr/svelte': 'src/ssr/svelte.ts'
+        'ssr/svelte': 'src/ssr/svelte.ts',
+        'ssr/solid': 'src/ssr/solid.ts'
     },
     bundle: true,
     outdir: 'dist',

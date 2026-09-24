@@ -2,6 +2,10 @@ import * as esbuild from 'esbuild';
 import * as fs from 'fs';
 import * as path from 'path';
 import sveltePlugin from 'esbuild-svelte';
+import { transformAsync } from '@babel/core';
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
 
 const isWatch = process.argv.includes('--watch');
 const outDir = 'wwwroot/js';
@@ -27,6 +31,31 @@ export const dedupeFrameworks = {
     }
 };
 
+// Solid components need Solid's own JSX compiler (babel-preset-solid), which emits different code for
+// the server (`ssr`) and the browser (`dom`) - both `hydratable`, so hydration can match them up.
+// Scoped to Scripts/islands/solid/ because this project's JSX default is React's.
+const SOLID_FILES = /[\\/]Scripts[\\/]islands[\\/]solid[\\/][^\\/]+\.tsx$/;
+function solidJsx(generate) {
+    return {
+        name: `solid-jsx-${generate}`,
+        setup(build) {
+            build.onLoad({ filter: SOLID_FILES }, async args => {
+                const source = await fs.promises.readFile(args.path, 'utf8');
+                const { code } = await transformAsync(source, {
+                    filename: args.path,
+                    babelrc: false,
+                    configFile: false,
+                    presets: [
+                        require.resolve('@babel/preset-typescript'),
+                        [require.resolve('babel-preset-solid'), { generate, hydratable: true }]
+                    ]
+                });
+                return { contents: code, loader: 'js' };
+            });
+        }
+    };
+}
+
 const ctx = await esbuild.context({
     entryPoints: ['Scripts/main.ts'],
     bundle: true,
@@ -37,7 +66,7 @@ const ctx = await esbuild.context({
     sourcemap: true,
     minify: true,
     jsx: 'automatic',
-    plugins: [dedupeFrameworks, sveltePlugin({ compilerOptions: { generate: 'client' } })],
+    plugins: [dedupeFrameworks, sveltePlugin({ compilerOptions: { generate: 'client' } }), solidJsx('dom')],
     // Vue's browser build (vue.runtime.esm-bundler.js) takes its compile-time feature flags from the
     // bundler. The Options API stays on (islands may use it); mismatch details stay off in production,
     // where Vue still logs that a hydration mismatch happened.
@@ -62,8 +91,8 @@ const ssrCtx = await esbuild.context({
     outfile: 'ssr/server-bundle.mjs',
     sourcemap: true,
     jsx: 'automatic',
-    // The same .svelte files as the browser build, compiled to Svelte's server output instead.
-    plugins: [dedupeFrameworks, sveltePlugin({ compilerOptions: { generate: 'server' } })],
+    // The same .svelte and Solid files as the browser build, compiled to their server output instead.
+    plugins: [dedupeFrameworks, sveltePlugin({ compilerOptions: { generate: 'server' } }), solidJsx('ssr')],
     // Frameworks pick their dev or prod build from NODE_ENV at runtime. Node launched by .NET has it
     // unset, which would mean the slow development build on the server; the minified browser bundle
     // already gets production (esbuild defines it automatically there), so match it here.

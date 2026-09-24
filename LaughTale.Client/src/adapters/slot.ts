@@ -63,3 +63,17 @@ export function warnIfSlotUnused(extractedSlot: ExtractedSlot | null, container:
     const name = container.getAttribute('data-island') || container.getAttribute('name') || '(unnamed)';
     console.warn(`[LaughTale] Island '${name}' received child content (via <island>...</island> markup) but its mounted component never rendered it. Render \`props.children\` (React/Preact) or the default slot (Vue) to use it.`);
 }
+
+/**
+ * Empties a container before a framework mount that APPENDS to its target (Svelte 5's mount(),
+ * Solid's render()) rather than replacing its content, so server fallback markup doesn't stay next
+ * to the live component. Keeps `<template data-slot="fallback">`: it's inert, and error-boundary.ts
+ * reads it if the mount that follows throws. Call after extractIslandSlot(), which has already
+ * detached the slot content.
+ */
+export function clearForAppendingMount(container: HTMLElement): void {
+    for (const node of Array.from(container.childNodes)) {
+        const isFallbackTemplate = node.nodeName === 'TEMPLATE' && (node as Element).getAttribute('data-slot') === 'fallback';
+        if (!isFallbackTemplate) node.remove();
+    }
+}

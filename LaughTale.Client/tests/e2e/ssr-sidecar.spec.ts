@@ -1,9 +1,9 @@
 import { test, expect } from '@playwright/test';
 
 // The SSR sidecar end to end: .NET asks a Node child process (the Showcase's ssr/server-bundle.mjs)
-// to render islands (React, Preact, Vue, Svelte), and the browser hydrates that markup instead of
-// re-mounting it. The Showcase enables the sidecar in Development (appsettings.Development.json),
-// which is how Playwright's webServer runs it.
+// to render islands (React, Preact, Vue, Svelte, Solid), and the browser hydrates that markup
+// instead of re-mounting it. The Showcase enables the sidecar in Development
+// (appsettings.Development.json), which is how Playwright's webServer runs it.
 
 test.describe('SSR sidecar (React)', () => {
     test('the server response already contains the React island rendered to HTML', async ({ request }) => {
@@ -184,6 +184,57 @@ test.describe('SSR sidecar (Svelte)', () => {
             return !!captured && captured === document.querySelector('[data-island="polyglot-svelte"] [data-testid="svelte-load"]');
         });
         expect(sameNode, 'the node present in the server HTML must still be the live node after hydration').toBe(true);
+
+        expect(errors.filter(e => /hydrat|did not match|mismatch/i.test(e))).toEqual([]);
+    });
+});
+
+test.describe('SSR sidecar (Solid)', () => {
+    test('the server response already contains the Solid island rendered to HTML', async ({ request }) => {
+        const html = await (await request.get('/polyglot')).text();
+
+        expect(html).toContain('data-lt-ssr="true" data-island="polyglot-solid"');
+        // data-hk is the key Solid's hydrate() uses to find each server node.
+        expect(html).toMatch(/data-island="polyglot-solid"[^>]*><div data-hk="/);
+        expect(html).toMatch(/data-testid="solid-count"[^>]*>\s*0\s*</);
+    });
+
+    test('the browser hydrates the server markup - same DOM nodes, interactive, no hydration script needed', async ({ page }) => {
+        const errors: string[] = [];
+        page.on('console', msg => { if (msg.type() === 'error' || msg.type() === 'warning') errors.push(msg.text()); });
+        page.on('pageerror', err => errors.push(err.message));
+
+        // Solid silently rebuilds DOM it can't match, so node identity is the check that matters.
+        await page.addInitScript(() => {
+            document.addEventListener('readystatechange', () => {
+                if (document.readyState === 'interactive') {
+                    (window as any).__ssrSolidCountNode = document.querySelector('[data-island="polyglot-solid"] [data-testid="solid-count"]');
+                    // The page ships no Solid hydration script; the adapter provides what hydrate() needs.
+                    (window as any).__hadSolidHydrationScript = typeof (window as any)._$HY !== 'undefined';
+                }
+            });
+        });
+
+        await page.goto('/polyglot');
+        const island = page.locator('[data-island="polyglot-solid"]');
+        await expect(island).toHaveAttribute('data-lt-ssr-hydrated', 'true');
+
+        const increment = island.locator('[data-testid="solid-increment"]');
+        await increment.click();
+        await increment.click();
+        await increment.click();
+        await expect(island.locator('[data-testid="solid-count"]')).toHaveText('3');
+        await expect(island.locator('button')).toHaveCount(1);
+
+        const result = await page.evaluate(() => {
+            const captured = (window as any).__ssrSolidCountNode;
+            return {
+                sameNode: !!captured && captured === document.querySelector('[data-island="polyglot-solid"] [data-testid="solid-count"]'),
+                hadScript: (window as any).__hadSolidHydrationScript
+            };
+        });
+        expect(result.sameNode, 'the node present in the server HTML must still be the live node after hydration').toBe(true);
+        expect(result.hadScript).toBe(false);
 
         expect(errors.filter(e => /hydrat|did not match|mismatch/i.test(e))).toEqual([]);
     });

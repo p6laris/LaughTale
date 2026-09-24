@@ -111,10 +111,10 @@ happens. Be honest with yourself about the difference:
 - **Razor markup, `Vanilla`, Web Components, and Alpine islands** can have real server-rendered
   content: override `BuildSsrHtml()` (or nest markup inside `<island>...</island>`) with genuine HTML,
   and that's what a visitor sees immediately, JS or not.
-- **React, Preact, Vue and Svelte islands can be truly server-rendered with the opt-in SSR sidecar**
-  (see below). Without it - and for **Solid**, which the sidecar doesn't support yet - a
-  framework-mounted island with no `BuildSsrHtml()` override and no child content renders a genuinely
-  **empty wrapper `<div>`** until its client JS chunk loads and mounts.
+- **React, Preact, Vue, Svelte and Solid islands can be truly server-rendered with the opt-in SSR
+  sidecar** (see below). Without it, a framework-mounted island with no `BuildSsrHtml()` override
+  and no child content renders a genuinely **empty wrapper `<div>`** until its client JS chunk loads
+  and mounts.
 
 For `Idle`/`Visible`/`Media`/`Interaction`, an empty island until then is often exactly what you want -
 `Visible`'s whole pitch is "0 KB until scrolled into view." **`hydrate="Load"` is different**: it
@@ -124,10 +124,10 @@ server-side content at all gets a `data-laughtale-warning-no-fallback` attribute
 DOM inspector. Fix it by giving it real `BuildSsrHtml()` markup, nesting fallback content inside the
 `<island>` tag, or switching to a deferred strategy if a brief blank gap is genuinely fine.
 
-### The SSR sidecar (React, Preact, Vue, Svelte)
+### The SSR sidecar (React, Preact, Vue, Svelte, Solid)
 
-The sidecar closes this gap for React, Preact, Vue and Svelte islands. At startup your app runs a
-Node child process - your own **server bundle** - and while rendering a page, asks it over
+The sidecar closes this gap for React, Preact, Vue, Svelte and Solid islands. At startup your app
+runs a Node child process - your own **server bundle** - and while rendering a page, asks it over
 stdin/stdout to render each registered island with its props. The HTML goes straight into the page
 with a `data-lt-ssr="true"` stamp, and in the browser the framework **hydrates** that markup
 (attaching to the existing DOM) instead of mounting from scratch. No network port is opened.
@@ -142,16 +142,19 @@ with a `data-lt-ssr="true"` stamp, and in the browser the framework **hydrates**
    import { preactSsrComponent } from 'laughtale/ssr/preact';
    import { vueSsrComponent } from 'laughtale/ssr/vue';
    import { svelteSsrComponent } from 'laughtale/ssr/svelte';
+   import { solidSsrComponent } from 'laughtale/ssr/solid';
    import RevenueCard from './islands/RevenueCard';
    import Throughput from './islands/Throughput';
    import Inventory from './islands/Inventory';
    import LoadGauge from './islands/LoadGauge.svelte';
+   import Counter from './islands/solid/Counter';
 
    startSsrHost({
        'revenue-card': reactSsrComponent(RevenueCard),
        'throughput': preactSsrComponent(Throughput),
        'inventory': vueSsrComponent(Inventory),
-       'load-gauge': svelteSsrComponent(LoadGauge)
+       'load-gauge': svelteSsrComponent(LoadGauge),
+       'counter': solidSsrComponent(Counter)
    });
    ```
 
@@ -170,6 +173,12 @@ with a `data-lt-ssr="true"` stamp, and in the browser the framework **hydrates**
      builds need a Svelte plugin (e.g. `esbuild-svelte`) with the matching output:
      `compilerOptions: { generate: 'server' }` for the server bundle and `generate: 'client'` for
      the browser bundle. `<svelte:head>` content is dropped, since an island has no `<head>`.
+   - **Solid** components must be compiled by Solid's own JSX compiler (`babel-preset-solid`), in
+     both builds, with `hydratable: true`: `generate: 'ssr'` for the server bundle and
+     `generate: 'dom'` for the browser. If your project's JSX defaults to React, scope the Solid
+     compiler to Solid files (the Showcase's `esbuild.config.mjs` runs it only on
+     `Scripts/islands/solid/`). No Solid hydration script (`generateHydrationScript()`) is needed -
+     the adapter provides what `hydrate()` expects - so nothing extra has to pass your CSP.
 
 2. **Bundle it for Node** into one self-contained file, *outside* `wwwroot` (it's server code), with
    `NODE_ENV` pinned to `production` so the server runs the same framework build as the browser.
@@ -208,11 +217,11 @@ compares: `Math.random()`, `Date.now()`, or locale-dependent formatting such as 
 with no locale argument (a server and a browser in different locales print `84,500` vs `84.500`)
 produce a mismatch. React discards the server HTML and re-renders; Preact silently patches the DOM
 to match; Vue patches it and logs "Hydration completed but contains mismatches."; Svelte's
-production build patches differing text silently and re-mounts markup it can't walk, also silently.
-Pass an explicit locale, and keep randomness in effects, lifecycle hooks and event handlers.
+production build patches differing text silently and re-mounts markup it can't walk, also silently;
+Solid silently rebuilds any node whose hydration key it can't find. Pass an explicit locale, and
+keep randomness in effects, lifecycle hooks and event handlers.
 
-**Not server-rendered yet:** islands with slotted child content, `<island-deferred>` islands, and
-Solid components.
+**Not server-rendered yet:** islands with slotted child content, and `<island-deferred>` islands.
 
 **Bundle each framework once.** If a framework can be resolved from two `node_modules` trees (for
 example your app's and a linked library's), the bundler may include two copies, and hooks break.
