@@ -1,9 +1,9 @@
 import { test, expect } from '@playwright/test';
 
 // The SSR sidecar end to end: .NET asks a Node child process (the Showcase's ssr/server-bundle.mjs)
-// to render islands (React, Preact, Vue), and the browser hydrates that markup instead of re-mounting
-// it. The Showcase enables the sidecar in Development (appsettings.Development.json), which is how
-// Playwright's webServer runs it.
+// to render islands (React, Preact, Vue, Svelte), and the browser hydrates that markup instead of
+// re-mounting it. The Showcase enables the sidecar in Development (appsettings.Development.json),
+// which is how Playwright's webServer runs it.
 
 test.describe('SSR sidecar (React)', () => {
     test('the server response already contains the React island rendered to HTML', async ({ request }) => {
@@ -136,6 +136,55 @@ test.describe('SSR sidecar (Vue)', () => {
         expect(sameNode, 'the node present in the server HTML must still be the live node after hydration').toBe(true);
 
         // Vue logs "Hydration completed but contains mismatches." even in production builds.
+        expect(errors.filter(e => /hydrat|did not match|mismatch/i.test(e))).toEqual([]);
+    });
+});
+
+test.describe('SSR sidecar (Svelte)', () => {
+    test('the server response already contains the Svelte island rendered to HTML', async ({ request }) => {
+        const html = await (await request.get('/polyglot')).text();
+
+        expect(html).toContain('data-lt-ssr="true" data-island="polyglot-svelte"');
+        expect(html).toMatch(/data-testid="svelte-load"[^>]*>40%</);
+        // The block marker Svelte's hydrate() needs; without it Svelte silently re-mounts.
+        expect(html).toMatch(/data-island="polyglot-svelte"[^>]*><!--\[-->/);
+    });
+
+    test('the browser hydrates the server markup - same DOM nodes, interactive', async ({ page }) => {
+        const errors: string[] = [];
+        page.on('console', msg => { if (msg.type() === 'error' || msg.type() === 'warning') errors.push(msg.text()); });
+        page.on('pageerror', err => errors.push(err.message));
+
+        // Svelte's production build re-mounts markup it can't hydrate without any warning, so node
+        // identity is the check that matters here.
+        await page.addInitScript(() => {
+            document.addEventListener('readystatechange', () => {
+                if (document.readyState === 'interactive') {
+                    (window as any).__ssrLoadNode = document.querySelector('[data-island="polyglot-svelte"] [data-testid="svelte-load"]');
+                }
+            });
+        });
+
+        await page.goto('/polyglot');
+        const island = page.locator('[data-island="polyglot-svelte"]');
+        await expect(island).toHaveAttribute('data-lt-ssr-hydrated', 'true');
+
+        // The gauge decays on a timer once hydrated, so assert outcomes the timer can't flake:
+        // two spikes from ~40% always cross the 75% "Peak Load" threshold.
+        const spike = island.locator('[data-testid="svelte-spike"]');
+        await spike.click();
+        await spike.click();
+        await expect(island.locator('[data-testid="svelte-status"]')).toHaveText('Peak Load');
+        const load = parseInt((await island.locator('[data-testid="svelte-load"]').textContent()) ?? '', 10);
+        expect(load).toBeGreaterThanOrEqual(75);
+        await expect(island.locator('button')).toHaveCount(1);
+
+        const sameNode = await page.evaluate(() => {
+            const captured = (window as any).__ssrLoadNode;
+            return !!captured && captured === document.querySelector('[data-island="polyglot-svelte"] [data-testid="svelte-load"]');
+        });
+        expect(sameNode, 'the node present in the server HTML must still be the live node after hydration').toBe(true);
+
         expect(errors.filter(e => /hydrat|did not match|mismatch/i.test(e))).toEqual([]);
     });
 });

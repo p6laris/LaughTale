@@ -1,6 +1,7 @@
 import * as esbuild from 'esbuild';
 import * as fs from 'fs';
 import * as path from 'path';
+import sveltePlugin from 'esbuild-svelte';
 
 const isWatch = process.argv.includes('--watch');
 const outDir = 'wwwroot/js';
@@ -14,7 +15,7 @@ if (!fs.existsSync(outDir)) {
 // react, which breaks hooks ("Invalid hook call") and splits Solid's reactive graph. Re-resolving
 // these packages from this project's root keeps normal package "exports" resolution (browser vs
 // server builds) while guaranteeing one copy - the equivalent of Vite's resolve.dedupe.
-const DEDUPED = /^(react|react-dom|solid-js|preact|preact-render-to-string|vue|@vue\/[\w-]+)(\/.*)?$/;
+const DEDUPED = /^(react|react-dom|solid-js|preact|preact-render-to-string|vue|@vue\/[\w-]+|svelte)(\/.*)?$/;
 const projectRoot = path.resolve('.');
 export const dedupeFrameworks = {
     name: 'dedupe-frameworks',
@@ -36,7 +37,7 @@ const ctx = await esbuild.context({
     sourcemap: true,
     minify: true,
     jsx: 'automatic',
-    plugins: [dedupeFrameworks],
+    plugins: [dedupeFrameworks, sveltePlugin({ compilerOptions: { generate: 'client' } })],
     // Vue's browser build (vue.runtime.esm-bundler.js) takes its compile-time feature flags from the
     // bundler. The Options API stays on (islands may use it); mismatch details stay off in production,
     // where Vue still logs that a hydration mismatch happened.
@@ -61,7 +62,8 @@ const ssrCtx = await esbuild.context({
     outfile: 'ssr/server-bundle.mjs',
     sourcemap: true,
     jsx: 'automatic',
-    plugins: [dedupeFrameworks],
+    // The same .svelte files as the browser build, compiled to Svelte's server output instead.
+    plugins: [dedupeFrameworks, sveltePlugin({ compilerOptions: { generate: 'server' } })],
     // Frameworks pick their dev or prod build from NODE_ENV at runtime. Node launched by .NET has it
     // unset, which would mean the slow development build on the server; the minified browser bundle
     // already gets production (esbuild defines it automatically there), so match it here.

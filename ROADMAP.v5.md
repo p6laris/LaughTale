@@ -473,7 +473,7 @@ behaviour, and the fixes are sitting unused in `src/composables/`.
 
 ---
 
-## 6. Part D — Adapters — **[CLOSED except Angular (deferred) and the Framework SSR sidecar (IN PROGRESS - Phases 1-3, React, Preact and Vue, done) - see "New adapters" and "Framework SSR sidecar" rows]**
+## 6. Part D — Adapters — **[CLOSED except Angular (deferred) and the Framework SSR sidecar (IN PROGRESS - Phases 1-4, React, Preact, Vue and Svelte, done) - see "New adapters" and "Framework SSR sidecar" rows]**
 
 All five adapters *were* one-shot mount functions (324 lines total, confirmed by `wc -l`: 314
 across the five adapter files — `react.ts` 71, `vue.ts` 69, `preact.ts` 64, `svelte.ts` 94,
@@ -654,7 +654,7 @@ store, left unfixed here since it's unrelated to the actual ask; new adapters; a
 preservation for a nested island inside a framework adapter's destructive mount when the parent
 doesn't forward it as a slot (an author-error case, not a framework gap).
 
-| **Framework SSR sidecar — [IN PROGRESS: Phase 1 (React, full pipeline), Phase 2 (Preact) and Phase 3 (Vue) DONE; Svelte, Solid to follow - see Part G/L "Validation: Framework SSR sidecar"]** Node render host over a local socket. The right *first plugin* to prove the Part L API, not core work. Until then, rename the strategy `client-only` and require a fallback | Astro, Nuxt | XL · 8+ wks |
+| **Framework SSR sidecar — [IN PROGRESS: Phase 1 (React, full pipeline), Phase 2 (Preact), Phase 3 (Vue) and Phase 4 (Svelte) DONE; Solid to follow - see Part G/L "Validation: Framework SSR sidecar"]** Node render host over a local socket. The right *first plugin* to prove the Part L API, not core work. Until then, rename the strategy `client-only` and require a fallback | Astro, Nuxt | XL · 8+ wks |
 
 ---
 
@@ -2112,7 +2112,7 @@ how much of the enterprise story stops at that one policy string.
 
 ---
 
-## 14. Part G/L — DX & plugin architecture — **[CLOSED except the Framework SSR sidecar, now IN PROGRESS - Phases 1-3 (React, Preact, Vue) done; mechanism + other validation-plugin layers closed]**
+## 14. Part G/L — DX & plugin architecture — **[CLOSED except the Framework SSR sidecar, now IN PROGRESS - Phases 1-4 (React, Preact, Vue, Svelte) done; mechanism + other validation-plugin layers closed]**
 
 Build the plugin API **before** Parts E and F, so streaming, actions and cache tags are written as
 first-party plugins against your own interface. Nothing proves an extension point like being forced
@@ -2281,6 +2281,40 @@ pipeline carried over as-is.
   React island's sale events still reach it. Client 814/814 (twice), .NET 535/535, typecheck, contract
   gate and bundle budgets pass, and SSR e2e is 12/12 in Chromium and WebKit.
 - **Not yet:** `.vue` single-file components; Svelte and Solid (next phases).
+
+**Update - Framework SSR sidecar, Phase 4 (Svelte 5) DONE.** No .NET changes.
+- **JS (`laughtale/ssr/svelte`):** `svelteSsrComponent(Component)` awaits `svelte/server`'s
+  `render()` (covering Svelte's async components too) and returns `body`, including the `<!--[-->`
+  block markers the browser's `hydrate()` needs. Svelte compiles each component differently per
+  target, so the Showcase now runs `esbuild-svelte` in both builds: `generate: 'server'` for the
+  sidecar bundle and `generate: 'client'` for the browser.
+- **Adapter:** stamped islands hydrate without a manual opt-in, the same rule as the other adapters.
+  Also fixed: Svelte 5's `mount()` *appends* to its target, so the plain-mount path left any server
+  fallback markup next to the live component; the adapter now clears the container first, like React,
+  Vue and Preact effectively do.
+- **Tests:** `svelte` is now a Client devDependency, and the tests compile real components at test
+  time with `svelte/compiler` (`tests/helpers/svelte.ts`), so the test runner is unchanged. The old
+  adapter test only ever reached the "package not found" fallback; it now mounts and destroys a real
+  component. A probe showed Svelte's production hydration checks little - a different tag is adopted
+  as-is, differing text is patched silently, and markup it can't walk is re-mounted without any
+  warning - so the tests rely on node identity and "exactly one button" rather than on warnings.
+  Two mutation checks, one per fix: the old hydrate rule fails exactly the stamped-hydration test; no
+  clearing fails exactly the three plain-mount tests.
+- **Found along the way:** installing Svelte for the tests made esbuild inline Svelte's whole runtime
+  into the all-in-one IIFE (+18 KB gzip, over its 420 KB budget) and into `dist/adapters/svelte.js`
+  (5 KB -> 52 KB), where it would also have given apps a second Svelte copy. `svelte` is now external
+  in both builds, restoring their previous contents. The other published adapters already inline
+  their frameworks (`dist/adapters/react.js` is ~224 KB) - a pre-existing duplicate-framework issue,
+  flagged separately rather than changed here.
+- **Showcase:** `/polyglot`'s Svelte island was the last vanilla-JS imitation among the SSR
+  frameworks; it's now a real runes component (`$props`, `$state`, `$derived`, with the event
+  subscription and decay timer in `$effect`, which never runs on the server). `svelte` was added to
+  the dedupe list; the browser bundle has one Svelte copy with only the client runtime.
+- **Verified:** the raw server HTML contains the rendered island and its block marker; the browser
+  hydrates onto the same node, spikes and cross-island sale events update it, and the console is
+  clean. Client 820/820 (twice), .NET 535/535, typecheck, contract gate and bundle budgets pass, and
+  SSR e2e is 16/16 in Chromium and WebKit.
+- **Not yet:** Solid (Phase 5); slot forwarding and `update()` for Svelte islands.
 
 **Two significant, previously-undiscovered bugs found and fixed while getting Server Actions to a real
 live-browser proof — both pre-existing, unrelated to the plugin API itself, neither ever caught because

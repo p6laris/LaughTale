@@ -83,7 +83,11 @@ await esbuild.build({
     format: 'iife',
     globalName: 'LaughTaleIslands',
     target: 'es2022',
-    outfile: 'dist/index.js'
+    outfile: 'dist/index.js',
+    // Svelte is a devDependency only so the tests can compile real components; this bundle never
+    // included it (the adapter's import('svelte') used to be unresolvable here), and installing a
+    // test dependency must not grow what ships by Svelte's whole runtime.
+    external: ['svelte']
 });
 
 // 4. Build the per-framework mount adapters as standalone ESM modules.
@@ -114,7 +118,10 @@ await esbuild.build({
     format: 'esm',
     target: 'es2022',
     minify: isProd,
-    sourcemap: !isProd
+    sourcemap: !isProd,
+    // Same reason as the all-in-one bundle above: Svelte is installed for the tests only, and the
+    // app's compiled components must share the app's own Svelte runtime, not a copy inlined here.
+    external: ['svelte']
 });
 
 // 5. Build the Tailwind preset for the "./tailwind" subpath export (same gap as
@@ -142,7 +149,8 @@ await esbuild.build({
         'ssr/index': 'src/ssr/index.ts',
         'ssr/react': 'src/ssr/react.ts',
         'ssr/preact': 'src/ssr/preact.ts',
-        'ssr/vue': 'src/ssr/vue.ts'
+        'ssr/vue': 'src/ssr/vue.ts',
+        'ssr/svelte': 'src/ssr/svelte.ts'
     },
     bundle: true,
     outdir: 'dist',

@@ -14,10 +14,9 @@ export interface SvelteAdapterOptions {
  * Slot/children forwarding (ROADMAP.v5.md Part D, close adapter gaps) is deliberately NOT
  * implemented here, unlike react.ts/vue.ts/preact.ts. Svelte 5's children are snippets (a function
  * prop rendered via `{@render children()}`, not a raw-DOM-node consumption model like React/Preact
- * children or Vue's slot-functions-returning-vnodes), and this repo has no Svelte compiler
- * toolchain to verify a real fix against - the same reason this adapter's test coverage already
- * only exercises the fallback path (no `svelte` devDependency), and the same reason `update()` was
- * deliberately excluded here in the prior pass.
+ * children or Vue's slot-functions-returning-vnodes), so forwarding server-rendered slot DOM into
+ * one needs its own design. `update()` is likewise still not implemented. Mount, hydrate and
+ * unmount are tested against real compiled Svelte 5 components (tests/helpers/svelte.ts).
  */
 
 /**
@@ -40,10 +39,19 @@ export function createSvelteIsland<TProps = any>(
             let unmountFn: (() => void) | null = null;
 
             if (svelte && typeof svelte.mount === 'function') {
-                // Svelte 5 API
-                const mount = (options.hydrate && typeof svelte.hydrate === 'function' && (ctx?.hydrate || container.hasChildNodes()))
-                    ? svelte.hydrate
-                    : svelte.mount;
+                // Svelte 5 API. Same rule as the React adapter: hydrate markup the server stamped
+                // (ctx.hydrate, set from data-lt-ssr by the hydrator) with no opt-in needed; an
+                // explicit {hydrate:true} keeps its old meaning; {hydrate:false} always opts out.
+                const hydrateMode = typeof svelte.hydrate === 'function' && options.hydrate !== false
+                    && (ctx?.hydrate === true || (options.hydrate === true && container.hasChildNodes()));
+                const mount = hydrateMode ? svelte.hydrate : svelte.mount;
+
+                // Unlike React/Vue/Preact, Svelte's mount() appends to the target instead of
+                // replacing its content, so any server fallback markup would stay next to the live
+                // component. Clear it first so a plain mount behaves like the other adapters.
+                if (!hydrateMode) {
+                    container.replaceChildren();
+                }
 
                 const instance = mount(Component, {
                     target: container,

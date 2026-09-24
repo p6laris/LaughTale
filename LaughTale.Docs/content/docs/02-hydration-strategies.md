@@ -111,8 +111,8 @@ happens. Be honest with yourself about the difference:
 - **Razor markup, `Vanilla`, Web Components, and Alpine islands** can have real server-rendered
   content: override `BuildSsrHtml()` (or nest markup inside `<island>...</island>`) with genuine HTML,
   and that's what a visitor sees immediately, JS or not.
-- **React, Preact and Vue islands can be truly server-rendered with the opt-in SSR sidecar** (see
-  below). Without it - and for **Svelte and Solid**, which the sidecar doesn't support yet - a
+- **React, Preact, Vue and Svelte islands can be truly server-rendered with the opt-in SSR sidecar**
+  (see below). Without it - and for **Solid**, which the sidecar doesn't support yet - a
   framework-mounted island with no `BuildSsrHtml()` override and no child content renders a genuinely
   **empty wrapper `<div>`** until its client JS chunk loads and mounts.
 
@@ -124,13 +124,13 @@ server-side content at all gets a `data-laughtale-warning-no-fallback` attribute
 DOM inspector. Fix it by giving it real `BuildSsrHtml()` markup, nesting fallback content inside the
 `<island>` tag, or switching to a deferred strategy if a brief blank gap is genuinely fine.
 
-### The SSR sidecar (React, Preact, Vue)
+### The SSR sidecar (React, Preact, Vue, Svelte)
 
-The sidecar closes this gap for React, Preact and Vue islands. At startup your app runs a Node child
-process - your own **server bundle** - and while rendering a page, asks it over stdin/stdout to render
-each registered island with its props. The HTML goes straight into the page with a
-`data-lt-ssr="true"` stamp, and in the browser the framework **hydrates** that markup (attaching to
-the existing DOM) instead of mounting from scratch. No network port is opened.
+The sidecar closes this gap for React, Preact, Vue and Svelte islands. At startup your app runs a
+Node child process - your own **server bundle** - and while rendering a page, asks it over
+stdin/stdout to render each registered island with its props. The HTML goes straight into the page
+with a `data-lt-ssr="true"` stamp, and in the browser the framework **hydrates** that markup
+(attaching to the existing DOM) instead of mounting from scratch. No network port is opened.
 
 1. **Write a server entry** that registers the islands to server-render, keyed by the same names you
    use in Razor:
@@ -141,14 +141,17 @@ the existing DOM) instead of mounting from scratch. No network port is opened.
    import { reactSsrComponent } from 'laughtale/ssr/react';
    import { preactSsrComponent } from 'laughtale/ssr/preact';
    import { vueSsrComponent } from 'laughtale/ssr/vue';
+   import { svelteSsrComponent } from 'laughtale/ssr/svelte';
    import RevenueCard from './islands/RevenueCard';
    import Throughput from './islands/Throughput';
    import Inventory from './islands/Inventory';
+   import LoadGauge from './islands/LoadGauge.svelte';
 
    startSsrHost({
        'revenue-card': reactSsrComponent(RevenueCard),
        'throughput': preactSsrComponent(Throughput),
-       'inventory': vueSsrComponent(Inventory)
+       'inventory': vueSsrComponent(Inventory),
+       'load-gauge': svelteSsrComponent(LoadGauge)
    });
    ```
 
@@ -163,6 +166,10 @@ the existing DOM) instead of mounting from scratch. No network port is opened.
      receives - Vue renders undeclared ones as HTML attributes on the root element. Vue's browser build
      expects its feature flags from the bundler: define `__VUE_OPTIONS_API__`,
      `__VUE_PROD_DEVTOOLS__` and `__VUE_PROD_HYDRATION_MISMATCH_DETAILS__` in the browser build.
+   - **Svelte 5** compiles each `.svelte` file differently for the server and the browser, so both
+     builds need a Svelte plugin (e.g. `esbuild-svelte`) with the matching output:
+     `compilerOptions: { generate: 'server' }` for the server bundle and `generate: 'client'` for
+     the browser bundle. `<svelte:head>` content is dropped, since an island has no `<head>`.
 
 2. **Bundle it for Node** into one self-contained file, *outside* `wwwroot` (it's server code), with
    `NODE_ENV` pinned to `production` so the server runs the same framework build as the browser.
@@ -200,11 +207,12 @@ needed where you enable it - a production image can stay .NET-only.
 compares: `Math.random()`, `Date.now()`, or locale-dependent formatting such as `toLocaleString()`
 with no locale argument (a server and a browser in different locales print `84,500` vs `84.500`)
 produce a mismatch. React discards the server HTML and re-renders; Preact silently patches the DOM
-to match; Vue patches it and logs "Hydration completed but contains mismatches." Pass an explicit
-locale, and keep randomness in effects, lifecycle hooks and event handlers.
+to match; Vue patches it and logs "Hydration completed but contains mismatches."; Svelte's
+production build patches differing text silently and re-mounts markup it can't walk, also silently.
+Pass an explicit locale, and keep randomness in effects, lifecycle hooks and event handlers.
 
 **Not server-rendered yet:** islands with slotted child content, `<island-deferred>` islands, and
-components in Svelte or Solid.
+Solid components.
 
 **Bundle each framework once.** If a framework can be resolved from two `node_modules` trees (for
 example your app's and a linked library's), the bundler may include two copies, and hooks break.

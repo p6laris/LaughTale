@@ -39,7 +39,8 @@
     "./ssr": "./dist/ssr/index.js",
     "./ssr/react": "./dist/ssr/react.js",
     "./ssr/preact": "./dist/ssr/preact.js",
-    "./ssr/vue": "./dist/ssr/vue.js"
+    "./ssr/vue": "./dist/ssr/vue.js",
+    "./ssr/svelte": "./dist/ssr/svelte.js"
   },
   "scripts": {
     "gen:icons": "node ../scripts/gen-icons.mjs",
@@ -80,6 +81,7 @@
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "solid-js": "^1.9.15",
+    "svelte": "^5.57.1",
     "vue": "^3.5.42"
   }
 }

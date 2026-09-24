@@ -2,14 +2,15 @@ import './setup.ts';
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { createVanillaIsland, createReactIsland, createVueIsland, createSvelteIsland, createPreactIsland } from '../src/index.ts';
+import { compileSvelte } from './helpers/svelte.ts';
 
-// React, Vue and Preact are real devDependencies (see package.json) specifically so the tests
-// below exercise each adapter's actual framework-mount/update code path, not just its
+// React, Vue, Preact and Svelte are real devDependencies (see package.json) specifically so the
+// tests below exercise each adapter's actual framework-mount/update code path, not just its
 // "package not found" fallback branch (which is all any adapter test could reach before, since
 // no framework package was ever installed - the fallback ran unconditionally for all five
-// adapters and none of them ever mounted a real component). Svelte is deliberately NOT a
-// dependency - ROADMAP.v5.md Part D records why createSvelteIsland does not implement update()
-// in this pass - so its test below still legitimately exercises the fallback path.
+// adapters and none of them ever mounted a real component). Svelte components are compiled at
+// test time (tests/helpers/svelte.ts); createSvelteIsland still has no update() - see
+// ROADMAP.v5.md Part D.
 //
 // These MUST be dynamic imports, not static `import ... from 'vue'` declarations. esbuild
 // inlines setup.ts's happy-dom globalThis assignments into this same bundled module, and ES
@@ -325,8 +326,9 @@ describe('LaughTale Framework Mount Adapters Suite', () => {
         );
     });
 
-    it('createSvelteIsland: handles fallback gracefully with IslandContext signal', async () => {
+    it('createSvelteIsland: mounts a real Svelte 5 component and unmounts via IslandContext signal', async () => {
         const container = document.createElement('div');
+        container.innerHTML = '<p class="fallback">Loading...</p>';
         let cleanedUp = false;
 
         const abortController = new AbortController();
@@ -341,18 +343,22 @@ describe('LaughTale Framework Mount Adapters Suite', () => {
             }
         };
 
-        const mount = createSvelteIsland((el: HTMLElement, props: any) => {
-            el.textContent = `Svelte ${props.title}`;
-            return () => { cleanedUp = true; };
-        });
+        const Card = await compileSvelte('AdapterSvelteCard', `<script>
+            import { onDestroy } from 'svelte';
+            let { title, onDestroyed } = $props();
+            onDestroy(() => onDestroyed());
+        </script>
+        <span id="svelte-card">Svelte {title}</span>`, 'client');
 
-        const unmount = await mount(container, { title: 'Graph' }, ctx);
+        const mount = createSvelteIsland(Card);
+        await mount(container, { title: 'Graph', onDestroyed: () => { cleanedUp = true; } }, ctx);
         assert.equal(container.textContent, 'Svelte Graph');
+        // Svelte's mount() appends; the adapter clears fallback markup first, like the other adapters.
+        assert.equal(container.querySelector('.fallback'), null, 'server fallback markup must be replaced, not kept beside the component');
 
-        if (typeof unmount === 'function') {
-            unmount();
-            assert.equal(cleanedUp, true);
-        }
+        abortController.abort();
+        assert.equal(cleanedUp, true, 'aborting the island signal must destroy the component');
+        assert.equal(container.querySelector('#svelte-card'), null);
     });
 
     it('createPreactIsland: mounts a real Preact component and unmounts via IslandContext signal', async () => {
