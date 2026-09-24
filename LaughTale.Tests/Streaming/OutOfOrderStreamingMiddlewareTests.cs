@@ -100,7 +100,15 @@ public class OutOfOrderStreamingMiddlewareTests
 
         // Resolve Fast well before Slow, despite being declared second.
         fastTcs.SetResult(new { Message = "fast" });
-        await Task.Delay(30);
+        // Wait for the fast fragment to actually be written (bounded) instead of a fixed 30ms delay,
+        // which flaked under a loaded thread pool. A broken implementation still fails the ordering assert.
+        var body0 = (MemoryStream)httpContext.Response.Body;
+        var waitStarted = System.Diagnostics.Stopwatch.StartNew();
+        while (!Encoding.UTF8.GetString(body0.ToArray()).Contains("fast-widget", StringComparison.Ordinal)
+               && waitStarted.Elapsed < TimeSpan.FromSeconds(5))
+        {
+            await Task.Delay(10);
+        }
         slowTcs.SetResult(new { Message = "slow" });
 
         await invokeTask;

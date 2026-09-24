@@ -80,7 +80,14 @@ public class LaughTaleActivitySourceTests
         {
             ShouldListenTo = source => source.Name == LaughTaleActivitySource.Name,
             Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllData,
-            ActivityStopped = activity => { if (activity.OperationName == "island.render") recorded.Add(activity); }
+            // Also filtered by island name: other test classes render IslandTagHelperBase islands in parallel.
+            ActivityStopped = activity =>
+            {
+                if (activity.OperationName == "island.render" && Equals(activity.GetTagItem("island.name"), "test-telemetry-island"))
+                {
+                    lock (recorded) recorded.Add(activity);
+                }
+            }
         };
         ActivitySource.AddActivityListener(listener);
 

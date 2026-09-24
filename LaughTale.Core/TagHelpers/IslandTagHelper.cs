@@ -141,7 +141,43 @@ public class IslandTagHelper : TagHelper
             output.Attributes.SetAttribute("dir", isRtl ? "rtl" : "ltr");
         }
 
-        var serializedProps = IslandJson.SerializeProps(Props);
+        // Same OnIslandRendering splice as IslandTagHelperBase: after authorization, before props
+        // serialization. A no-op (no context allocation) when no plugins are registered.
+        var props = Props;
+        var contentModifiedBeforePlugins = output.Content.IsModified;
+        var plugins = requestServices.GetService<System.Collections.Generic.IEnumerable<LaughTale.Core.Plugins.LaughTalePlugin>>();
+        if (plugins != null)
+        {
+            using var pluginEnumerator = plugins.GetEnumerator();
+            if (pluginEnumerator.MoveNext())
+            {
+                var renderingContext = new LaughTale.Core.Plugins.IslandRenderingContext
+                {
+                    IslandName = Name,
+                    HttpContext = httpContext,
+                    Output = output,
+                    Props = props
+                };
+
+                do
+                {
+                    await pluginEnumerator.Current.OnIslandRenderingAsync(renderingContext);
+                }
+                while (pluginEnumerator.MoveNext());
+
+                props = renderingContext.Props;
+                if (!ReferenceEquals(props, Props))
+                {
+                    EnforceCachePrivacy(props);
+                }
+            }
+        }
+
+        var pluginSuppliedContent = !contentModifiedBeforePlugins
+            && output.Content.IsModified
+            && !output.Content.IsEmptyOrWhiteSpace;
+
+        var serializedProps = IslandJson.SerializeProps(props);
         var propBytes = System.Text.Encoding.UTF8.GetByteCount(serializedProps);
 
         output.Attributes.SetAttribute("data-island", Name);
@@ -186,22 +222,30 @@ public class IslandTagHelper : TagHelper
         }
 
         var childContent = await output.GetChildContentAsync();
-        var sb = new System.Text.StringBuilder();
+        var hasChildContent = !childContent.IsEmptyOrWhiteSpace;
 
-        if (!childContent.IsEmptyOrWhiteSpace)
+        // Plugin-supplied markup (e.g. SSR) is exactly the DOM the client framework hydrates, so it is
+        // kept as-is: no fallback template or end marker is appended, which would be a hydration mismatch.
+        // Child content still takes precedence, preserving the slotted-island behavior.
+        if (hasChildContent || !pluginSuppliedContent)
         {
-            sb.Append($"<div data-slot=\"default\" class=\"island-slot\">{childContent.GetContent()}</div>");
-        }
+            var sb = new System.Text.StringBuilder();
 
-        if (!string.IsNullOrWhiteSpace(Fallback))
-        {
-            sb.Append($"<template data-slot=\"fallback\" class=\"island-fallback-template\">{System.Net.WebUtility.HtmlEncode(Fallback)}</template>");
-        }
+            if (hasChildContent)
+            {
+                sb.Append($"<div data-slot=\"default\" class=\"island-slot\">{childContent.GetContent()}</div>");
+            }
 
-        if (sb.Length > 0)
-        {
-            sb.Append($"<!--island:end:{Name}-->");
-            output.Content.SetHtmlContent(sb.ToString());
+            if (!string.IsNullOrWhiteSpace(Fallback))
+            {
+                sb.Append($"<template data-slot=\"fallback\" class=\"island-fallback-template\">{System.Net.WebUtility.HtmlEncode(Fallback)}</template>");
+            }
+
+            if (sb.Length > 0)
+            {
+                sb.Append($"<!--island:end:{Name}-->");
+                output.Content.SetHtmlContent(sb.ToString());
+            }
         }
 
         IslandDiagnostics.ValidateIsland(
@@ -210,30 +254,17 @@ public class IslandTagHelper : TagHelper
             Media,
             !string.IsNullOrWhiteSpace(Persist),
             output,
-            childContent.IsEmptyOrWhiteSpace);
+            !hasChildContent && !pluginSuppliedContent);
     }
 
-    private void EnforceCachePrivacy()
+    private void EnforceCachePrivacy() => EnforceCachePrivacy(Props);
+
+    private void EnforceCachePrivacy(object? props)
     {
         var httpContext = ViewContext?.HttpContext;
         if (httpContext == null) return;
 
-        bool hasPrivateAttr = false;
-        if (IsPrivate == true)
-        {
-            hasPrivateAttr = true;
-        }
-        else if (Props != null)
-        {
-            var propsType = Props.GetType();
-            hasPrivateAttr = propsType.GetCustomAttribute<IslandPrivateAttribute>(true) != null ||
-                             propsType.GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                                      .Any(p => p.GetCustomAttribute<IslandPrivateAttribute>(true) != null);
-        }
-
-        if (hasPrivateAttr)
-        {
-            LaughTale.Core.Security.IslandCachePrivacy.EnforceNoStore(httpContext, Name, _logger);
-        }
+        var hasPrivateAttr = IsPrivate == true || LaughTale.Core.Security.IslandCachePrivacyGuard.IsPrivate(props?.GetType());
+        LaughTale.Core.Security.IslandCachePrivacyGuard.EnforceIfPrivate(httpContext, Name, hasPrivateAttr, _logger);
     }
 }

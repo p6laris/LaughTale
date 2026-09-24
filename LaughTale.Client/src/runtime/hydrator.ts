@@ -14,6 +14,7 @@ import { initDesignTokens } from '../styles/design-tokens';
 import { useLocale } from '../composables/useLocale';
 import { useSharedState } from './state';
 import { useAmbientState } from './ambient-state';
+import { SSR_ATTR, SSR_HYDRATED_ATTR, markSsrHydrated } from './ssr';
 
 export type HydrateStrategy = 'load' | 'idle' | 'visible' | 'media' | 'interaction' | 'never';
 export type HydrationState = 'idle' | 'pending' | 'mounted' | 'failed';
@@ -254,10 +255,10 @@ async function executeHydration(container: HTMLElement, name: string): Promise<v
             name,
             locale: localeVal,
             dir: dirVal,
-            // Computed once, here, so every mount function (vanilla included) shares one normalized
-            // answer to "was there pre-existing DOM here" instead of re-deriving it ad hoc (ROADMAP.v5.md
-            // Part D) - the same check react.ts/vue.ts/preact.ts/svelte.ts already performed independently.
-            hydrate: container.hasChildNodes(),
+            // Only the server's explicit `data-lt-ssr` stamp counts as "server-rendered" - whitespace,
+            // skeletons and `.island-slot` content are child nodes too, but not markup to hydrate.
+            // An already-consumed stamp (a remount after unmount) renders fresh.
+            hydrate: container.hasAttribute(SSR_ATTR) && !container.hasAttribute(SSR_HYDRATED_ATTR),
             // Reaches the existing (previously unwired) useSharedState composable - see IslandContext's
             // own doc comment for why this is `sharedState`, not `state` (ROADMAP.v5.md Part D vs Part F).
             sharedState: useSharedState,
@@ -285,6 +286,10 @@ async function executeHydration(container: HTMLElement, name: string): Promise<v
         // into this instance without a full unmount/remount. Internal plumbing only — not
         // part of the public container.island handle below.
         setIslandUpdateFn(container, update);
+
+        if (ctx.hydrate) {
+            markSsrHydrated(container);
+        }
 
         const cleanup = () => {
             try {
@@ -392,6 +397,9 @@ async function executeHydration(container: HTMLElement, name: string): Promise<v
         hydrateTopLevelIslandsWithin(container);
     } catch (error: any) {
         (container as any)[HYDRATION_STATE_KEY] = 'failed';
+        // The error boundary below replaces the server markup, so a later retryIsland() must mount
+        // fresh rather than try to hydrate DOM that no longer matches the server render.
+        container.removeAttribute(SSR_ATTR);
 
         // Notify custom telemetry error handler if registered
         if (globalErrorHandler) {

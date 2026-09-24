@@ -132,6 +132,26 @@ await esbuild.build({
     sourcemap: !isProd
 });
 
+// 6. Build the SSR sidecar library ("./ssr", "./ssr/react") for Node. Every bare package import
+// stays external: the app's own server build bundles these together with ITS framework copy, so
+// the component and the framework's server renderer share one instance (two React copies break
+// hooks). Separate from the ESM build above, so it never lands in dist/meta.json's per-island
+// chunk budget or the browser bundle report below.
+await esbuild.build({
+    entryPoints: {
+        'ssr/index': 'src/ssr/index.ts',
+        'ssr/react': 'src/ssr/react.ts'
+    },
+    bundle: true,
+    outdir: 'dist',
+    platform: 'node',
+    format: 'esm',
+    target: 'node20',
+    packages: 'external',
+    minify: isProd,
+    sourcemap: !isProd
+});
+
 console.log(`[LaughTale] Client bundle built successfully (${isProd ? 'Production' : 'Development'}).`);
 
 // 4. Budget & Size Reports

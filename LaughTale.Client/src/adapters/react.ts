@@ -44,7 +44,11 @@ export function createReactIsland<TProps = any>(
 
             if (createRoot && createElement) {
                 let root: any;
-                const hydrateMode = options.hydrate && hydrateRoot && (ctx?.hydrate ?? container.hasChildNodes());
+                // ctx.hydrate is true only for a `data-lt-ssr`-stamped container (see hydrator.ts), so
+                // server-rendered markup hydrates by default; `{ hydrate: false }` opts out, and an
+                // explicit `{ hydrate: true }` keeps its pre-SSR meaning of "adopt any existing DOM".
+                const hydrateMode = !!hydrateRoot && options.hydrate !== false
+                    && (ctx?.hydrate === true || (options.hydrate === true && container.hasChildNodes()));
 
                 // Extract `.island-slot` (ROADMAP.v5.md Part D, close adapter gaps) BEFORE the
                 // destructive render below wipes it out - forwarded to the component as

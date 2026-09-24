@@ -54,6 +54,12 @@
   <!-- Auto-bundle TypeScript islands before build -->
   <Target Name="BuildIslandsJs" BeforeTargets="AssignTargetPaths;ResolveStaticWebAssetsInputs;BeforeBuild" Condition="'$(DesignTimeBuild)' != 'true'">
     <Exec Command="npm run build" WorkingDirectory="$(ProjectDir)" Condition="Exists('$(ProjectDir)package.json')" />
+    <!-- The SSR sidecar's server bundle is produced by the npm step above, so it is added here at
+         execution time rather than by a static glob (which would miss it on a clean build). It sits
+         outside wwwroot on purpose: server code that must never be served as a static asset. -->
+    <ItemGroup>
+      <None Include="ssr\**" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    </ItemGroup>
   </Target>
 
   <Import Project="..\LaughTale.Generators\buildTransitive\LaughTale.Generators.targets" Condition="Exists('..\LaughTale.Generators\buildTransitive\LaughTale.Generators.targets')" />

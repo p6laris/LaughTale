@@ -7,6 +7,7 @@ using LaughTale.Core.Endpoints;
 using LaughTale.Core.Extensions;
 using LaughTale.Core.Performance;
 using LaughTale.Core.Plugins;
+using LaughTale.Core.Ssr;
 using LaughTale.Core.Streaming;
 using LaughTale.Showcase.Configuration;
 
@@ -47,6 +48,17 @@ builder.Services.AddLaughTaleOutputCache(options =>
 // the public LaughTalePlugin API. See /PluginCacheTagsDemo for the live proof (no HttpContext.Tag(...)
 // call anywhere on that page, unlike /CacheTagsDemo's own hand-written Part F version).
 builder.Services.AddLaughTalePlugin(new IslandCacheTagsPlugin());
+
+// SSR sidecar: server-renders framework islands through a Node child process running
+// ssr/server-bundle.mjs (built from Scripts/ssr-entry.ts). Opt-in via LaughTale:Ssr:Enabled, which
+// appsettings.Development.json turns on; the production image ships no Node, and if Node is missing or
+// a render fails, islands simply render client-side as before. The working directory is pinned to the
+// content root because `dotnet run --project` would otherwise resolve the bundle from the repo root.
+builder.Services.AddLaughTaleSsrSidecar(builder.Configuration, ssr =>
+{
+    ssr.WorkingDirectory ??= builder.Environment.ContentRootPath;
+    ssr.ServerBundlePath ??= "ssr/server-bundle.mjs";
+});
 
 // ROADMAP.v5.md Part B "Asset pipeline" (integrity manifest): enables lt-integrity on <script>/<link>.
 builder.Services.AddLaughTaleAssetIntegrity();

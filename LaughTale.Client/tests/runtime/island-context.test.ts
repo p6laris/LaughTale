@@ -109,35 +109,63 @@ describe('IslandContext & Lifecycle AbortSignal Suite', () => {
         assert.equal(clickCount, 1, 'Listener bound to ctx.signal should not fire after unmount');
     });
 
-    it('ctx.hydrate reflects whether the container already had DOM content when hydration started (ROADMAP.v5.md Part D)', async () => {
-        let emptyCtx: IslandContext | null = null;
-        let seededCtx: IslandContext | null = null;
+    it('ctx.hydrate is true only for a data-lt-ssr-stamped container, not for mere child nodes (SSR sidecar)', async () => {
+        const seen = new Map<string, IslandContext>();
+        for (const name of ['hydrate-empty', 'hydrate-children', 'hydrate-whitespace', 'hydrate-stamped']) {
+            defineIsland(name, async () => ({
+                default: (el, props, ctx) => { seen.set(name, ctx!); }
+            }));
+        }
 
-        defineIsland('hydrate-signal-empty', async () => ({
-            default: (el, props, ctx) => { emptyCtx = ctx!; }
-        }));
-        defineIsland('hydrate-signal-seeded', async () => ({
-            default: (el, props, ctx) => { seededCtx = ctx!; }
-        }));
+        const make = (name: string, html: string, stamped = false) => {
+            const el = document.createElement('div');
+            el.setAttribute('data-island', name);
+            el.setAttribute('data-hydrate', 'load');
+            if (stamped) el.setAttribute('data-lt-ssr', 'true');
+            el.innerHTML = html;
+            document.body.appendChild(el);
+            return el;
+        };
 
-        const emptyContainer = document.createElement('div');
-        emptyContainer.setAttribute('data-island', 'hydrate-signal-empty');
-        emptyContainer.setAttribute('data-hydrate', 'load');
-        document.body.appendChild(emptyContainer);
-
-        const seededContainer = document.createElement('div');
-        seededContainer.setAttribute('data-island', 'hydrate-signal-seeded');
-        seededContainer.setAttribute('data-hydrate', 'load');
-        seededContainer.innerHTML = '<span>server-rendered</span>';
-        document.body.appendChild(seededContainer);
-
-        hydrateIsland(emptyContainer);
-        hydrateIsland(seededContainer);
+        const containers = [
+            make('hydrate-empty', ''),
+            make('hydrate-children', '<span>skeleton</span>'),
+            make('hydrate-whitespace', '\n   \n'),
+            make('hydrate-stamped', '<span>server-rendered</span>', true)
+        ];
+        containers.forEach((el) => hydrateIsland(el));
 
         await new Promise(r => setTimeout(r, 40));
 
-        assert.equal(emptyCtx?.hydrate, false, 'an empty container must report ctx.hydrate === false');
-        assert.equal(seededCtx?.hydrate, true, 'a container seeded with markup must report ctx.hydrate === true');
+        assert.equal(seen.get('hydrate-empty')?.hydrate, false, 'an empty container must report ctx.hydrate === false');
+        assert.equal(seen.get('hydrate-children')?.hydrate, false, 'child nodes without the stamp must report ctx.hydrate === false');
+        assert.equal(seen.get('hydrate-whitespace')?.hydrate, false, 'whitespace without the stamp must report ctx.hydrate === false');
+        assert.equal(seen.get('hydrate-stamped')?.hydrate, true, 'a data-lt-ssr container must report ctx.hydrate === true');
+        assert.equal(containers[3].getAttribute('data-lt-ssr-hydrated'), 'true', 'a consumed SSR stamp is marked hydrated');
+        assert.equal(containers[1].hasAttribute('data-lt-ssr-hydrated'), false);
+    });
+
+    it('a failed mount drops the data-lt-ssr stamp so a retry mounts fresh instead of hydrating the error boundary', async () => {
+        defineIsland('hydrate-stamped-failing', async () => ({
+            default: () => { throw new Error('boom'); }
+        }));
+        const el = document.createElement('div');
+        el.setAttribute('data-island', 'hydrate-stamped-failing');
+        el.setAttribute('data-hydrate', 'load');
+        el.setAttribute('data-lt-ssr', 'true');
+        el.innerHTML = '<span>server-rendered</span>';
+        document.body.appendChild(el);
+
+        const originalError = console.error;
+        console.error = () => {};
+        try {
+            hydrateIsland(el);
+            await new Promise(r => setTimeout(r, 40));
+        } finally {
+            console.error = originalError;
+        }
+
+        assert.equal(el.hasAttribute('data-lt-ssr'), false);
     });
 
     it('ctx.sharedState reaches the same store across two islands, and set()/subscribe() sync them (ROADMAP.v5.md Part D)', async () => {

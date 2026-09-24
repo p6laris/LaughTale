@@ -20,6 +20,7 @@ namespace LaughTale.Tests.Assets;
 /// auto-stamping width/height, defaulting loading="lazy", and never overriding an author-supplied
 /// width/height/loading.
 /// </summary>
+[Collection(LaughTale.Tests.LaughTaleEnvironmentCollection.Name)]
 public class ImageOptimizationTagHelperTests : IDisposable
 {
     // A real 2x3 PNG (System.Drawing-encoded, hand-verified via ImageDimensionReaderTests already) -

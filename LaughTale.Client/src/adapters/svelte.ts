@@ -41,7 +41,7 @@ export function createSvelteIsland<TProps = any>(
 
             if (svelte && typeof svelte.mount === 'function') {
                 // Svelte 5 API
-                const mount = (options.hydrate && typeof svelte.hydrate === 'function' && (ctx?.hydrate ?? container.hasChildNodes()))
+                const mount = (options.hydrate && typeof svelte.hydrate === 'function' && (ctx?.hydrate || container.hasChildNodes()))
                     ? svelte.hydrate
                     : svelte.mount;
 

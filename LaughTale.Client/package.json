@@ -35,7 +35,9 @@
     "./adapters/web-components": "./dist/adapters/web-components.js",
     "./adapters/solid": "./dist/adapters/solid.js",
     "./adapters/alpine": "./dist/adapters/alpine.js",
-    "./tailwind": "./dist/styles/tailwind.preset.js"
+    "./tailwind": "./dist/styles/tailwind.preset.js",
+    "./ssr": "./dist/ssr/index.js",
+    "./ssr/react": "./dist/ssr/react.js"
   },
   "scripts": {
     "gen:icons": "node ../scripts/gen-icons.mjs",

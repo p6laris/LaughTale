@@ -16,6 +16,7 @@
 ## Generated Client & Showcase Bundles
 **/wwwroot/js/
 !**/wwwroot/js/.gitkeep
+LaughTale.Showcase/ssr/
 
 ## OS generated
 .DS_Store

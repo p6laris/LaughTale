@@ -38,7 +38,7 @@ export function createVueIsland<TProps = any>(
                 // app/root is created, and Vue's own patch algorithm updates the mounted
                 // component in place.
                 const propsRef = shallowRef(props);
-                const hydrateMode = options.hydrate && createSSRApp && (ctx?.hydrate ?? container.hasChildNodes());
+                const hydrateMode = options.hydrate && createSSRApp && (ctx?.hydrate || container.hasChildNodes());
                 const appFactory = hydrateMode ? createSSRApp : createApp;
 
                 // Extract `.island-slot` (ROADMAP.v5.md Part D, close adapter gaps) BEFORE the

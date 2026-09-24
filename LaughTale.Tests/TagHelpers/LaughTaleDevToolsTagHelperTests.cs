@@ -8,6 +8,7 @@ using Xunit;
 
 namespace LaughTale.Tests.TagHelpers;
 
+[Collection(LaughTale.Tests.LaughTaleEnvironmentCollection.Name)]
 public class LaughTaleDevToolsTagHelperTests : IDisposable
 {
     public LaughTaleDevToolsTagHelperTests()

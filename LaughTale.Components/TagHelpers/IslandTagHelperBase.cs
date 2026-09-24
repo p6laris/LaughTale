@@ -211,6 +211,7 @@ public abstract class IslandTagHelperBase : TagHelper
         }
 
         var props = BuildProps();
+        var builtProps = props;
 
         // ROADMAP.v5.md Part G/L: OnIslandRendering plugin hook. Splicing it in here, in the shared
         // base class, means every IslandTagHelperBase subclass reaches it for free - zero generator
@@ -240,6 +241,20 @@ public abstract class IslandTagHelperBase : TagHelper
 
                 props = renderingContext.Props;
             }
+        }
+
+        // [IslandPrivate] cache rule, matching the core <island> TagHelper: the component type, the built
+        // props, or plugin-replaced props being private all force a no-store response.
+        var isPrivate = LaughTale.Core.Security.IslandCachePrivacyGuard.IsPrivate(GetType())
+            || LaughTale.Core.Security.IslandCachePrivacyGuard.IsPrivate(builtProps?.GetType())
+            || (!ReferenceEquals(props, builtProps) && LaughTale.Core.Security.IslandCachePrivacyGuard.IsPrivate(props?.GetType()));
+        if (isPrivate)
+        {
+            LaughTale.Core.Security.IslandCachePrivacyGuard.EnforceIfPrivate(
+                httpContext,
+                IslandName,
+                isPrivate,
+                requestServices.GetService<Microsoft.Extensions.Logging.ILogger<IslandTagHelperBase>>());
         }
 
         if (props != null)

@@ -31,7 +31,7 @@ export function createPreactIsland<TProps = any>(
             const hydrate = preact.hydrate || preact.default?.hydrate;
 
             if (render && h) {
-                const hydrateMode = options.hydrate && hydrate && (ctx?.hydrate ?? container.hasChildNodes());
+                const hydrateMode = options.hydrate && hydrate && (ctx?.hydrate || container.hasChildNodes());
 
                 // Extract `.island-slot` (ROADMAP.v5.md Part D, close adapter gaps) BEFORE the
                 // destructive render below wipes it out - see the identical rationale in

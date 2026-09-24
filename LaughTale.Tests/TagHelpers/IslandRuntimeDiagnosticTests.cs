@@ -15,6 +15,7 @@ using Xunit;
 
 namespace LaughTale.Tests.TagHelpers;
 
+[Collection(LaughTale.Tests.LaughTaleEnvironmentCollection.Name)]
 public class IslandRuntimeDiagnosticTests : IDisposable
 {
     public IslandRuntimeDiagnosticTests()
@@ -163,6 +164,43 @@ public class IslandRuntimeDiagnosticTests : IDisposable
         Assert.False(output.Attributes.ContainsName("data-laughtale-warning-name"));
         Assert.False(output.Attributes.ContainsName("data-laughtale-warning-media"));
         Assert.False(output.Attributes.ContainsName("data-laughtale-warning-persist"));
+    }
+
+    [Fact]
+    public async Task Development_LoadIslandWithPluginSuppliedSsrContent_DoesNotEmitNoFallbackWarning()
+    {
+        var services = new ServiceCollection();
+        services.AddLogging();
+        services.AddLaughTale(options => options.Refresh.AllowUndeclaredIslands = true);
+        services.AddSingleton<LaughTale.Core.Ssr.ISsrRenderer>(new AlwaysRenders());
+        services.AddLaughTalePlugin(new LaughTale.Core.Ssr.SsrSidecarPlugin());
+        var viewContext = new ViewContext
+        {
+            HttpContext = new DefaultHttpContext { RequestServices = services.BuildServiceProvider() },
+            ViewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary())
+        };
+
+        var withSsr = new IslandTagHelper { ViewContext = viewContext, Name = "ssr-card", Hydrate = HydrateStrategy.Load };
+        var (context, output) = CreateTagHelperContext("island");
+        await withSsr.ProcessAsync(context, output);
+
+        var withoutSsr = new IslandTagHelper { ViewContext = CreateViewContext(), Name = "ssr-card", Hydrate = HydrateStrategy.Load };
+        var (context2, output2) = CreateTagHelperContext("island");
+        await withoutSsr.ProcessAsync(context2, output2);
+
+        Assert.Equal("<p>server</p>", output.Content.GetContent());
+        Assert.False(output.Attributes.ContainsName("data-laughtale-warning-no-fallback"));
+        Assert.True(output2.Attributes.ContainsName("data-laughtale-warning-no-fallback"));
+    }
+
+    private sealed class AlwaysRenders : LaughTale.Core.Ssr.ISsrRenderer
+    {
+        public bool IsReady => true;
+
+        public bool CanRender(string islandName) => true;
+
+        public Task<LaughTale.Core.Ssr.SsrRenderResult> RenderAsync(string islandName, string? propsJson, System.Threading.CancellationToken cancellationToken = default) =>
+            Task.FromResult(LaughTale.Core.Ssr.SsrRenderResult.Ok("<p>server</p>"));
     }
 
     private static (TagHelperContext Context, TagHelperOutput Output) CreateTagHelperContext(string tagName)

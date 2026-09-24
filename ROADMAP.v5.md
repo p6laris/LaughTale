@@ -473,7 +473,7 @@ behaviour, and the fixes are sitting unused in `src/composables/`.
 
 ---
 
-## 6. Part D — Adapters — **[CLOSED except Angular and the Framework SSR sidecar's Node-process work, both explicitly deferred as their own multi-week items - see "New adapters" and "Framework SSR sidecar" rows]**
+## 6. Part D — Adapters — **[CLOSED except Angular (deferred) and the Framework SSR sidecar (IN PROGRESS - Phase 1, React, done) - see "New adapters" and "Framework SSR sidecar" rows]**
 
 All five adapters *were* one-shot mount functions (324 lines total, confirmed by `wc -l`: 314
 across the five adapter files — `react.ts` 71, `vue.ts` 69, `preact.ts` 64, `svelte.ts` 94,
@@ -654,7 +654,7 @@ store, left unfixed here since it's unrelated to the actual ask; new adapters; a
 preservation for a nested island inside a framework adapter's destructive mount when the parent
 doesn't forward it as a slot (an author-error case, not a framework gap).
 
-| **Framework SSR sidecar — [DEFERRED, real Node-sidecar work explicitly not attempted; interim "require a fallback" half CLOSED - see Part G/L "Validation: Framework SSR sidecar"]** Node render host over a local socket. The right *first plugin* to prove the Part L API, not core work. Until then, rename the strategy `client-only` and require a fallback | Astro, Nuxt | XL · 8+ wks |
+| **Framework SSR sidecar — [IN PROGRESS: Phase 1 (React, full pipeline) DONE; Preact, Vue, Svelte, Solid to follow - see Part G/L "Validation: Framework SSR sidecar"]** Node render host over a local socket. The right *first plugin* to prove the Part L API, not core work. Until then, rename the strategy `client-only` and require a fallback | Astro, Nuxt | XL · 8+ wks |
 
 ---
 
@@ -2112,7 +2112,7 @@ how much of the enterprise story stops at that one policy string.
 
 ---
 
-## 14. Part G/L — DX & plugin architecture — **[CLOSED except the Framework SSR sidecar's own Node-process implementation, explicitly deferred - mechanism + all 3 validation-plugin layers otherwise closed]**
+## 14. Part G/L — DX & plugin architecture — **[CLOSED except the Framework SSR sidecar, now IN PROGRESS - Phase 1 (React) done; mechanism + other validation-plugin layers closed]**
 
 Build the plugin API **before** Parts E and F, so streaming, actions and cache tags are written as
 first-party plugins against your own interface. Nothing proves an extension point like being forced
@@ -2196,6 +2196,46 @@ true SSR in LaughTale today - only Razor/Vanilla/Web-Components/Alpine content i
 `/polyglot` alone has 12 islands using `hydrate="Load"` with no fallback content today (`theme-studio`,
 `sidebar`, `persistent-telemetry`, and 9 more) - a real, pre-existing backlog this diagnostic now makes
 visible, left as-is rather than retrofitting 12 unrelated demo pages as a side effect of this item.
+
+**Update - Framework SSR sidecar, Phase 1 (React) DONE.** Built as the Part L plugin it was always
+meant to validate, with no changes to the `LaughTalePlugin` API itself (its render-time hook,
+`OnIslandRenderingAsync`, already received the island's output and props). Scope for the whole item:
+all five frameworks, opt-in, fail-open; Phase 1 proves the full pipeline with React.
+- **.NET (`LaughTale.Core/Ssr/`):** `NodeSsrSidecar`, a hosted service that runs `node <server
+  bundle>` as a child process and talks newline-delimited JSON over stdin/stdout - no network port.
+  It correlates concurrent renders by id, enforces a per-render `RenderTimeout` (500 ms default),
+  restarts a crashed process with exponential backoff, and kills the process tree on shutdown.
+  `SsrSidecarPlugin` sends each island the bundle registered, with props serialized by the same
+  `IslandJson.SerializeProps` as `data-props` (asserted byte-identical by a test, since any difference
+  is a hydration mismatch), and writes the HTML with a `data-lt-ssr="true"` stamp. Opt-in via
+  `AddLaughTaleSsrSidecar(...)` / `LaughTale:Ssr:Enabled`; on any failure the island renders exactly
+  as before.
+- **JS (`laughtale/ssr`, `laughtale/ssr/react`):** the app's own server bundle *is* the Node program
+  (`startSsrHost({...})`), so the component and `react-dom/server` share one React - a separate host
+  loading components could end up with two copies, which breaks hooks. Component `console.*` output
+  is redirected off the protocol stream.
+- **Client:** the hydrator now decides "server-rendered" from the explicit `data-lt-ssr` stamp instead
+  of `hasChildNodes()` (whitespace, skeletons and slot content counted as markup to hydrate), and the
+  React adapter hydrates stamped islands without a manual opt-in. The adapters' hydrate paths had
+  existed all along but were never enabled or tested.
+- **Real bugs found and fixed along the way:** the core `<island>` TagHelper - the one users actually
+  write - never called plugins at all (only the generated component TagHelpers did); the base
+  TagHelper path skipped the `[IslandPrivate]` no-store rule the core one enforces; and the Showcase
+  bundled React, ReactDOM and Solid **twice** (committed separately as 05546b1), which only worked
+  because its one React island used no hooks. Four already-flaky .NET tests were also stabilized.
+- **Showcase:** `/polyglot`'s React island was a vanilla-JS imitation setting `innerHTML`; it's now a
+  real React component with hooks, server-rendered from `ssr/server-bundle.mjs` (built outside
+  `wwwroot`, never served) and enabled in `appsettings.Development.json` only - the production image
+  stays .NET-only. Its original `toLocaleString()` would have been a guaranteed hydration mismatch
+  across server/browser locales; the new one formats with a fixed locale.
+- **Verified:** the raw server HTML contains the rendered component; the browser hydrates it with
+  **the same DOM nodes** (a Playwright test captures the server-rendered node before any page script
+  runs and asserts it is still the live node afterwards), no hydration errors, and working state;
+  killing the Node process mid-run keeps pages at HTTP 200 with client-side rendering, and SSR resumes
+  about a second later on a restarted process. .NET 535/535, client 800/800 (twice), e2e passing in
+  Chromium and WebKit (Firefox won't launch on the dev machine for any spec; CI installs its own).
+- **Not yet:** Preact, Vue, Svelte and Solid (next phases); islands with slotted child content;
+  `<island-deferred>` islands; a single Node process renders serially.
 
 **Two significant, previously-undiscovered bugs found and fixed while getting Server Actions to a real
 live-browser proof — both pre-existing, unrelated to the plugin API itself, neither ever caught because

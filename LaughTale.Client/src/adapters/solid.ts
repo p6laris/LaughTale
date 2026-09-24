@@ -70,7 +70,7 @@ export function createSolidIsland<TProps = any>(
             const createSignal = solidCore.createSignal;
 
             if (render && createComponent && createSignal) {
-                const hydrateMode = options.hydrate && typeof hydrate === 'function' && (ctx?.hydrate ?? container.hasChildNodes());
+                const hydrateMode = options.hydrate && typeof hydrate === 'function' && (ctx?.hydrate || container.hasChildNodes());
 
                 // Extract `.island-slot` (ROADMAP.v5.md Part D, close adapter gaps) BEFORE the
                 // destructive render below wipes it out - identical rationale to react.ts/vue.ts.

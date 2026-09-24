@@ -111,11 +111,10 @@ happens. Be honest with yourself about the difference:
 - **Razor markup, `Vanilla`, Web Components, and Alpine islands** can have real server-rendered
   content: override `BuildSsrHtml()` (or nest markup inside `<island>...</island>`) with genuine HTML,
   and that's what a visitor sees immediately, JS or not.
-- **React, Vue, Svelte, Preact, and Solid islands have no true server-side rendering in LaughTale
-  today.** There is no Node render host - `BuildSsrHtml()` for these is either left `null` (the
-  default) or hand-written HTML that approximates what the component would render, maintained by you,
-  by hand, forever. A framework-mounted island with no `BuildSsrHtml()` override and no child content
-  renders a genuinely **empty wrapper `<div>`** until its client JS chunk loads and mounts.
+- **React islands can be truly server-rendered with the opt-in SSR sidecar** (see below). Without
+  it - and for **Vue, Svelte, Preact, and Solid**, which the sidecar doesn't support yet - a
+  framework-mounted island with no `BuildSsrHtml()` override and no child content renders a genuinely
+  **empty wrapper `<div>`** until its client JS chunk loads and mounts.
 
 For `Idle`/`Visible`/`Media`/`Interaction`, an empty island until then is often exactly what you want -
 `Visible`'s whole pitch is "0 KB until scrolled into view." **`hydrate="Load"` is different**: it
@@ -125,9 +124,66 @@ server-side content at all gets a `data-laughtale-warning-no-fallback` attribute
 DOM inspector. Fix it by giving it real `BuildSsrHtml()` markup, nesting fallback content inside the
 `<island>` tag, or switching to a deferred strategy if a brief blank gap is genuinely fine.
 
-A **Node-based SSR sidecar** (real `renderToString()`-equivalent output for framework components, over
-a local socket) would close this gap for good - it's on the roadmap, sized honestly at 8+ weeks of its
-own, and deliberately not something this framework fakes with a partial implementation in the meantime.
+### The SSR sidecar (React)
+
+The sidecar closes this gap for React islands. At startup your app runs a Node child process - your
+own **server bundle** - and while rendering a page, asks it over stdin/stdout to render each React
+island with its props. The HTML goes straight into the page with a `data-lt-ssr="true"` stamp, and in
+the browser React **hydrates** that markup (attaching to the existing DOM) instead of mounting from
+scratch. No network port is opened.
+
+1. **Write a server entry** that registers the islands to server-render, keyed by the same names you
+   use in Razor:
+
+   ```ts
+   // Scripts/ssr-entry.ts
+   import { startSsrHost } from 'laughtale/ssr';
+   import { reactSsrComponent } from 'laughtale/ssr/react';
+   import RevenueCard from './islands/RevenueCard';
+
+   startSsrHost({ 'revenue-card': reactSsrComponent(RevenueCard) });
+   ```
+
+2. **Bundle it for Node** into one self-contained file, *outside* `wwwroot` (it's server code), with
+   `NODE_ENV` pinned to `production` so the server runs the same React build as the browser. React's
+   server build is CommonJS, so an ESM bundle needs a `require` shim:
+
+   ```js
+   await esbuild.build({
+       entryPoints: ['Scripts/ssr-entry.ts'], bundle: true, platform: 'node', format: 'esm',
+       outfile: 'ssr/server-bundle.mjs', jsx: 'automatic',
+       define: { 'process.env.NODE_ENV': '"production"' },
+       banner: { js: "import { createRequire } from 'module'; const require = createRequire(import.meta.url);" }
+   });
+   ```
+
+3. **Enable it** in the .NET app:
+
+   ```csharp
+   builder.Services.AddLaughTaleSsrSidecar(builder.Configuration, ssr =>
+   {
+       ssr.WorkingDirectory ??= builder.Environment.ContentRootPath;
+       ssr.ServerBundlePath ??= "ssr/server-bundle.mjs";
+   });
+   ```
+
+   ```json
+   { "LaughTale": { "Ssr": { "Enabled": true } } }
+   ```
+
+**It fails open.** If Node isn't installed, is still starting, crashes, or a render errors or exceeds
+`RenderTimeout` (500 ms by default), the island renders exactly as it would without the sidecar and
+mounts client-side; a crashed Node process is restarted automatically with backoff. Node is only
+needed where you enable it - a production image can stay .NET-only.
+
+**Your component's first render must be deterministic.** The browser re-runs it during hydration and
+compares: `Math.random()`, `Date.now()`, or locale-dependent formatting such as `toLocaleString()`
+with no locale argument (a server and a browser in different locales print `84,500` vs `84.500`)
+produce a mismatch, and React discards the server HTML. Pass an explicit locale, and keep randomness
+in effects and event handlers.
+
+**Not server-rendered yet:** islands with slotted child content, `<island-deferred>` islands, and
+components in Vue, Svelte, Preact, or Solid.
 
 ---
 

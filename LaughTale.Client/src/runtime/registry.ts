@@ -16,10 +16,11 @@ export interface IslandContext {
     t?: (key: string, ...args: any[]) => string;
     dictionary?: Record<string, any>;
     /**
-     * True when this container already had DOM content (server-rendered markup, an `.island-slot`,
-     * etc.) at the moment hydration started - computed once by hydrator.ts via `container.hasChildNodes()`
-     * so every mount function (vanilla included) has a normalized signal for "adopt existing DOM" vs
-     * "render fresh" instead of reinventing ad-hoc detection (ROADMAP.v5.md Part D).
+     * True when the container carries the server's `data-lt-ssr` stamp (its content is a real
+     * server render of this island, e.g. from the SSR sidecar) and that markup hasn't been consumed
+     * by an earlier mount yet - computed once by hydrator.ts so every mount function (vanilla
+     * included) has a normalized signal for "adopt existing DOM" vs "render fresh". Plain child nodes
+     * (whitespace, skeletons, an `.island-slot`) do NOT make this true.
      */
     hydrate?: boolean;
     /**
