@@ -14,7 +14,7 @@ if (!fs.existsSync(outDir)) {
 // react, which breaks hooks ("Invalid hook call") and splits Solid's reactive graph. Re-resolving
 // these packages from this project's root keeps normal package "exports" resolution (browser vs
 // server builds) while guaranteeing one copy - the equivalent of Vite's resolve.dedupe.
-const DEDUPED = /^(react|react-dom|solid-js|preact|preact-render-to-string)(\/.*)?$/;
+const DEDUPED = /^(react|react-dom|solid-js|preact|preact-render-to-string|vue|@vue\/[\w-]+)(\/.*)?$/;
 const projectRoot = path.resolve('.');
 export const dedupeFrameworks = {
     name: 'dedupe-frameworks',
@@ -36,7 +36,15 @@ const ctx = await esbuild.context({
     sourcemap: true,
     minify: true,
     jsx: 'automatic',
-    plugins: [dedupeFrameworks]
+    plugins: [dedupeFrameworks],
+    // Vue's browser build (vue.runtime.esm-bundler.js) takes its compile-time feature flags from the
+    // bundler. The Options API stays on (islands may use it); mismatch details stay off in production,
+    // where Vue still logs that a hydration mismatch happened.
+    define: {
+        __VUE_OPTIONS_API__: 'true',
+        __VUE_PROD_DEVTOOLS__: 'false',
+        __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'false'
+    }
 });
 
 // The SSR sidecar's server bundle: the Node program the .NET app runs as `node ssr/server-bundle.mjs`

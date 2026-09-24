@@ -473,7 +473,7 @@ behaviour, and the fixes are sitting unused in `src/composables/`.
 
 ---
 
-## 6. Part D — Adapters — **[CLOSED except Angular (deferred) and the Framework SSR sidecar (IN PROGRESS - Phases 1-2, React and Preact, done) - see "New adapters" and "Framework SSR sidecar" rows]**
+## 6. Part D — Adapters — **[CLOSED except Angular (deferred) and the Framework SSR sidecar (IN PROGRESS - Phases 1-3, React, Preact and Vue, done) - see "New adapters" and "Framework SSR sidecar" rows]**
 
 All five adapters *were* one-shot mount functions (324 lines total, confirmed by `wc -l`: 314
 across the five adapter files — `react.ts` 71, `vue.ts` 69, `preact.ts` 64, `svelte.ts` 94,
@@ -654,7 +654,7 @@ store, left unfixed here since it's unrelated to the actual ask; new adapters; a
 preservation for a nested island inside a framework adapter's destructive mount when the parent
 doesn't forward it as a slot (an author-error case, not a framework gap).
 
-| **Framework SSR sidecar — [IN PROGRESS: Phase 1 (React, full pipeline) and Phase 2 (Preact) DONE; Vue, Svelte, Solid to follow - see Part G/L "Validation: Framework SSR sidecar"]** Node render host over a local socket. The right *first plugin* to prove the Part L API, not core work. Until then, rename the strategy `client-only` and require a fallback | Astro, Nuxt | XL · 8+ wks |
+| **Framework SSR sidecar — [IN PROGRESS: Phase 1 (React, full pipeline), Phase 2 (Preact) and Phase 3 (Vue) DONE; Svelte, Solid to follow - see Part G/L "Validation: Framework SSR sidecar"]** Node render host over a local socket. The right *first plugin* to prove the Part L API, not core work. Until then, rename the strategy `client-only` and require a fallback | Astro, Nuxt | XL · 8+ wks |
 
 ---
 
@@ -2112,7 +2112,7 @@ how much of the enterprise story stops at that one policy string.
 
 ---
 
-## 14. Part G/L — DX & plugin architecture — **[CLOSED except the Framework SSR sidecar, now IN PROGRESS - Phases 1-2 (React, Preact) done; mechanism + other validation-plugin layers closed]**
+## 14. Part G/L — DX & plugin architecture — **[CLOSED except the Framework SSR sidecar, now IN PROGRESS - Phases 1-3 (React, Preact, Vue) done; mechanism + other validation-plugin layers closed]**
 
 Build the plugin API **before** Parts E and F, so streaming, actions and cache tags are written as
 first-party plugins against your own interface. Nothing proves an extension point like being forced
@@ -2234,7 +2234,7 @@ all five frameworks, opt-in, fail-open; Phase 1 proves the full pipeline with Re
   killing the Node process mid-run keeps pages at HTTP 200 with client-side rendering, and SSR resumes
   about a second later on a restarted process. .NET 535/535, client 800/800 (twice), e2e passing in
   Chromium and WebKit (Firefox won't launch on the dev machine for any spec; CI installs its own).
-- **Not yet:** Vue, Svelte and Solid (next phases); islands with slotted child content;
+- **Not yet:** Preact, Vue, Svelte and Solid (next phases); islands with slotted child content;
   `<island-deferred>` islands; a single Node process renders serially.
 
 **Update - Framework SSR sidecar, Phase 2 (Preact) DONE.** No .NET changes were needed; the Phase 1
@@ -2256,6 +2256,31 @@ pipeline carried over as-is.
   off-screen and still shows server content; after scrolling into view it hydrates onto the same
   node, with no hydration errors and working state. Client 806/806 (twice), .NET 535/535, typecheck,
   contract gate and bundle budgets pass, and SSR e2e is 8/8 in Chromium and WebKit.
+
+**Update - Framework SSR sidecar, Phase 3 (Vue) DONE.** Again no .NET changes.
+- **JS (`laughtale/ssr/vue`):** `vueSsrComponent(Component)` renders a fresh `createSSRApp` per
+  request with `vue/server-renderer`, using the same root shape the browser adapter mounts, so
+  hydration walks an identical vnode tree. Vue is imported on first render rather than at module load:
+  Vue's runtime-dom captures the global `document` when it first evaluates, and the eager version
+  broke every later plain mount in the happy-dom unit tests (hydration creates no nodes, so it hid
+  there). The Vue adapter now hydrates stamped islands without a manual opt-in, using the same rule as
+  React and Preact.
+- **Tests:** a plain Vue mount replaces the container's nodes, so node identity proves hydration, as
+  with React. Unit tests cover the render output, per-request state isolation, stamped vs unstamped
+  markup, the `{hydrate:false}` opt-out, adjacent text children merged by the server, and a
+  deliberate mismatch - proving Vue's mismatch reports actually reach the captured console, so the
+  "no mismatch" assertions mean something. Mutation check: with the old adapter rule, exactly the
+  three hydration-path tests fail.
+- **Showcase:** `/polyglot`'s Vue island was a third vanilla-JS imitation; it's now a real Vue 3
+  component (`defineComponent` + render functions, since Vue JSX and `.vue` files each need another
+  compiler). `vue` was added to the Showcase and `vue`/`@vue/*` to the dedupe list (one runtime-only
+  copy in the browser bundle, production CommonJS builds in the server bundle), and the browser build
+  now defines Vue's feature flags.
+- **Verified:** the raw server HTML contains the rendered island with no stray prop attributes; the
+  browser hydrates onto the same nodes with no mismatch report, cart and stock updates work, and the
+  React island's sale events still reach it. Client 814/814 (twice), .NET 535/535, typecheck, contract
+  gate and bundle budgets pass, and SSR e2e is 12/12 in Chromium and WebKit.
+- **Not yet:** `.vue` single-file components; Svelte and Solid (next phases).
 
 **Two significant, previously-undiscovered bugs found and fixed while getting Server Actions to a real
 live-browser proof — both pre-existing, unrelated to the plugin API itself, neither ever caught because

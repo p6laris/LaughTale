@@ -111,8 +111,8 @@ happens. Be honest with yourself about the difference:
 - **Razor markup, `Vanilla`, Web Components, and Alpine islands** can have real server-rendered
   content: override `BuildSsrHtml()` (or nest markup inside `<island>...</island>`) with genuine HTML,
   and that's what a visitor sees immediately, JS or not.
-- **React and Preact islands can be truly server-rendered with the opt-in SSR sidecar** (see below).
-  Without it - and for **Vue, Svelte, and Solid**, which the sidecar doesn't support yet - a
+- **React, Preact and Vue islands can be truly server-rendered with the opt-in SSR sidecar** (see
+  below). Without it - and for **Svelte and Solid**, which the sidecar doesn't support yet - a
   framework-mounted island with no `BuildSsrHtml()` override and no child content renders a genuinely
   **empty wrapper `<div>`** until its client JS chunk loads and mounts.
 
@@ -124,13 +124,13 @@ server-side content at all gets a `data-laughtale-warning-no-fallback` attribute
 DOM inspector. Fix it by giving it real `BuildSsrHtml()` markup, nesting fallback content inside the
 `<island>` tag, or switching to a deferred strategy if a brief blank gap is genuinely fine.
 
-### The SSR sidecar (React, Preact)
+### The SSR sidecar (React, Preact, Vue)
 
-The sidecar closes this gap for React and Preact islands. At startup your app runs a Node child process - your
-own **server bundle** - and while rendering a page, asks it over stdin/stdout to render each React
-island with its props. The HTML goes straight into the page with a `data-lt-ssr="true"` stamp, and in
-the browser the framework **hydrates** that markup (attaching to the existing DOM) instead of mounting from
-scratch. No network port is opened.
+The sidecar closes this gap for React, Preact and Vue islands. At startup your app runs a Node child
+process - your own **server bundle** - and while rendering a page, asks it over stdin/stdout to render
+each registered island with its props. The HTML goes straight into the page with a
+`data-lt-ssr="true"` stamp, and in the browser the framework **hydrates** that markup (attaching to
+the existing DOM) instead of mounting from scratch. No network port is opened.
 
 1. **Write a server entry** that registers the islands to server-render, keyed by the same names you
    use in Razor:
@@ -140,23 +140,33 @@ scratch. No network port is opened.
    import { startSsrHost } from 'laughtale/ssr';
    import { reactSsrComponent } from 'laughtale/ssr/react';
    import { preactSsrComponent } from 'laughtale/ssr/preact';
+   import { vueSsrComponent } from 'laughtale/ssr/vue';
    import RevenueCard from './islands/RevenueCard';
    import Throughput from './islands/Throughput';
+   import Inventory from './islands/Inventory';
 
    startSsrHost({
        'revenue-card': reactSsrComponent(RevenueCard),
-       'throughput': preactSsrComponent(Throughput)
+       'throughput': preactSsrComponent(Throughput),
+       'inventory': vueSsrComponent(Inventory)
    });
    ```
 
-   Import the raw component, not the `createReactIsland(...)` / `createPreactIsland(...)` wrapper -
-   keep each component in its own file so both the browser island and the server entry can import it.
-   The server needs `preact-render-to-string` installed next to `preact`. If your project's JSX
-   defaults to React, start Preact `.tsx` files with `/** @jsxImportSource preact */`.
+   Import the raw component, not the `createReactIsland(...)` / `createPreactIsland(...)` /
+   `createVueIsland(...)` wrapper - keep each component in its own file so both the browser island and
+   the server entry can import it.
+   - **Preact** needs `preact-render-to-string` installed next to `preact`. If your project's JSX
+     defaults to React, start Preact `.tsx` files with `/** @jsxImportSource preact */`.
+   - **Vue** needs nothing extra (`vue/server-renderer` ships with `vue`). Components written with
+     render functions (`defineComponent` + `h`) are supported; `.vue` single-file components need a
+     Vue compiler plugin in both builds and haven't been tested yet. Declare every prop the island
+     receives - Vue renders undeclared ones as HTML attributes on the root element. Vue's browser build
+     expects its feature flags from the bundler: define `__VUE_OPTIONS_API__`,
+     `__VUE_PROD_DEVTOOLS__` and `__VUE_PROD_HYDRATION_MISMATCH_DETAILS__` in the browser build.
 
 2. **Bundle it for Node** into one self-contained file, *outside* `wwwroot` (it's server code), with
-   `NODE_ENV` pinned to `production` so the server runs the same framework build as the browser. React's
-   server build is CommonJS, so an ESM bundle needs a `require` shim:
+   `NODE_ENV` pinned to `production` so the server runs the same framework build as the browser.
+   React's server build is CommonJS, so an ESM bundle needs a `require` shim:
 
    ```js
    await esbuild.build({
@@ -189,11 +199,12 @@ needed where you enable it - a production image can stay .NET-only.
 **Your component's first render must be deterministic.** The browser re-runs it during hydration and
 compares: `Math.random()`, `Date.now()`, or locale-dependent formatting such as `toLocaleString()`
 with no locale argument (a server and a browser in different locales print `84,500` vs `84.500`)
-produce a mismatch - React discards the server HTML, and Preact silently patches it to match. Pass an explicit locale, and keep randomness
-in effects and event handlers.
+produce a mismatch. React discards the server HTML and re-renders; Preact silently patches the DOM
+to match; Vue patches it and logs "Hydration completed but contains mismatches." Pass an explicit
+locale, and keep randomness in effects, lifecycle hooks and event handlers.
 
 **Not server-rendered yet:** islands with slotted child content, `<island-deferred>` islands, and
-components in Vue, Svelte, or Solid.
+components in Svelte or Solid.
 
 **Bundle each framework once.** If a framework can be resolved from two `node_modules` trees (for
 example your app's and a linked library's), the bundler may include two copies, and hooks break.

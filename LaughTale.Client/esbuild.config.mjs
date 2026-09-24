@@ -141,7 +141,8 @@ await esbuild.build({
     entryPoints: {
         'ssr/index': 'src/ssr/index.ts',
         'ssr/react': 'src/ssr/react.ts',
-        'ssr/preact': 'src/ssr/preact.ts'
+        'ssr/preact': 'src/ssr/preact.ts',
+        'ssr/vue': 'src/ssr/vue.ts'
     },
     bundle: true,
     outdir: 'dist',

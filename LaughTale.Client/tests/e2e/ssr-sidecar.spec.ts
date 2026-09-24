@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test';
 
 // The SSR sidecar end to end: .NET asks a Node child process (the Showcase's ssr/server-bundle.mjs)
-// to render the React island, and the browser hydrates that markup instead of re-mounting it. The
-// Showcase enables the sidecar in Development (appsettings.Development.json), which is how
+// to render islands (React, Preact, Vue), and the browser hydrates that markup instead of re-mounting
+// it. The Showcase enables the sidecar in Development (appsettings.Development.json), which is how
 // Playwright's webServer runs it.
 
 test.describe('SSR sidecar (React)', () => {
@@ -90,6 +90,52 @@ test.describe('SSR sidecar (Preact)', () => {
         });
         expect(sameNode, 'the node present in the server HTML must still be the live node after hydration').toBe(true);
 
+        expect(errors.filter(e => /hydrat|did not match|mismatch/i.test(e))).toEqual([]);
+    });
+});
+
+test.describe('SSR sidecar (Vue)', () => {
+    test('the server response already contains the Vue island rendered to HTML', async ({ request }) => {
+        const html = await (await request.get('/polyglot')).text();
+
+        expect(html).toContain('data-lt-ssr="true" data-island="polyglot-vue"');
+        expect(html).toMatch(/data-testid="vue-cart-total"[^>]*>\$0</);
+        // Declared props must not fall through as HTML attributes.
+        expect(html).not.toMatch(/initialstock=/i);
+    });
+
+    test('the browser hydrates the server markup - same DOM nodes, no mismatch, interactive', async ({ page }) => {
+        const errors: string[] = [];
+        page.on('console', msg => { if (msg.type() === 'error' || msg.type() === 'warning') errors.push(msg.text()); });
+        page.on('pageerror', err => errors.push(err.message));
+
+        // A plain Vue mount empties the container and builds new nodes; hydration keeps them.
+        await page.addInitScript(() => {
+            document.addEventListener('readystatechange', () => {
+                if (document.readyState === 'interactive') {
+                    (window as any).__ssrCartTotalNode = document.querySelector('[data-island="polyglot-vue"] [data-testid="vue-cart-total"]');
+                }
+            });
+        });
+
+        await page.goto('/polyglot');
+        const island = page.locator('[data-island="polyglot-vue"]');
+        await expect(island).toHaveAttribute('data-lt-ssr-hydrated', 'true');
+
+        const total = island.locator('[data-testid="vue-cart-total"]');
+        await expect(total).toHaveText('$0');
+        await island.locator('[data-testid="vue-inc-0"]').click();
+        await island.locator('[data-testid="vue-inc-2"]').click();
+        await expect(total).toHaveText('$598');
+        await expect(island.locator('[data-testid="vue-stock-0"]')).toHaveText('11');
+
+        const sameNode = await page.evaluate(() => {
+            const captured = (window as any).__ssrCartTotalNode;
+            return !!captured && captured === document.querySelector('[data-island="polyglot-vue"] [data-testid="vue-cart-total"]');
+        });
+        expect(sameNode, 'the node present in the server HTML must still be the live node after hydration').toBe(true);
+
+        // Vue logs "Hydration completed but contains mismatches." even in production builds.
         expect(errors.filter(e => /hydrat|did not match|mismatch/i.test(e))).toEqual([]);
     });
 });

@@ -38,7 +38,8 @@
     "./tailwind": "./dist/styles/tailwind.preset.js",
     "./ssr": "./dist/ssr/index.js",
     "./ssr/react": "./dist/ssr/react.js",
-    "./ssr/preact": "./dist/ssr/preact.js"
+    "./ssr/preact": "./dist/ssr/preact.js",
+    "./ssr/vue": "./dist/ssr/vue.js"
   },
   "scripts": {
     "gen:icons": "node ../scripts/gen-icons.mjs",
