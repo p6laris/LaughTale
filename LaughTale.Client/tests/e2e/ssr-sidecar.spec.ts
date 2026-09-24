@@ -48,3 +48,48 @@ test.describe('SSR sidecar (React)', () => {
         expect(errors.filter(e => /hydrat|did not match|mismatch/i.test(e))).toEqual([]);
     });
 });
+
+test.describe('SSR sidecar (Preact)', () => {
+    test('the server response already contains the Preact island rendered to HTML', async ({ request }) => {
+        const html = await (await request.get('/polyglot')).text();
+
+        expect(html).toContain('data-lt-ssr="true" data-island="polyglot-preact"');
+        expect(html).toMatch(/data-testid="preact-throughput"[^>]*>52 </);
+    });
+
+    test('a hydrate="Visible" island shows server content before its JS runs, then hydrates on scroll', async ({ page }) => {
+        const errors: string[] = [];
+        page.on('console', msg => { if (msg.type() === 'error') errors.push(msg.text()); });
+        page.on('pageerror', err => errors.push(err.message));
+
+        await page.addInitScript(() => {
+            document.addEventListener('readystatechange', () => {
+                if (document.readyState === 'interactive') {
+                    (window as any).__ssrThroughputNode = document.querySelector('[data-island="polyglot-preact"] [data-testid="preact-throughput"]');
+                }
+            });
+        });
+
+        await page.goto('/polyglot');
+        const island = page.locator('[data-island="polyglot-preact"]');
+        const throughput = island.locator('[data-testid="preact-throughput"]');
+
+        // Off-screen and not hydrated yet - but the content is already there, from the server.
+        await expect(throughput).toHaveText('52 tx/sec');
+        expect(await island.getAttribute('data-lt-ssr-hydrated')).toBeNull();
+
+        await island.scrollIntoViewIfNeeded();
+        await expect(island).toHaveAttribute('data-lt-ssr-hydrated', 'true');
+
+        await island.locator('[data-testid="preact-burst"]').click();
+        await expect(throughput).toHaveText('77 tx/sec');
+
+        const sameNode = await page.evaluate(() => {
+            const captured = (window as any).__ssrThroughputNode;
+            return !!captured && captured === document.querySelector('[data-island="polyglot-preact"] [data-testid="preact-throughput"]');
+        });
+        expect(sameNode, 'the node present in the server HTML must still be the live node after hydration').toBe(true);
+
+        expect(errors.filter(e => /hydrat|did not match|mismatch/i.test(e))).toEqual([]);
+    });
+});

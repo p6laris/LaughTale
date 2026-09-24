@@ -31,7 +31,11 @@ export function createPreactIsland<TProps = any>(
             const hydrate = preact.hydrate || preact.default?.hydrate;
 
             if (render && h) {
-                const hydrateMode = options.hydrate && hydrate && (ctx?.hydrate || container.hasChildNodes());
+                // Same rule as the React adapter: hydrate markup the server stamped (ctx.hydrate, set
+                // from data-lt-ssr by the hydrator) with no opt-in needed; an explicit {hydrate:true}
+                // keeps its old meaning; {hydrate:false} always opts out.
+                const hydrateMode = !!hydrate && options.hydrate !== false
+                    && (ctx?.hydrate === true || (options.hydrate === true && container.hasChildNodes()));
 
                 // Extract `.island-slot` (ROADMAP.v5.md Part D, close adapter gaps) BEFORE the
                 // destructive render below wipes it out - see the identical rationale in

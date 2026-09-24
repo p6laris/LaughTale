@@ -473,7 +473,7 @@ behaviour, and the fixes are sitting unused in `src/composables/`.
 
 ---
 
-## 6. Part D — Adapters — **[CLOSED except Angular (deferred) and the Framework SSR sidecar (IN PROGRESS - Phase 1, React, done) - see "New adapters" and "Framework SSR sidecar" rows]**
+## 6. Part D — Adapters — **[CLOSED except Angular (deferred) and the Framework SSR sidecar (IN PROGRESS - Phases 1-2, React and Preact, done) - see "New adapters" and "Framework SSR sidecar" rows]**
 
 All five adapters *were* one-shot mount functions (324 lines total, confirmed by `wc -l`: 314
 across the five adapter files — `react.ts` 71, `vue.ts` 69, `preact.ts` 64, `svelte.ts` 94,
@@ -654,7 +654,7 @@ store, left unfixed here since it's unrelated to the actual ask; new adapters; a
 preservation for a nested island inside a framework adapter's destructive mount when the parent
 doesn't forward it as a slot (an author-error case, not a framework gap).
 
-| **Framework SSR sidecar — [IN PROGRESS: Phase 1 (React, full pipeline) DONE; Preact, Vue, Svelte, Solid to follow - see Part G/L "Validation: Framework SSR sidecar"]** Node render host over a local socket. The right *first plugin* to prove the Part L API, not core work. Until then, rename the strategy `client-only` and require a fallback | Astro, Nuxt | XL · 8+ wks |
+| **Framework SSR sidecar — [IN PROGRESS: Phase 1 (React, full pipeline) and Phase 2 (Preact) DONE; Vue, Svelte, Solid to follow - see Part G/L "Validation: Framework SSR sidecar"]** Node render host over a local socket. The right *first plugin* to prove the Part L API, not core work. Until then, rename the strategy `client-only` and require a fallback | Astro, Nuxt | XL · 8+ wks |
 
 ---
 
@@ -2112,7 +2112,7 @@ how much of the enterprise story stops at that one policy string.
 
 ---
 
-## 14. Part G/L — DX & plugin architecture — **[CLOSED except the Framework SSR sidecar, now IN PROGRESS - Phase 1 (React) done; mechanism + other validation-plugin layers closed]**
+## 14. Part G/L — DX & plugin architecture — **[CLOSED except the Framework SSR sidecar, now IN PROGRESS - Phases 1-2 (React, Preact) done; mechanism + other validation-plugin layers closed]**
 
 Build the plugin API **before** Parts E and F, so streaming, actions and cache tags are written as
 first-party plugins against your own interface. Nothing proves an extension point like being forced
@@ -2234,8 +2234,28 @@ all five frameworks, opt-in, fail-open; Phase 1 proves the full pipeline with Re
   killing the Node process mid-run keeps pages at HTTP 200 with client-side rendering, and SSR resumes
   about a second later on a restarted process. .NET 535/535, client 800/800 (twice), e2e passing in
   Chromium and WebKit (Firefox won't launch on the dev machine for any spec; CI installs its own).
-- **Not yet:** Preact, Vue, Svelte and Solid (next phases); islands with slotted child content;
+- **Not yet:** Vue, Svelte and Solid (next phases); islands with slotted child content;
   `<island-deferred>` islands; a single Node process renders serially.
+
+**Update - Framework SSR sidecar, Phase 2 (Preact) DONE.** No .NET changes were needed; the Phase 1
+pipeline carried over as-is.
+- **JS (`laughtale/ssr/preact`):** `preactSsrComponent(Component)` renders with
+  `preact-render-to-string`. The Preact adapter now hydrates stamped islands without a manual opt-in,
+  using the same rule as the React adapter.
+- **Proving hydration in Preact needed a different test.** Unlike React, Preact's plain `render()`
+  also reuses matching DOM nodes, so node identity alone can't tell hydration from a re-render. The
+  difference is that `render()` strips attributes the component doesn't produce and `hydrate()` leaves
+  them alone, so the unit test plants a server-only attribute and checks it survives. Mutation check:
+  with the old adapter rule, exactly that test fails. Adjacent text children (which
+  `renderToString` merges into one text node) were checked and hydrate correctly.
+- **Showcase:** `/polyglot`'s Preact island was another vanilla-JS imitation; it's now a real Preact
+  component with hooks, server-rendered and hydrated on `hydrate="Visible"`, so the chart and
+  throughput are visible before its chunk ever loads. `preact` and `preact-render-to-string` were
+  added to the Showcase's dedupe list, and the metafile confirms one Preact copy in each bundle.
+- **Verified:** the raw server HTML contains the rendered island; the island stays unhydrated while
+  off-screen and still shows server content; after scrolling into view it hydrates onto the same
+  node, with no hydration errors and working state. Client 806/806 (twice), .NET 535/535, typecheck,
+  contract gate and bundle budgets pass, and SSR e2e is 8/8 in Chromium and WebKit.
 
 **Two significant, previously-undiscovered bugs found and fixed while getting Server Actions to a real
 live-browser proof — both pre-existing, unrelated to the plugin API itself, neither ever caught because

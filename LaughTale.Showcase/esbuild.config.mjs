@@ -14,7 +14,7 @@ if (!fs.existsSync(outDir)) {
 // react, which breaks hooks ("Invalid hook call") and splits Solid's reactive graph. Re-resolving
 // these packages from this project's root keeps normal package "exports" resolution (browser vs
 // server builds) while guaranteeing one copy - the equivalent of Vite's resolve.dedupe.
-const DEDUPED = /^(react|react-dom|solid-js)(\/.*)?$/;
+const DEDUPED = /^(react|react-dom|solid-js|preact|preact-render-to-string)(\/.*)?$/;
 const projectRoot = path.resolve('.');
 export const dedupeFrameworks = {
     name: 'dedupe-frameworks',

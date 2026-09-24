@@ -111,8 +111,8 @@ happens. Be honest with yourself about the difference:
 - **Razor markup, `Vanilla`, Web Components, and Alpine islands** can have real server-rendered
   content: override `BuildSsrHtml()` (or nest markup inside `<island>...</island>`) with genuine HTML,
   and that's what a visitor sees immediately, JS or not.
-- **React islands can be truly server-rendered with the opt-in SSR sidecar** (see below). Without
-  it - and for **Vue, Svelte, Preact, and Solid**, which the sidecar doesn't support yet - a
+- **React and Preact islands can be truly server-rendered with the opt-in SSR sidecar** (see below).
+  Without it - and for **Vue, Svelte, and Solid**, which the sidecar doesn't support yet - a
   framework-mounted island with no `BuildSsrHtml()` override and no child content renders a genuinely
   **empty wrapper `<div>`** until its client JS chunk loads and mounts.
 
@@ -124,12 +124,12 @@ server-side content at all gets a `data-laughtale-warning-no-fallback` attribute
 DOM inspector. Fix it by giving it real `BuildSsrHtml()` markup, nesting fallback content inside the
 `<island>` tag, or switching to a deferred strategy if a brief blank gap is genuinely fine.
 
-### The SSR sidecar (React)
+### The SSR sidecar (React, Preact)
 
-The sidecar closes this gap for React islands. At startup your app runs a Node child process - your
+The sidecar closes this gap for React and Preact islands. At startup your app runs a Node child process - your
 own **server bundle** - and while rendering a page, asks it over stdin/stdout to render each React
 island with its props. The HTML goes straight into the page with a `data-lt-ssr="true"` stamp, and in
-the browser React **hydrates** that markup (attaching to the existing DOM) instead of mounting from
+the browser the framework **hydrates** that markup (attaching to the existing DOM) instead of mounting from
 scratch. No network port is opened.
 
 1. **Write a server entry** that registers the islands to server-render, keyed by the same names you
@@ -139,13 +139,23 @@ scratch. No network port is opened.
    // Scripts/ssr-entry.ts
    import { startSsrHost } from 'laughtale/ssr';
    import { reactSsrComponent } from 'laughtale/ssr/react';
+   import { preactSsrComponent } from 'laughtale/ssr/preact';
    import RevenueCard from './islands/RevenueCard';
+   import Throughput from './islands/Throughput';
 
-   startSsrHost({ 'revenue-card': reactSsrComponent(RevenueCard) });
+   startSsrHost({
+       'revenue-card': reactSsrComponent(RevenueCard),
+       'throughput': preactSsrComponent(Throughput)
+   });
    ```
 
+   Import the raw component, not the `createReactIsland(...)` / `createPreactIsland(...)` wrapper -
+   keep each component in its own file so both the browser island and the server entry can import it.
+   The server needs `preact-render-to-string` installed next to `preact`. If your project's JSX
+   defaults to React, start Preact `.tsx` files with `/** @jsxImportSource preact */`.
+
 2. **Bundle it for Node** into one self-contained file, *outside* `wwwroot` (it's server code), with
-   `NODE_ENV` pinned to `production` so the server runs the same React build as the browser. React's
+   `NODE_ENV` pinned to `production` so the server runs the same framework build as the browser. React's
    server build is CommonJS, so an ESM bundle needs a `require` shim:
 
    ```js
@@ -179,11 +189,16 @@ needed where you enable it - a production image can stay .NET-only.
 **Your component's first render must be deterministic.** The browser re-runs it during hydration and
 compares: `Math.random()`, `Date.now()`, or locale-dependent formatting such as `toLocaleString()`
 with no locale argument (a server and a browser in different locales print `84,500` vs `84.500`)
-produce a mismatch, and React discards the server HTML. Pass an explicit locale, and keep randomness
+produce a mismatch - React discards the server HTML, and Preact silently patches it to match. Pass an explicit locale, and keep randomness
 in effects and event handlers.
 
 **Not server-rendered yet:** islands with slotted child content, `<island-deferred>` islands, and
-components in Vue, Svelte, Preact, or Solid.
+components in Vue, Svelte, or Solid.
+
+**Bundle each framework once.** If a framework can be resolved from two `node_modules` trees (for
+example your app's and a linked library's), the bundler may include two copies, and hooks break.
+Resolve framework packages from one root (Vite's `resolve.dedupe`, or an esbuild `onResolve` plugin
+as in the Showcase's `esbuild.config.mjs`).
 
 ---
 

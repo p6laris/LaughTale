@@ -37,7 +37,8 @@
     "./adapters/alpine": "./dist/adapters/alpine.js",
     "./tailwind": "./dist/styles/tailwind.preset.js",
     "./ssr": "./dist/ssr/index.js",
-    "./ssr/react": "./dist/ssr/react.js"
+    "./ssr/react": "./dist/ssr/react.js",
+    "./ssr/preact": "./dist/ssr/preact.js"
   },
   "scripts": {
     "gen:icons": "node ../scripts/gen-icons.mjs",
@@ -74,6 +75,7 @@
     "happy-dom": "^20.11.6",
     "lucide-static": "^1.33.0",
     "preact": "^10.29.8",
+    "preact-render-to-string": "^6.7.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "solid-js": "^1.9.15",
