@@ -195,13 +195,13 @@ const PAGINATOR_CSS = `
 }
 
 /* Image gallery container */
-.p-paginator .p-paginator-image-display {
+.p-paginator-wrapper .p-paginator-image-display {
     width: 100%;
     margin-top: 1.25rem;
     display: flex;
     justify-content: center;
 }
-.p-paginator .p-paginator-image-card {
+.p-paginator-wrapper .p-paginator-image-card {
     width: 100%;
     max-width: 36rem;
     height: 20rem;
@@ -215,7 +215,7 @@ const PAGINATOR_CSS = `
     justify-content: center;
     position: relative;
 }
-.p-paginator .p-paginator-image-card img {
+.p-paginator-wrapper .p-paginator-image-card img {
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -311,9 +311,9 @@ html.dark .p-paginator .p-paginator-jtp-container,
 .dark .p-paginator .p-paginator-jtp-container {
     color: var(--p-text-muted) !important;
 }
-html.dark .p-paginator .p-paginator-image-card,
-[data-theme="dark"] .p-paginator .p-paginator-image-card,
-.dark .p-paginator .p-paginator-image-card {
+html.dark .p-paginator-wrapper .p-paginator-image-card,
+[data-theme="dark"] .p-paginator-wrapper .p-paginator-image-card,
+.dark .p-paginator-wrapper .p-paginator-image-card {
     background: var(--p-surface-100) !important;
     border-color: var(--p-border-color) !important;
 }
