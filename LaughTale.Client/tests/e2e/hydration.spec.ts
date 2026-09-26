@@ -124,4 +124,35 @@ test.describe('LaughTale Real Browser Hydration & View Transitions Suite', () =>
 
         await expect.poll(() => page.evaluate(() => window.scrollY), { timeout: 30_000 }).toBe(scrolledY);
     });
+
+    // The sibling test above flaked because scroll was restored once, right after the page swap,
+    // while the returning page was still growing (islands hydrating adds ~130px to "/"). This makes
+    // that case deterministic: the viewport is sized so the saved position is only reachable once
+    // the page has finished growing. A one-shot restore clamps it to what's scrollable at that
+    // instant (it came back as 0); the router must hold the target until the page settles.
+    test('back navigation restores a scroll position the page can only reach after it finishes growing', async ({ page, browserName }) => {
+        test.skip(browserName === 'webkit', "Playwright's WebKit crashes rendering the ~2400px-tall viewport this needs");
+        test.setTimeout(90_000);
+
+        await page.goto('/');
+        await page.waitForLoadState('networkidle');
+        const fullHeight = await page.evaluate(() => document.documentElement.scrollHeight);
+        await page.setViewportSize({ width: 1280, height: fullHeight - 120 });
+
+        await page.evaluate(() => window.scrollTo(0, 100_000));
+        await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(60);
+        const savedY = await page.evaluate(() => window.scrollY);
+
+        await page.evaluate(() => {
+            document.querySelector<HTMLAnchorElement>('a.p-breadcrumb-item-link[href="/components"]')!.click();
+        });
+        await expect(page).toHaveURL(/\/components$/, { timeout: 30_000 });
+
+        await page.goBack();
+        await expect(page).toHaveURL(/\/$/, { timeout: 30_000 });
+
+        // Not asserted: what happens after the router lets go. A layout change after that (the hold
+        // releases once the page stops resizing) is ordinary browsing, not restoration.
+        await expect.poll(() => page.evaluate(() => window.scrollY), { timeout: 10_000 }).toBe(savedY);
+    });
 });

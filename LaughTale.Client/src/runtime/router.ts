@@ -14,6 +14,7 @@ import { applyNonceToScript } from '../directives/csp';
 import { prefetchManager } from '../router/prefetch';
 import { isReducedMotionPreferred } from '../styles/animations';
 import { announce } from '../accessibility/announcer';
+import { holdScrollPosition, releaseScrollHold } from './scroll-restore';
 
 let isRouterActive = false;
 let inFlightController: AbortController | null = null;
@@ -192,6 +193,9 @@ export async function navigateTo(
     inFlightController = new AbortController();
     const signal = inFlightController.signal;
 
+    // A previous navigation may still be holding its restored scroll position (scroll-restore.ts).
+    releaseScrollHold();
+
     // Save scroll coordinates of current page before departure
     if (pushState && typeof window !== 'undefined' && 'history' in window) {
         try {
@@ -362,16 +366,18 @@ export async function navigateTo(
             initIslands(swapRoot);
             initDirectives(swapRoot);
 
-            // Handle scroll restoration or hash anchor
+            // Handle scroll restoration or hash anchor. The new page is still growing at this point
+            // (islands hydrating, fonts and images loading), so the position is HELD until it settles
+            // rather than set once - see scroll-restore.ts for how a one-shot scrollTo goes wrong.
             if (restoreScroll && typeof restoreScroll.scrollY === 'number') {
-                window.scrollTo({ left: restoreScroll.scrollX || 0, top: restoreScroll.scrollY, behavior: 'instant' as any });
+                holdScrollPosition(restoreScroll.scrollX || 0, restoreScroll.scrollY);
             } else {
                 const targetUrl = new URL(urlStr, window.location.origin);
                 if (targetUrl.hash) {
                     const targetEl = document.querySelector(targetUrl.hash);
                     if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth' });
                 } else {
-                    window.scrollTo({ top: 0, left: 0, behavior: 'instant' as any });
+                    holdScrollPosition(0, 0);
                 }
             }
 

@@ -208,8 +208,10 @@ describe('Router Comprehensive Suite (, , , )', () => {
     it('navigateTo: preserves departure scroll in history and restores scroll position', async () => {
         let scrollToOptions: any = null;
         const originalScrollTo = window.scrollTo;
+        // Moves scrollY like a real browser: the router skips scrollTo when already at the target.
         window.scrollTo = ((opts: any) => {
             scrollToOptions = opts;
+            (window as any).scrollY = opts.top;
         }) as any;
 
         const originalFetch = globalThis.fetch;
