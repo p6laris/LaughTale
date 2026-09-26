@@ -375,7 +375,7 @@ const DATAVIEW_CSS = `
 .p-dataview .p-tag-danger { background: var(--lt-danger-100, var(--lt-danger-100)); color: var(--lt-danger-700, var(--lt-danger-700)); }
 
 /* Skeleton Shimmer */
-.p-skeleton {
+.p-dataview .p-skeleton {
     border-radius: 4px;
     background: linear-gradient(90deg, var(--lt-surface-200) 25%, var(--lt-surface-100) 50%, var(--lt-surface-200) 75%);
     background-size: 200% 100%;
@@ -399,12 +399,12 @@ const DATAVIEW_CSS = `
     flex-wrap: wrap;
     gap: 0.75rem;
 }
-.p-paginator-pages {
+.p-dataview .p-paginator-pages {
     display: flex;
     align-items: center;
     gap: 0.25rem;
 }
-.p-paginator-page, .p-paginator-nav {
+.p-dataview .p-paginator-page, .p-dataview .p-paginator-nav {
     min-width: 2rem;
     height: 2rem;
     padding: 0 0.5rem;
@@ -420,19 +420,19 @@ const DATAVIEW_CSS = `
     color: var(--lt-surface-700);
     transition: all 0.15s ease;
 }
-.p-paginator-page:hover:not(:disabled), .p-paginator-nav:hover:not(:disabled) {
+.p-dataview .p-paginator-page:hover:not(:disabled), .p-dataview .p-paginator-nav:hover:not(:disabled) {
     background: var(--lt-surface-100);
     color: var(--lt-surface-900);
 }
-.p-paginator-page.p-paginator-page-active {
+.p-dataview .p-paginator-page.p-paginator-page-active {
     background: var(--p-primary-color, var(--lt-primary-500, #10b981)) !important;
     color: var(--p-primary-contrast-color, #ffffff) !important;
     font-weight: 700;
 }
-.p-paginator-page.p-paginator-page-active:hover {
+.p-dataview .p-paginator-page.p-paginator-page-active:hover {
     background: var(--p-primary-hover-color, var(--lt-primary-600, #059669)) !important;
 }
-.p-paginator-page:disabled, .p-paginator-nav:disabled {
+.p-dataview .p-paginator-page:disabled, .p-dataview .p-paginator-nav:disabled {
     opacity: 0.4;
     cursor: not-allowed;
 }

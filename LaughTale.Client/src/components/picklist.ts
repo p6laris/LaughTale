@@ -181,7 +181,7 @@ const PICKLIST_CSS = `
 }
 
 /* Custom Checkbox */
-.p-checkbox-box {
+.p-picklist .p-checkbox-box {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -194,12 +194,12 @@ const PICKLIST_CSS = `
     transition: background-color 0.12s ease, border-color 0.12s ease;
     flex-shrink: 0;
 }
-.p-checkbox-box.p-checked {
+.p-picklist .p-checkbox-box.p-checked {
     background: var(--lt-primary-500);
     border-color: var(--lt-primary-500);
     color: var(--lt-surface-0, var(--lt-surface-0));
 }
-.p-checkbox-box.p-indeterminate {
+.p-picklist .p-checkbox-box.p-indeterminate {
     background: var(--lt-primary-500);
     border-color: var(--lt-primary-500);
     color: var(--lt-surface-0, var(--lt-surface-0));

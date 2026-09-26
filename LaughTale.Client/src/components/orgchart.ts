@@ -152,7 +152,7 @@ const ORGCHART_CSS = `
 }
 
 /* Checkbox */
-.p-checkbox-box {
+.p-organizationchart .p-checkbox-box {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -166,12 +166,12 @@ const ORGCHART_CSS = `
     flex-shrink: 0;
     margin-inline-end: 0.625rem;
 }
-.p-checkbox-box.p-checked {
+.p-organizationchart .p-checkbox-box.p-checked {
     background: var(--lt-primary-500);
     border-color: var(--lt-primary-500);
     color: var(--lt-surface-0, var(--lt-surface-0));
 }
-.p-checkbox-box.p-indeterminate {
+.p-organizationchart .p-checkbox-box.p-indeterminate {
     background: var(--lt-primary-500);
     border-color: var(--lt-primary-500);
     color: var(--lt-surface-0, var(--lt-surface-0));

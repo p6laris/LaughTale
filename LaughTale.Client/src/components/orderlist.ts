@@ -190,7 +190,7 @@ const ORDERLIST_CSS = `
 }
 
 /* Checkbox */
-.p-checkbox-box {
+.p-orderlist .p-checkbox-box {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -203,7 +203,7 @@ const ORDERLIST_CSS = `
     transition: background-color 0.12s ease, border-color 0.12s ease;
     flex-shrink: 0;
 }
-.p-checkbox-box.p-checked {
+.p-orderlist .p-checkbox-box.p-checked {
     background: var(--lt-primary-500);
     border-color: var(--lt-primary-500);
     color: var(--lt-surface-0, var(--lt-surface-0));

@@ -56,19 +56,19 @@ const PAGINATOR_CSS = `
     transition: all 0.15s ease;
 }
 
-.p-paginator-start,
-.p-paginator-end {
+.p-paginator .p-paginator-start,
+.p-paginator .p-paginator-end {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
 }
 
-.p-paginator-first,
-.p-paginator-prev,
-.p-paginator-next,
-.p-paginator-last,
-.p-paginator-page,
-.p-paginator-action-btn {
+.p-paginator .p-paginator-first,
+.p-paginator .p-paginator-prev,
+.p-paginator .p-paginator-next,
+.p-paginator .p-paginator-last,
+.p-paginator .p-paginator-page,
+.p-paginator .p-paginator-action-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -88,65 +88,65 @@ const PAGINATOR_CSS = `
     padding: 0;
 }
 
-.p-paginator-page:hover:not(:disabled):not(.p-highlight):not(.p-paginator-page-selected),
-.p-paginator-first:hover:not(:disabled),
-.p-paginator-prev:hover:not(:disabled),
-.p-paginator-next:hover:not(:disabled),
-.p-paginator-last:hover:not(:disabled),
-.p-paginator-action-btn:hover:not(:disabled) {
+.p-paginator .p-paginator-page:hover:not(:disabled):not(.p-highlight):not(.p-paginator-page-selected),
+.p-paginator .p-paginator-first:hover:not(:disabled),
+.p-paginator .p-paginator-prev:hover:not(:disabled),
+.p-paginator .p-paginator-next:hover:not(:disabled),
+.p-paginator .p-paginator-last:hover:not(:disabled),
+.p-paginator .p-paginator-action-btn:hover:not(:disabled) {
     background: var(--p-content-hover-bg, var(--p-surface-100, #f1f5f9));
     color: var(--p-text-color, var(--lt-surface-900));
 }
 
-.p-paginator-page:focus-visible,
-.p-paginator-first:focus-visible,
-.p-paginator-prev:focus-visible,
-.p-paginator-next:focus-visible,
-.p-paginator-last:focus-visible,
-.p-paginator-action-btn:focus-visible {
+.p-paginator .p-paginator-page:focus-visible,
+.p-paginator .p-paginator-first:focus-visible,
+.p-paginator .p-paginator-prev:focus-visible,
+.p-paginator .p-paginator-next:focus-visible,
+.p-paginator .p-paginator-last:focus-visible,
+.p-paginator .p-paginator-action-btn:focus-visible {
     box-shadow: 0 0 0 1px var(--p-surface-0, #ffffff), 0 0 0 3px var(--p-primary-color, var(--lt-primary-500, #10b981)) !important;
 }
 
-.p-paginator-page.p-highlight,
-.p-paginator-page.p-paginator-page-selected,
-.p-paginator-page.p-paginator-page-active {
+.p-paginator .p-paginator-page.p-highlight,
+.p-paginator .p-paginator-page.p-paginator-page-selected,
+.p-paginator .p-paginator-page.p-paginator-page-active {
     background: var(--p-primary-color, var(--lt-primary-500, #10b981)) !important;
     color: var(--p-primary-contrast-color, #ffffff) !important;
     font-weight: 700;
 }
 
-.p-paginator-page.p-highlight:hover,
-.p-paginator-page.p-paginator-page-selected:hover,
-.p-paginator-page.p-paginator-page-active:hover {
+.p-paginator .p-paginator-page.p-highlight:hover,
+.p-paginator .p-paginator-page.p-paginator-page-selected:hover,
+.p-paginator .p-paginator-page.p-paginator-page-active:hover {
     background: var(--p-primary-hover-color, var(--lt-primary-600, #059669)) !important;
     color: var(--p-primary-contrast-color, #ffffff) !important;
 }
 
-.p-paginator-first:disabled,
-.p-paginator-prev:disabled,
-.p-paginator-next:disabled,
-.p-paginator-last:disabled,
-.p-paginator-page:disabled,
-.p-paginator-action-btn:disabled {
+.p-paginator .p-paginator-first:disabled,
+.p-paginator .p-paginator-prev:disabled,
+.p-paginator .p-paginator-next:disabled,
+.p-paginator .p-paginator-last:disabled,
+.p-paginator .p-paginator-page:disabled,
+.p-paginator .p-paginator-action-btn:disabled {
     opacity: 0.35;
     cursor: default;
 }
 
-.p-paginator-pages {
+.p-paginator .p-paginator-pages {
     display: inline-flex;
     align-items: center;
     gap: 0.25rem;
 }
 
-.p-paginator-current {
+.p-paginator .p-paginator-current {
     font-size: 0.875rem;
     color: var(--p-text-muted, var(--lt-surface-500));
     padding: 0 0.75rem;
     white-space: nowrap;
 }
 
-.p-paginator-rpp-select,
-.p-paginator-jtp-select {
+.p-paginator .p-paginator-rpp-select,
+.p-paginator .p-paginator-jtp-select {
     appearance: none;
     padding: 0.35rem 2rem 0.35rem 0.75rem;
     border-radius: var(--p-border-radius, var(--lt-radius, 0.5rem));
@@ -159,14 +159,14 @@ const PAGINATOR_CSS = `
     cursor: pointer;
     transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
-.p-paginator-rpp-select:focus,
-.p-paginator-jtp-select:focus,
-.p-paginator-jtp-input:focus {
+.p-paginator .p-paginator-rpp-select:focus,
+.p-paginator .p-paginator-jtp-select:focus,
+.p-paginator .p-paginator-jtp-input:focus {
     border-color: var(--p-primary-color, var(--lt-primary-500, #10b981)) !important;
     box-shadow: 0 0 0 1px var(--p-primary-color, var(--lt-primary-500, #10b981)) !important;
 }
 
-.p-paginator-jtp-container {
+.p-paginator .p-paginator-jtp-container {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
@@ -175,7 +175,7 @@ const PAGINATOR_CSS = `
     padding: 0 0.5rem;
 }
 
-.p-paginator-jtp-input {
+.p-paginator .p-paginator-jtp-input {
     width: 3.5rem;
     padding: 0.35rem 0.5rem;
     text-align: center;
@@ -188,20 +188,20 @@ const PAGINATOR_CSS = `
     transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.p-paginator-slider {
+.p-paginator .p-paginator-slider {
     width: 8rem;
     accent-color: var(--p-primary-color, var(--lt-primary-500, #10b981));
     cursor: pointer;
 }
 
 /* Image gallery container */
-.p-paginator-image-display {
+.p-paginator .p-paginator-image-display {
     width: 100%;
     margin-top: 1.25rem;
     display: flex;
     justify-content: center;
 }
-.p-paginator-image-card {
+.p-paginator .p-paginator-image-card {
     width: 100%;
     max-width: 36rem;
     height: 20rem;
@@ -215,7 +215,7 @@ const PAGINATOR_CSS = `
     justify-content: center;
     position: relative;
 }
-.p-paginator-image-card img {
+.p-paginator .p-paginator-image-card img {
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -231,89 +231,89 @@ html.dark .p-paginator,
     border-color: var(--p-border-color) !important;
     color: var(--p-text-color) !important;
 }
-html.dark .p-paginator-page,
-html.dark .p-paginator-first,
-html.dark .p-paginator-prev,
-html.dark .p-paginator-next,
-html.dark .p-paginator-last,
-html.dark .p-paginator-action-btn,
-[data-theme="dark"] .p-paginator-page,
-[data-theme="dark"] .p-paginator-first,
-[data-theme="dark"] .p-paginator-prev,
-[data-theme="dark"] .p-paginator-next,
-[data-theme="dark"] .p-paginator-last,
-[data-theme="dark"] .p-paginator-action-btn,
-.dark .p-paginator-page,
-.dark .p-paginator-first,
-.dark .p-paginator-prev,
-.dark .p-paginator-next,
-.dark .p-paginator-last,
-.dark .p-paginator-action-btn {
+html.dark .p-paginator .p-paginator-page,
+html.dark .p-paginator .p-paginator-first,
+html.dark .p-paginator .p-paginator-prev,
+html.dark .p-paginator .p-paginator-next,
+html.dark .p-paginator .p-paginator-last,
+html.dark .p-paginator .p-paginator-action-btn,
+[data-theme="dark"] .p-paginator .p-paginator-page,
+[data-theme="dark"] .p-paginator .p-paginator-first,
+[data-theme="dark"] .p-paginator .p-paginator-prev,
+[data-theme="dark"] .p-paginator .p-paginator-next,
+[data-theme="dark"] .p-paginator .p-paginator-last,
+[data-theme="dark"] .p-paginator .p-paginator-action-btn,
+.dark .p-paginator .p-paginator-page,
+.dark .p-paginator .p-paginator-first,
+.dark .p-paginator .p-paginator-prev,
+.dark .p-paginator .p-paginator-next,
+.dark .p-paginator .p-paginator-last,
+.dark .p-paginator .p-paginator-action-btn {
     color: var(--p-text-muted) !important;
 }
-html.dark .p-paginator-page:hover:not(:disabled):not(.p-highlight):not(.p-paginator-page-selected),
-html.dark .p-paginator-first:hover:not(:disabled),
-html.dark .p-paginator-prev:hover:not(:disabled),
-html.dark .p-paginator-next:hover:not(:disabled),
-html.dark .p-paginator-last:hover:not(:disabled),
-html.dark .p-paginator-action-btn:hover:not(:disabled),
-[data-theme="dark"] .p-paginator-page:hover:not(:disabled):not(.p-highlight):not(.p-paginator-page-selected),
-[data-theme="dark"] .p-paginator-first:hover:not(:disabled),
-[data-theme="dark"] .p-paginator-prev:hover:not(:disabled),
-[data-theme="dark"] .p-paginator-next:hover:not(:disabled),
-[data-theme="dark"] .p-paginator-last:hover:not(:disabled),
-[data-theme="dark"] .p-paginator-action-btn:hover:not(:disabled),
-.dark .p-paginator-page:hover:not(:disabled):not(.p-highlight):not(.p-paginator-page-selected),
-.dark .p-paginator-first:hover:not(:disabled),
-.dark .p-paginator-prev:hover:not(:disabled),
-.dark .p-paginator-next:hover:not(:disabled),
-.dark .p-paginator-last:hover:not(:disabled),
-.dark .p-paginator-action-btn:hover:not(:disabled) {
+html.dark .p-paginator .p-paginator-page:hover:not(:disabled):not(.p-highlight):not(.p-paginator-page-selected),
+html.dark .p-paginator .p-paginator-first:hover:not(:disabled),
+html.dark .p-paginator .p-paginator-prev:hover:not(:disabled),
+html.dark .p-paginator .p-paginator-next:hover:not(:disabled),
+html.dark .p-paginator .p-paginator-last:hover:not(:disabled),
+html.dark .p-paginator .p-paginator-action-btn:hover:not(:disabled),
+[data-theme="dark"] .p-paginator .p-paginator-page:hover:not(:disabled):not(.p-highlight):not(.p-paginator-page-selected),
+[data-theme="dark"] .p-paginator .p-paginator-first:hover:not(:disabled),
+[data-theme="dark"] .p-paginator .p-paginator-prev:hover:not(:disabled),
+[data-theme="dark"] .p-paginator .p-paginator-next:hover:not(:disabled),
+[data-theme="dark"] .p-paginator .p-paginator-last:hover:not(:disabled),
+[data-theme="dark"] .p-paginator .p-paginator-action-btn:hover:not(:disabled),
+.dark .p-paginator .p-paginator-page:hover:not(:disabled):not(.p-highlight):not(.p-paginator-page-selected),
+.dark .p-paginator .p-paginator-first:hover:not(:disabled),
+.dark .p-paginator .p-paginator-prev:hover:not(:disabled),
+.dark .p-paginator .p-paginator-next:hover:not(:disabled),
+.dark .p-paginator .p-paginator-last:hover:not(:disabled),
+.dark .p-paginator .p-paginator-action-btn:hover:not(:disabled) {
     background: var(--p-surface-100) !important;
     color: var(--p-text-color) !important;
 }
-html.dark .p-paginator-page.p-highlight,
-html.dark .p-paginator-page.p-paginator-page-selected,
-[data-theme="dark"] .p-paginator-page.p-highlight,
-[data-theme="dark"] .p-paginator-page.p-paginator-page-selected,
-.dark .p-paginator-page.p-highlight,
-.dark .p-paginator-page.p-paginator-page-selected {
+html.dark .p-paginator .p-paginator-page.p-highlight,
+html.dark .p-paginator .p-paginator-page.p-paginator-page-selected,
+[data-theme="dark"] .p-paginator .p-paginator-page.p-highlight,
+[data-theme="dark"] .p-paginator .p-paginator-page.p-paginator-page-selected,
+.dark .p-paginator .p-paginator-page.p-highlight,
+.dark .p-paginator .p-paginator-page.p-paginator-page-selected {
     background: var(--p-primary-color, var(--lt-primary-500, #10b981)) !important;
     color: var(--p-primary-contrast-color, #ffffff) !important;
 }
-html.dark .p-paginator-page.p-highlight:hover,
-html.dark .p-paginator-page.p-paginator-page-selected:hover,
-[data-theme="dark"] .p-paginator-page.p-highlight:hover,
-[data-theme="dark"] .p-paginator-page.p-paginator-page-selected:hover,
-.dark .p-paginator-page.p-highlight:hover,
-.dark .p-paginator-page.p-paginator-page-selected:hover {
+html.dark .p-paginator .p-paginator-page.p-highlight:hover,
+html.dark .p-paginator .p-paginator-page.p-paginator-page-selected:hover,
+[data-theme="dark"] .p-paginator .p-paginator-page.p-highlight:hover,
+[data-theme="dark"] .p-paginator .p-paginator-page.p-paginator-page-selected:hover,
+.dark .p-paginator .p-paginator-page.p-highlight:hover,
+.dark .p-paginator .p-paginator-page.p-paginator-page-selected:hover {
     background: var(--p-primary-hover-color, var(--lt-primary-600, #059669)) !important;
     color: var(--p-primary-contrast-color, #ffffff) !important;
 }
-html.dark .p-paginator-rpp-select,
-html.dark .p-paginator-jtp-select,
-html.dark .p-paginator-jtp-input,
-[data-theme="dark"] .p-paginator-rpp-select,
-[data-theme="dark"] .p-paginator-jtp-select,
-[data-theme="dark"] .p-paginator-jtp-input,
-.dark .p-paginator-rpp-select,
-.dark .p-paginator-jtp-select,
-.dark .p-paginator-jtp-input {
+html.dark .p-paginator .p-paginator-rpp-select,
+html.dark .p-paginator .p-paginator-jtp-select,
+html.dark .p-paginator .p-paginator-jtp-input,
+[data-theme="dark"] .p-paginator .p-paginator-rpp-select,
+[data-theme="dark"] .p-paginator .p-paginator-jtp-select,
+[data-theme="dark"] .p-paginator .p-paginator-jtp-input,
+.dark .p-paginator .p-paginator-rpp-select,
+.dark .p-paginator .p-paginator-jtp-select,
+.dark .p-paginator .p-paginator-jtp-input {
     background-color: var(--p-surface-100) !important;
     border-color: var(--p-border-color) !important;
     color: var(--p-text-color) !important;
 }
-html.dark .p-paginator-current,
-html.dark .p-paginator-jtp-container,
-[data-theme="dark"] .p-paginator-current,
-[data-theme="dark"] .p-paginator-jtp-container,
-.dark .p-paginator-current,
-.dark .p-paginator-jtp-container {
+html.dark .p-paginator .p-paginator-current,
+html.dark .p-paginator .p-paginator-jtp-container,
+[data-theme="dark"] .p-paginator .p-paginator-current,
+[data-theme="dark"] .p-paginator .p-paginator-jtp-container,
+.dark .p-paginator .p-paginator-current,
+.dark .p-paginator .p-paginator-jtp-container {
     color: var(--p-text-muted) !important;
 }
-html.dark .p-paginator-image-card,
-[data-theme="dark"] .p-paginator-image-card,
-.dark .p-paginator-image-card {
+html.dark .p-paginator .p-paginator-image-card,
+[data-theme="dark"] .p-paginator .p-paginator-image-card,
+.dark .p-paginator .p-paginator-image-card {
     background: var(--p-surface-100) !important;
     border-color: var(--p-border-color) !important;
 }

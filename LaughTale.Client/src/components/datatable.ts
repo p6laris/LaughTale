@@ -275,7 +275,7 @@ const DATATABLE_CSS = `
 }
 
 /* Custom Checkbox & Radio */
-.p-checkbox-box, .p-radio-box {
+.p-datatable .p-checkbox-box, .p-datatable .p-radio-box {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -288,10 +288,10 @@ const DATATABLE_CSS = `
     transition: all 0.15s ease;
     user-select: none;
 }
-.p-radio-box {
+.p-datatable .p-radio-box {
     border-radius: 9999px;
 }
-.p-checkbox-box.p-checked, .p-radio-box.p-checked {
+.p-datatable .p-checkbox-box.p-checked, .p-datatable .p-radio-box.p-checked {
     background: var(--lt-primary-500);
     border-color: var(--lt-primary-500);
     color: var(--lt-surface-0, var(--lt-surface-0));
@@ -460,12 +460,12 @@ const DATATABLE_CSS = `
     flex-wrap: wrap;
     gap: 0.75rem;
 }
-.p-paginator-pages {
+.p-datatable .p-paginator-pages {
     display: flex;
     align-items: center;
     gap: 0.25rem;
 }
-.p-paginator-page, .p-paginator-nav {
+.p-datatable .p-paginator-page, .p-datatable .p-paginator-nav {
     min-width: 2rem;
     height: 2rem;
     padding: 0 0.5rem;
@@ -481,19 +481,19 @@ const DATATABLE_CSS = `
     color: var(--lt-surface-700);
     transition: all 0.15s ease;
 }
-.p-paginator-page:hover:not(:disabled), .p-paginator-nav:hover:not(:disabled) {
+.p-datatable .p-paginator-page:hover:not(:disabled), .p-datatable .p-paginator-nav:hover:not(:disabled) {
     background: var(--lt-surface-100);
     color: var(--lt-surface-900);
 }
-.p-paginator-page.p-paginator-page-active {
+.p-datatable .p-paginator-page.p-paginator-page-active {
     background: var(--p-primary-color, var(--lt-primary-500, #10b981)) !important;
     color: var(--p-primary-contrast-color, #ffffff) !important;
     font-weight: 700;
 }
-.p-paginator-page.p-paginator-page-active:hover {
+.p-datatable .p-paginator-page.p-paginator-page-active:hover {
     background: var(--p-primary-hover-color, var(--lt-primary-600, #059669)) !important;
 }
-.p-paginator-page:disabled, .p-paginator-nav:disabled {
+.p-datatable .p-paginator-page:disabled, .p-datatable .p-paginator-nav:disabled {
     opacity: 0.4;
     cursor: not-allowed;
 }
@@ -598,7 +598,7 @@ html.dark .p-datatable-loading-overlay,
 }
 html.dark .p-tag-secondary,
 [data-theme="dark"] .p-tag-secondary,
-.dark .p-tag-secondary {
+.dark .p-datatable .p-tag-secondary {
     background: var(--p-surface-100);
     color: var(--p-text-color);
 }
